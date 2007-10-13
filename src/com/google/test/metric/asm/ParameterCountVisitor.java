@@ -20,7 +20,56 @@ import org.objectweb.asm.signature.SignatureVisitor;
 
 public class ParameterCountVisitor extends NoopSignatureVisitor {
 
+	public class ReturnTypeVisitor extends NoopSignatureVisitor {
+		@Override
+		public SignatureVisitor visitArrayType() {
+			returnType = Object[].class;
+			return new NoopSignatureVisitor();
+		}
+		
+		@Override
+		public void visitBaseType(char descriptor) {
+			switch (descriptor) {
+			case 'V':
+				break;
+			case 'B':
+				returnType = byte.class;
+				break;
+			case 'S':
+				returnType = short.class;
+				break;
+			case 'I':
+				returnType = int.class;
+				break;
+			case 'Z':
+				returnType = boolean.class;
+				break;
+			case 'C':
+				returnType = char.class;
+				break;
+			case 'J':
+				returnType = long.class;
+				break;
+			case 'D':
+				returnType = double.class;
+				break;
+			case 'F':
+				returnType = float.class;
+				break;
+			default:
+				throw new IllegalStateException("Unexpected type: " + descriptor);
+			}
+		}
+		
+		@Override
+		public void visitClassType(String name) {
+			returnType = Object.class;
+		}
+		
+	}
+
 	private int count = 0;
+	private Class<?> returnType;
 
 	@Override
 	public SignatureVisitor visitArrayType() {
@@ -43,8 +92,17 @@ public class ParameterCountVisitor extends NoopSignatureVisitor {
 		return this;
 	}
 	
-	public int getCount() {
+	public int getParameterCount() {
 		return count;
+	}
+	
+	@Override
+	public SignatureVisitor visitReturnType() {
+		return new ReturnTypeVisitor();
+	}
+	
+	public Class<?> getReturnType() {
+		return returnType;
 	}
 
 }

@@ -16,11 +16,15 @@
 package com.google.test.metric.method;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.Label;
 
-import com.google.test.metric.Variable;
+import com.google.test.metric.method.op.stack.Load;
+import com.google.test.metric.method.op.stack.StackOperation;
+import com.google.test.metric.method.op.turing.Operation;
 
 /**
  * This method shows how this class decomposes the bytecodes into the blocks
@@ -76,19 +80,14 @@ import com.google.test.metric.Variable;
  * <li>
  * </ul>
  * 
- * @author mhevery
+ * @author misko@google.com <Misko Hevery>
  */
-public class BlockDecomposer {
+public class BlockDecomposer implements StackOperations {
 
 	private int nextBlockId = 0;
-	private Block mainBlock = newBlock();
-	private Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
+	private final Block mainBlock = newBlock();
+	private final Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
 	private Block currentBlock = mainBlock;
-	private int currentLineNumber;
-
-	public Block getMainBlock() {
-		return mainBlock;
-	}
 
 	public void unconditionalGoto(Label label) {
 		Block lookaheadBlock = newBlock();
@@ -98,58 +97,47 @@ public class BlockDecomposer {
 	}
 
 	public void conditionalGoto(Label label) {
-		currentBlock.pop(); // If condition operand;
 		Block nextBlock = newBlock();
-		currentBlock.addNextBlock(newLookaaheadBlock(label));
+		currentBlock.addNextBlock(newLookAheadBlock(label));
 		currentBlock.addNextBlock(nextBlock);
 		currentBlock = nextBlock;
 	}
 
-	private Block newLookaaheadBlock(Label label) {
+	private Block newBlock() {
+		return new Block("" + (nextBlockId++));
+	}
+
+	private Block newLookAheadBlock(Label label) {
 		Block lookaheadBlock = lookAheadBlocks.get(label);
 		if (lookaheadBlock == null) {
-			lookaheadBlock = new Block(-1);
+			lookaheadBlock = newBlock();
 			lookAheadBlocks.put(label, lookaheadBlock);
 		}
 		return lookaheadBlock;
 	}
 
 	public void tryCatchBlock(Label start, Label end, Label handler) {
-		Block startBlock = newLookaaheadBlock(start);
-		Block handlerBlock = newLookaaheadBlock(handler);
+		Block startBlock = newLookAheadBlock(start);
+		Block handlerBlock = newLookAheadBlock(handler);
 		startBlock.addNextBlock(handlerBlock);
-		startBlock.addNextBlock(newLookaaheadBlock(end));
-		handlerBlock.push(-1, new Constant(Throwable.class.getName()));
-	}
-
-	private Block newBlock() {
-		return new Block(nextBlockId++);
+		startBlock.addNextBlock(newLookAheadBlock(end));
+		if (handlerBlock.getOperations().size() == 0) {
+			handlerBlock.addOp(new Load(-1, new Constant(Throwable.class.getName(),
+					Object.class)));
+		}
 	}
 
 	public void tableSwitch(Label dflt, Label[] labels) {
 		for (Label caseLabel : labels) {
-			currentBlock.addNextBlock(newLookaaheadBlock(caseLabel));
+			currentBlock.addNextBlock(newLookAheadBlock(caseLabel));
 		}
-		currentBlock.addNextBlock(newLookaaheadBlock(dflt));
+		currentBlock.addNextBlock(newLookAheadBlock(dflt));
 		currentBlock = null;
-	}
-
-	public void pushVariable(Variable var) {
-		currentBlock.push(currentLineNumber, var);
-	}
-
-	public void popVariable(Variable variable) {
-		currentBlock.pop(currentLineNumber, variable);
-	}
-
-	public void dup() {
-		currentBlock.dup(currentLineNumber);
 	}
 
 	public void label(Label label) {
 		if (lookAheadBlocks.containsKey(label)) {
 			Block nextBlock = lookAheadBlocks.get(label);
-			nextBlock.setId(nextBlockId++);
 			if (currentBlock != null) {
 				currentBlock.addNextBlock(nextBlock);
 			}
@@ -157,17 +145,32 @@ public class BlockDecomposer {
 		}
 	}
 
-	public void lineNumber(int line, Label label) {
-		currentLineNumber = line;
-	}
-
-	public void methodInvokation(int opcode, String owner, String name,
-			String desc) {
-		currentBlock.invoke(currentLineNumber, opcode, owner, name, desc);
-	}
-
 	public void done() {
-		mainBlock.compact();
+	}
+
+	public List<Operation> getOperations() {
+		return new Stack2Turing(mainBlock).translate();
+	}
+
+	public void addOp(StackOperation operation) {
+		currentBlock.addOp(operation);
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		List<Block> blocks = new LinkedList<Block>();
+		List<Block> processed = new LinkedList<Block>();
+		blocks.add(mainBlock);
+		while(!blocks.isEmpty()) {
+			Block block = blocks.remove(0);
+			processed.add(block);
+			blocks.addAll(block.getNextBlocks());
+			blocks.removeAll(processed);
+			buf.append(block);
+			buf.append("\n");
+		}
+		return buf.toString();
 	}
 
 }

@@ -13,22 +13,33 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.asm;
+package com.google.test.metric.method.op.stack;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+import java.util.List;
 
-import com.google.test.metric.ClassInfo;
-import com.google.test.metric.FieldInfo;
+import com.google.test.metric.Variable;
+import com.google.test.metric.method.op.turing.Assignment;
+import com.google.test.metric.method.op.turing.Operation;
 
-public class FieldVisitorBuilder extends NoopFieldVisitor implements
-		FieldVisitor {
+public class ArrayStore extends StackOperation {
 
-	public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
-			String desc, String signature, Object value) {
-		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic);
-		classInfo.addField(fieldInfo);
+	public ArrayStore(int lineNumber) {
+		super(lineNumber);
 	}
-
+	
+	@Override
+	public int getOperatorCount() {
+		return 3;
+	}
+	
+	@Override
+	public Operation toOperation(List<Variable> input) {
+		return new Assignment(lineNumber, input.get(0), input.get(2));
+	}
+	
+	@Override
+	public String toString() {
+		return "arraystore";
+	}
+	
 }

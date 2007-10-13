@@ -98,7 +98,7 @@ public class ClassInfoTest extends TestCase {
 		assertSame(field, clazz.getField("fieldA"));
 	}
 
-	public static class LocalVarsCleass {
+	public static class LocalVarsClass {
 		public void method() {
 		}
 
@@ -116,7 +116,7 @@ public class ClassInfoTest extends TestCase {
 	}
 
 	public void testLocalVarsMethod() throws Exception {
-		assertLocalVars("method()V", params(), locals());
+		assertLocalVars("method()V", params(), locals("this"));
 	}
 
 	public void testLocalVarsStaticMethod() throws Exception {
@@ -125,7 +125,7 @@ public class ClassInfoTest extends TestCase {
 
 	public void testLocalVarsMethod3() throws Exception {
 		assertLocalVars("method3(Ljava/lang/Object;I[I)V",
-				params("a", "b", "c"), locals("d"));
+				params("a", "b", "c"), locals("this", "d"));
 	}
 
 	public void testLocalVarsStaticMethod3() throws Exception {
@@ -134,7 +134,7 @@ public class ClassInfoTest extends TestCase {
 	}
 
 	private void assertLocalVars(String method, String[] params, String[] locals) {
-		ClassInfo classInfo = repo.getClass(LocalVarsCleass.class);
+		ClassInfo classInfo = repo.getClass(LocalVarsClass.class);
 		MethodInfo methodInfo = classInfo.getMethod(method);
 		List<ParameterInfo> paramsParse = methodInfo.getParameters();
 		List<LocalVariableInfo> localsParse = methodInfo.getLocalVariables();
@@ -158,4 +158,31 @@ public class ClassInfoTest extends TestCase {
 		return strings;
 	}
 	
+
+	public void testJavaLangObject() throws Exception {
+		repo.getClass(Object.class);
+	}
+	
+	public void testJavaLangString() throws Exception {
+		repo.getClass(String.class);
+	}
+	
+	private static class Monitor {
+		public void  method() {
+			synchronized (this) {
+				hashCode();
+			}
+		}
+		public void  method2() {
+			hashCode();
+			synchronized (this) {
+				hashCode();
+			}
+			hashCode();
+		}
+	}
+	
+	public void testMonitor() throws Exception {
+		repo.getClass(Monitor.class);
+	}
 }

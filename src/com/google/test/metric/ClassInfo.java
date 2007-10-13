@@ -19,8 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.test.metric.asm.Visibility;
-
 
 public class ClassInfo {
 
@@ -71,24 +69,6 @@ public class ClassInfo {
 
 	public Collection<FieldInfo> getFields() {
 		return fields.values();
-	}
-
-	public void applyInjectability(InjectabilityContext context) {
-		for (MethodInfo method : methods.values()) {
-			if (method.isConstructor() && method.getVisibility() != Visibility.PRIVATE) {
-				method.applyInjectability(context);
-			}
-		}
-	}
-
-	public void seedInjectability(InjectabilityContext context) {
-		for (MethodInfo method : methods.values()) {
-			if (method.getVisibility() != Visibility.PRIVATE) {
-				for (ParameterInfo parameter : method.getParameters()) {
-					context.setInjectable(parameter);
-				}
-			}
-		}
 	}
 
 }

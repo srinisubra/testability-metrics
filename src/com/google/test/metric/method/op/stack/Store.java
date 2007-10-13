@@ -13,25 +13,36 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.method.op.stack;
 
-public class FieldInfo extends Variable {
+import java.util.List;
 
-	private final ClassInfo classInfo;
-	private final boolean isStatic;
+import com.google.test.metric.Variable;
+import com.google.test.metric.method.op.turing.Assignment;
+import com.google.test.metric.method.op.turing.Operation;
 
-	public FieldInfo(ClassInfo classInfo, String name, boolean isStatic) {
-		super(name);
-		this.classInfo = classInfo;
-		this.isStatic = isStatic;
+public class Store extends StackOperation {
+
+	private final Variable variable;
+
+	public Store(int lineNumber, Variable variable) {
+		super(lineNumber);
+		this.variable = variable;
 	}
 
 	@Override
 	public String toString() {
-		return classInfo + "." + getName();
+		return "store " + variable;
 	}
 
-	public boolean isStatic() {
-		return isStatic;
+	@Override
+	public int getOperatorCount() {
+		return 1;
 	}
+
+	@Override
+	public Operation toOperation(List<Variable> input) {
+		return new Assignment(lineNumber, variable, input.get(0));
+	}
+	
 }

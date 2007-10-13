@@ -21,9 +21,7 @@ import java.util.List;
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.MethodInfo;
-import com.google.test.metric.method.Block.Assignment;
-import com.google.test.metric.method.Block.MethodInvokation;
-import com.google.test.metric.method.Block.Operation;
+import com.google.test.metric.method.op.turing.Operation;
 
 import junit.framework.TestCase;
 
@@ -39,36 +37,24 @@ public class MethodBlockTest extends TestCase {
 		}
 	}
 
-	private void assertOperations(Block block, String... operations) {
-		String error = "\nExpecting: " + Arrays.toString(operations)
-				+ "\nActual:" + block;
-		assertEquals(error, operations.length, block.getOperations().size());
+	private void assertOperations(List<Operation> block, String... operations) {
+		String error = "\nExpecting:" + Arrays.toString(operations)
+				     + "\n   Actual:" + block;
+		assertEquals(error, operations.length, block.size());
 		for (int i = 0; i < operations.length; i++) {
 			String expecting = operations[i];
-			String actual = block.getOperations().get(i).toString();
+			String actual = block.get(i).toString();
 			assertEquals(error, expecting, actual);
 		}
 	}
 
 	public void testConstructor() throws Exception {
 		MethodInfo method = getMethod("<init>()V", Simple.class);
-		Block block = method.getBlock();
-		List<Operation> operations = block.getOperations();
-		assertEquals(3, operations.size());
-
-		MethodInvokation invokeSuper = (MethodInvokation) operations.get(0);
-		assertTrue(invokeSuper.getLineNumber() > 1);
-		assertEquals("java.lang.Object.<init>()V", invokeSuper.toString());
-
-		MethodInvokation invokeNew = (MethodInvokation) operations.get(1);
-		assertEquals(invokeSuper.getLineNumber() + 1, invokeNew.getLineNumber());
-		assertEquals("java.lang.Object.<init>()V", invokeNew.toString());
-
-		Assignment assignment = (Assignment) operations.get(2);
-		assertEquals(invokeSuper.getLineNumber() + 1, assignment
-				.getLineNumber());
-		assertEquals("a", assignment.getVariable().getName());
-		assertEquals("<new java/lang/Object>", assignment.getValue().toString());
+		List<Operation> operations = method.getOperations();
+		assertOperations(operations, 
+				"java.lang.Object.<init>()V",
+				"java.lang.Object.<init>()V",
+				"com.google.test.metric.method.MethodBlockTest$Simple.a <- new java.lang.Object");
 	}
 
 	public static class TryCatchFinally {
@@ -88,17 +74,24 @@ public class MethodBlockTest extends TestCase {
 
 	public void testTryCatchBlock() throws Exception {
 		MethodInfo method = getMethod("method()V", TryCatchFinally.class);
-		Block preBlock = method.getBlock();
-		Block tryBlock = preBlock.getNextBlocks().get(0);
-		Block catchBlock = tryBlock.getNextBlocks().get(0);
-		Block finallyBlock = catchBlock.getNextBlocks().get(0);
-		Block postBlock = finallyBlock.getNextBlocks().get(0);
+		List<Operation> operations = method.getOperations();
 
-		assertOperations(preBlock, "<1> -> b");
-		assertOperations(tryBlock, "<2> -> b");
-		assertOperations(catchBlock, "<java.lang.Throwable> -> e", "<3> -> b");
-		assertOperations(finallyBlock, "<4> -> b");
-		assertOperations(postBlock, "<5> -> b");
+		assertOperations(operations, 
+				"b <- 1", 
+				// try {
+				"b <- 2",
+				// } catch (RuntimeException e ) {
+				"e <- java.lang.Throwable", 
+				"b <- 3",
+				// } Finally uncaught {
+				"local_3 <- java.lang.Throwable",
+				"b <- 4",
+				// } Finally caught {
+				"b <- 4",
+				// } Finally normal {
+				"b <- 4",
+				// }
+				"b <- 5");
 	}
 
 	public static class IIF {
@@ -121,18 +114,12 @@ public class MethodBlockTest extends TestCase {
 	public void testMethodWithIIF() throws Exception {
 		Class<IIF> clazz = IIF.class;
 		MethodInfo method = getMethod("method()V", clazz);
-		Block preBlock = method.getBlock();
-		Block falseBlock = preBlock.getNextBlocks().get(0);
-		Block trueBlock = preBlock.getNextBlocks().get(1);
-		Block postBlock = falseBlock.getNextBlocks().get(0);
-		assertSame(postBlock, trueBlock.getNextBlocks().get(0));
-
-		assertOperations(preBlock, "<1> -> b");
-		assertOperations(falseBlock, "java.lang.Object.<init>()V",
-				"<new java/lang/Object> -> " + clazz.getName() + ".a");
-
-		assertOperations(trueBlock, "<null> -> " + clazz.getName() + ".a");
-		assertOperations(postBlock, "<2> -> b");
+		assertOperations(method.getOperations(), 
+				"b <- 1",
+				"java.lang.Object.<init>()V", 
+				clazz.getName() + ".a <- null", 
+				clazz.getName() + ".a <- new java.lang.Object", 
+				"b <- 2");
 	}
 
 	public class SwitchTable {
@@ -157,19 +144,36 @@ public class MethodBlockTest extends TestCase {
 
 	public void testSwitchTable() throws Exception {
 		MethodInfo method = getMethod("method()V", SwitchTable.class);
-		Block preBlock = method.getBlock();
-		assertOperations(preBlock, "<0> -> a");
+		assertOperations(method.getOperations(), 
+				"a <- 0", 
+				"a <- 1", 
+				"a <- 2",
+				"a <- 3",
+				"a <- 4", 
+				"a <- 5");
+	}
 
-		List<Block> switchBlocks = preBlock.getNextBlocks();
-		assertOperations(switchBlocks.get(0), "<1> -> a");
-		assertOperations(switchBlocks.get(1), "<2> -> a");
-		assertOperations(switchBlocks.get(2), "<3> -> a");
-		
-		Block defaultBlock = switchBlocks.get(3);
-		assertOperations(defaultBlock, "<4> -> a");
-		
-		Block postBlock = defaultBlock.getNextBlocks().get(0);
-		assertOperations(postBlock, "<5> -> a");
+	public static class CallMethods {
+		private String text = "ABC";
+		private static String staticText = "abc";
+
+		public int length() {
+			return text.length();
+		}
+
+		public static int staticLength() {
+			return staticText.length();
+		}
+	}
+
+	public void testCallMethodsLength() throws Exception {
+		MethodInfo method = getMethod("length()I", CallMethods.class);
+		assertOperations(method.getOperations(), "java.lang.String.length()I");
+	}
+
+	public void testCallMethodsStaticLength() throws Exception {
+		MethodInfo method = getMethod("staticLength()I", CallMethods.class);
+		assertOperations(method.getOperations(), "java.lang.String.length()I");
 	}
 
 }
