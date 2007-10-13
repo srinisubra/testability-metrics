@@ -13,22 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.asm;
+package com.google.test.metric.method.op.stack;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+public class MonitorExit extends StackOperation {
 
-import com.google.test.metric.ClassInfo;
-import com.google.test.metric.FieldInfo;
-
-public class FieldVisitorBuilder extends NoopFieldVisitor implements
-		FieldVisitor {
-
-	public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
-			String desc, String signature, Object value) {
-		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic);
-		classInfo.addField(fieldInfo);
+	public MonitorExit(int lineNumber) {
+		super(lineNumber);
 	}
 
+	@Override
+	public int getOperatorCount() {
+		return 1;
+	}
+	
+	@Override
+	public String toString() {
+		return "monitor exit";
+	}
 }

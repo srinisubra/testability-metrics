@@ -13,26 +13,38 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method;
+package com.google.test.metric.method.op.stack;
+
+import java.util.LinkedList;
+import java.util.List;
 
 import com.google.test.metric.Variable;
+import com.google.test.metric.method.Constant;
 
-public class Constant extends Variable {
-	private final Object value;
-	private final Class<?> type;
+public class Load extends StackOperation {
 
-	public Constant(Object value, Class<?> type) {
-		super("CONST: " + String.valueOf(value));
-		this.value = value;
-		this.type = type;
+	private final Variable variable;
+
+	public Load(int lineNumber, Object value) {
+		super(lineNumber);
+		variable = new Constant(value, value == null ? null : value.getClass());
 	}
 
 	@Override
 	public String toString() {
-		return String.valueOf(value);
+		return "push " + variable;
 	}
 
-	public Class<?> getType() {
-		return type;
+	@Override
+	public List<Variable> apply(List<Variable> input) {
+		LinkedList<Variable> vars = new LinkedList<Variable>();
+		vars.add(variable);
+		return vars;
 	}
+
+	@Override
+	public int getOperatorCount() {
+		return 0;
+	}
+
 }

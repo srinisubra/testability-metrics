@@ -13,25 +13,35 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.method.op.turing;
 
-public class FieldInfo extends Variable {
+import com.google.test.metric.InjectabilityContext;
+import com.google.test.metric.Variable;
 
-	private final ClassInfo classInfo;
-	private final boolean isStatic;
+public class Assignment extends Operation {
 
-	public FieldInfo(ClassInfo classInfo, String name, boolean isStatic) {
-		super(name);
-		this.classInfo = classInfo;
-		this.isStatic = isStatic;
+	private final Variable value;
+	private final Variable variable;
+
+	public Assignment(int lineNumber, Variable dst, Variable value) {
+		super(lineNumber);
+		this.value = value;
+		this.variable = dst;
+	}
+
+	public Variable getVariable() {
+		return variable;
+	}
+
+	public Variable getValue() {
+		return value;
 	}
 
 	@Override
 	public String toString() {
-		return classInfo + "." + getName();
+		return variable + " <- " + value;
 	}
 
-	public boolean isStatic() {
-		return isStatic;
+	public void computeMetric(InjectabilityContext context) {
 	}
 }

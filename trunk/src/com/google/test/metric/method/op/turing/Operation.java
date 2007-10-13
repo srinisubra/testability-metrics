@@ -13,22 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.asm;
+package com.google.test.metric.method.op.turing;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
+import com.google.test.metric.InjectabilityContext;
 
-import com.google.test.metric.ClassInfo;
-import com.google.test.metric.FieldInfo;
+public abstract class Operation {
 
-public class FieldVisitorBuilder extends NoopFieldVisitor implements
-		FieldVisitor {
+	private final int lineNumber;
 
-	public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
-			String desc, String signature, Object value) {
-		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic);
-		classInfo.addField(fieldInfo);
+	public Operation(int lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	public abstract void computeMetric(InjectabilityContext context);
 }

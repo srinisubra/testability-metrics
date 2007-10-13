@@ -17,6 +17,7 @@ package com.google.test.metric.asm;
 
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 import com.google.test.metric.ClassInfo;
 
@@ -34,8 +35,9 @@ public class ClassInfoBuilderVisitor extends NoopClassVisitor {
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc,
 			String signature, String[] exceptions) {
+		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
 		return new MethodVisitorBuilder(classInfo, name, desc, signature,
-				exceptions, Visibility.valueOf(access));
+				exceptions, isStatic, Visibility.valueOf(access));
 	}
 
 	@Override

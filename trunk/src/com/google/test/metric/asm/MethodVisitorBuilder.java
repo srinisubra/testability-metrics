@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureReader;
 
@@ -30,49 +33,74 @@ import com.google.test.metric.ParameterInfo;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.BlockDecomposer;
 import com.google.test.metric.method.Constant;
+import com.google.test.metric.method.op.stack.ArrayLoad;
+import com.google.test.metric.method.op.stack.ArrayStore;
+import com.google.test.metric.method.op.stack.Duplicate;
+import com.google.test.metric.method.op.stack.GetField;
+import com.google.test.metric.method.op.stack.Invoke;
+import com.google.test.metric.method.op.stack.Load;
+import com.google.test.metric.method.op.stack.MonitorEnter;
+import com.google.test.metric.method.op.stack.MonitorExit;
+import com.google.test.metric.method.op.stack.Pop;
+import com.google.test.metric.method.op.stack.Pop2;
+import com.google.test.metric.method.op.stack.PutField;
+import com.google.test.metric.method.op.stack.Return;
+import com.google.test.metric.method.op.stack.Store;
+import com.google.test.metric.method.op.stack.Throw;
+import com.google.test.metric.method.op.stack.Transform;
 
-public class MethodVisitorBuilder extends NoopMethodVisitor {
+public class MethodVisitorBuilder implements MethodVisitor {
 
+	protected static int lineNumber;
 	private final ClassInfo classInfo;
 	private final String name;
 	private final String desc;
 	private final int parameterCount;
 	private final Visibility visibility;
 	private List<Variable> variables = new ArrayList<Variable>();
-	private final BlockDecomposer blockDecomposer = new BlockDecomposer();
+	private final BlockDecomposer block = new BlockDecomposer();
 	private List<Runnable> recorder = new LinkedList<Runnable>();
 	private long cyclomaticComplexity = 1;
+	private final boolean isStatic;
 
 	public MethodVisitorBuilder(ClassInfo classInfo, String name, String desc,
-			String signature, String[] exceptions, Visibility visibility) {
+			String signature, String[] exceptions, boolean isStatic,
+			Visibility visibility) {
 		this.classInfo = classInfo;
 		this.name = name;
 		this.desc = desc;
+		this.isStatic = isStatic;
 		this.visibility = visibility;
 		ParameterCountVisitor counter = new ParameterCountVisitor();
 		new SignatureReader(desc).accept(counter);
-		parameterCount = counter.getCount();
+		parameterCount = counter.getParameterCount();
 	}
 
-	@Override
-	public void visitJumpInsn(int opcode, final Label label) {
+	public void visitJumpInsn(final int opcode, final Label label) {
 		if (opcode == Opcodes.GOTO) {
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.unconditionalGoto(label);
+					block.unconditionalGoto(label);
 				}
 			});
 		} else {
 			cyclomaticComplexity++;
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.conditionalGoto(label);
+					boolean singleOperand = opcode == Opcodes.IFEQ
+							|| opcode == Opcodes.IFNE || opcode == Opcodes.IFLT
+							|| opcode == Opcodes.IFGE || opcode == Opcodes.IFGT
+							|| opcode == Opcodes.IFLE
+							|| opcode == Opcodes.IFNONNULL
+							|| opcode == Opcodes.IFNULL;
+					int operatorCount = singleOperand ? 1 : 2;
+					block.addOp(new Transform(lineNumber, operatorCount, null));
+					block.conditionalGoto(label);
 				}
 			});
 		}
 	}
 
-	@Override
 	public void visitTryCatchBlock(final Label start, final Label end,
 			final Label handler, String type) {
 		if (type != null) {
@@ -80,12 +108,11 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		}
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.tryCatchBlock(start, end, handler);
+				block.tryCatchBlock(start, end, handler);
 			}
 		});
 	}
 
-	@Override
 	public void visitTableSwitchInsn(int min, int max, final Label dflt,
 			final Label[] labels) {
 		for (Label label : labels) {
@@ -95,12 +122,12 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		}
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.tableSwitch(dflt, labels);
+				block.addOp(new Pop(lineNumber));
+				block.tableSwitch(dflt, labels);
 			}
 		});
 	}
 
-	@Override
 	public void visitLookupSwitchInsn(final Label dflt, final int[] keys,
 			final Label[] labels) {
 		for (Label label : labels) {
@@ -110,12 +137,12 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		}
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.tableSwitch(dflt, labels);
+				block.addOp(new Pop(lineNumber));
+				block.tableSwitch(dflt, labels);
 			}
 		});
 	}
 
-	@Override
 	public void visitLocalVariable(String name, String desc, String signature,
 			Label start, Label end, int index) {
 		Variable variable;
@@ -134,55 +161,68 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 				&& variables.get(0).getName().equals("this");
 	}
 
-	@Override
 	public void visitLineNumber(final int line, final Label start) {
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.lineNumber(line, start);
+				lineNumber = line;
 			}
 		});
 	}
 
-	@Override
 	public void visitEnd() {
 		List<ParameterInfo> parameters = new ArrayList<ParameterInfo>();
 		List<LocalVariableInfo> localVariables = new ArrayList<LocalVariableInfo>();
 		for (Variable variable : variables) {
-			if (variable.getName().equals("this"))
-				continue;
-			if (variable instanceof ParameterInfo) {
+			if (variable.getName().equals("this")) {
+				localVariables.add((LocalVariableInfo) variable);
+			} else if (variable instanceof ParameterInfo) {
 				parameters.add((ParameterInfo) variable);
 			} else {
 				localVariables.add((LocalVariableInfo) variable);
 			}
 		}
-		MethodInfo methodInfo = new MethodInfo(classInfo, name, desc,
-				blockDecomposer.getMainBlock(), parameters, localVariables,
-				visibility, cyclomaticComplexity);
-		classInfo.addMethod(methodInfo);
 		for (Runnable runnable : recorder) {
 			runnable.run();
 		}
-		blockDecomposer.done();
+		block.done();
+		try {
+			MethodInfo methodInfo = new MethodInfo(classInfo, name, desc,
+					isStatic, parameters, localVariables, visibility,
+					cyclomaticComplexity, block.getOperations());
+			classInfo.addMethod(methodInfo);
+		} catch (IllegalStateException e) {
+			throw new IllegalStateException("Error in " + classInfo + "."
+					+ name + desc, e);
+		}
 	}
 
-	@Override
 	public void visitTypeInsn(final int opcode, final String desc) {
+		final String clazz = desc.replace('/', '.');
 		recorder.add(new Runnable() {
 			public void run() {
+				Constant constant;
 				switch (opcode) {
 				case Opcodes.NEW:
+					constant = new Constant("new " + clazz, Object.class);
+					break;
 				case Opcodes.NEWARRAY:
-					blockDecomposer.pushVariable(new Constant("new " + desc));
+				case Opcodes.ANEWARRAY:
+					constant = new Constant("new " + clazz, Object[].class);
 					break;
+				case Opcodes.INSTANCEOF:
+					block.addOp(new Transform(lineNumber, 1, new Constant("?",
+							boolean.class)));
+					return;
+				case Opcodes.CHECKCAST:
+					return;
 				default:
-					break;
+					throw new UnsupportedOperationException("" + opcode);
 				}
+				block.addOp(new Load(lineNumber, constant));
 			}
 		});
 	}
 
-	@Override
 	public void visitVarInsn(final int opcode, final int var) {
 		switch (opcode) {
 		case Opcodes.ILOAD:
@@ -192,7 +232,7 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.ALOAD:
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.pushVariable(variable(var));
+					block.addOp(new Load(lineNumber, variable(var)));
 				}
 			});
 			break;
@@ -204,7 +244,7 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.ASTORE:
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.popVariable(variable(var));
+					block.addOp(new Store(lineNumber, variable(var)));
 				}
 			});
 			break;
@@ -216,27 +256,37 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		if (variables.size() > var) {
 			return variables.get(var);
 		} else {
-			variables.add(new LocalVariableInfo("local_" + variables.size()));
+			boolean isThis = var == 0 && !isStatic;
+			String varName = isThis ? "this" : "local_" + variables.size();
+			variables.add(new LocalVariableInfo(varName));
 			return variable(var);
 		}
 	}
 
-	@Override
 	public void visitLabel(final Label label) {
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.label(label);
+				block.label(label);
 			}
 		});
 	}
 
-	@Override
+	public void visitLdcInsn(final Object cst) {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Load(lineNumber,
+						new Constant(cst, Object.class)));
+			}
+		});
+	}
+
 	public void visitInsn(final int opcode) {
 		switch (opcode) {
 		case Opcodes.ACONST_NULL:
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.pushVariable(new Constant(null));
+					block.addOp(new Load(lineNumber, new Constant(null,
+							Object.class)));
 				}
 			});
 			break;
@@ -247,20 +297,21 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.ICONST_3:
 		case Opcodes.ICONST_4:
 		case Opcodes.ICONST_5:
-			recorder.add(new Runnable() {
-				public void run() {
-					blockDecomposer.pushVariable(new Constant(opcode
-							- Opcodes.ICONST_M1 - 1));
-				}
-			});
+			recordConstant(opcode - Opcodes.ICONST_M1 - 1, int.class);
 			break;
 		case Opcodes.LCONST_0:
 		case Opcodes.LCONST_1:
+			recordConstant(opcode - Opcodes.LCONST_0, long.class);
+			break;
 		case Opcodes.FCONST_0:
 		case Opcodes.FCONST_1:
 		case Opcodes.FCONST_2:
+			recordConstant(opcode - Opcodes.FCONST_0, float.class);
+			break;
 		case Opcodes.DCONST_0:
 		case Opcodes.DCONST_1:
+			recordConstant(opcode - Opcodes.DCONST_0, double.class);
+			break;
 		case Opcodes.IALOAD:
 		case Opcodes.LALOAD:
 		case Opcodes.FALOAD:
@@ -269,6 +320,8 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.BALOAD:
 		case Opcodes.CALOAD:
 		case Opcodes.SALOAD:
+			recordArrayLoad();
+			break;
 		case Opcodes.IASTORE:
 		case Opcodes.LASTORE:
 		case Opcodes.FASTORE:
@@ -277,13 +330,18 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.BASTORE:
 		case Opcodes.CASTORE:
 		case Opcodes.SASTORE:
-		case Opcodes.POP:
+			recordArrayStore();
+			break;
 		case Opcodes.POP2:
+			recorderPop2();
+			break;
+		case Opcodes.POP:
+			recorderPop();
 			break;
 		case Opcodes.DUP:
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.dup();
+					block.addOp(new Duplicate(lineNumber));
 				}
 			});
 			break;
@@ -293,100 +351,262 @@ public class MethodVisitorBuilder extends NoopMethodVisitor {
 		case Opcodes.DUP2_X1:
 		case Opcodes.DUP2_X2:
 		case Opcodes.SWAP:
-		case Opcodes.IADD:
-		case Opcodes.LADD:
-		case Opcodes.FADD:
-		case Opcodes.DADD:
-		case Opcodes.ISUB:
-		case Opcodes.LSUB:
-		case Opcodes.FSUB:
-		case Opcodes.DSUB:
-		case Opcodes.IMUL:
-		case Opcodes.LMUL:
-		case Opcodes.FMUL:
-		case Opcodes.DMUL:
-		case Opcodes.IDIV:
-		case Opcodes.LDIV:
-		case Opcodes.FDIV:
-		case Opcodes.DDIV:
-		case Opcodes.IREM:
-		case Opcodes.LREM:
-		case Opcodes.FREM:
-		case Opcodes.DREM:
-		case Opcodes.INEG:
-		case Opcodes.LNEG:
-		case Opcodes.FNEG:
-		case Opcodes.DNEG:
-		case Opcodes.ISHL:
-		case Opcodes.LSHL:
-		case Opcodes.ISHR:
-		case Opcodes.LSHR:
-		case Opcodes.IUSHR:
-		case Opcodes.LUSHR:
-		case Opcodes.IAND:
-		case Opcodes.LAND:
-		case Opcodes.IOR:
-		case Opcodes.LOR:
-		case Opcodes.IXOR:
-		case Opcodes.LXOR:
-		case Opcodes.I2L:
-		case Opcodes.I2F:
-		case Opcodes.I2D:
-		case Opcodes.L2I:
-		case Opcodes.L2F:
-		case Opcodes.L2D:
-		case Opcodes.F2I:
-		case Opcodes.F2L:
-		case Opcodes.F2D:
-		case Opcodes.D2I:
-		case Opcodes.D2L:
-		case Opcodes.D2F:
-		case Opcodes.I2B:
-		case Opcodes.I2C:
-		case Opcodes.I2S:
-		case Opcodes.LCMP:
-		case Opcodes.FCMPL:
-		case Opcodes.FCMPG:
-		case Opcodes.DCMPL:
-		case Opcodes.DCMPG:
+			throw new UnsupportedOperationException("" + opcode);
 		case Opcodes.IRETURN:
 		case Opcodes.LRETURN:
 		case Opcodes.FRETURN:
 		case Opcodes.DRETURN:
 		case Opcodes.ARETURN:
-		case Opcodes.RETURN:
-		case Opcodes.ARRAYLENGTH:
-		case Opcodes.ATHROW:
-		case Opcodes.MONITORENTER:
-		case Opcodes.MONITOREXIT:
-		}
-	}
-
-	@Override
-	public void visitFieldInsn(final int opcode, final String owner,
-			final String name, final String desc) {
-		switch (opcode) {
-		case Opcodes.GETSTATIC:
-		case Opcodes.PUTSTATIC:
-		case Opcodes.GETFIELD:
-		case Opcodes.PUTFIELD:
 			recorder.add(new Runnable() {
 				public void run() {
-					blockDecomposer.popVariable(classInfo.getField(name));
+					block.addOp(new Return(lineNumber));
+				}
+			});
+			break;
+		case Opcodes.ATHROW:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new Throw(lineNumber));
+				}
+			});
+			break;
+		case Opcodes.RETURN:
+			break;
+		case Opcodes.LCMP:
+			recordPopPush(2, long.class);
+			break;
+		case Opcodes.FCMPL:
+		case Opcodes.FCMPG:
+			recordPopPush(2, float.class);
+			break;
+		case Opcodes.DCMPL:
+		case Opcodes.DCMPG:
+			recordPopPush(2, double.class);
+			break;
+		case Opcodes.LSHL:
+		case Opcodes.LSHR:
+		case Opcodes.LUSHR:
+		case Opcodes.LADD:
+		case Opcodes.LSUB:
+		case Opcodes.LDIV:
+		case Opcodes.LREM:
+		case Opcodes.LAND:
+		case Opcodes.LOR:
+		case Opcodes.LXOR:
+		case Opcodes.LMUL:
+			recordPopPush(2, long.class);
+			break;
+		case Opcodes.FADD:
+		case Opcodes.FSUB:
+		case Opcodes.FMUL:
+		case Opcodes.FREM:
+		case Opcodes.FDIV:
+			recordPopPush(2, float.class);
+			break;
+		case Opcodes.ISHL:
+		case Opcodes.ISHR:
+		case Opcodes.IUSHR:
+		case Opcodes.IADD:
+		case Opcodes.ISUB:
+		case Opcodes.IMUL:
+		case Opcodes.IDIV:
+		case Opcodes.IREM:
+		case Opcodes.IAND:
+		case Opcodes.IOR:
+		case Opcodes.IXOR:
+			recordPopPush(2, int.class);
+			break;
+		case Opcodes.DSUB:
+		case Opcodes.DADD:
+		case Opcodes.DMUL:
+		case Opcodes.DDIV:
+		case Opcodes.DREM:
+			recordPopPush(2, double.class);
+			break;
+		case Opcodes.L2I:
+		case Opcodes.L2F:
+		case Opcodes.L2D:
+		case Opcodes.LNEG:
+			recordPopPush(1, long.class);
+			break;
+		case Opcodes.F2I:
+		case Opcodes.F2L:
+		case Opcodes.FNEG:
+		case Opcodes.F2D:
+			recordPopPush(1, float.class);
+			break;
+		case Opcodes.D2I:
+		case Opcodes.D2L:
+		case Opcodes.D2F:
+		case Opcodes.DNEG:
+			recordPopPush(1, double.class);
+			break;
+		case Opcodes.I2L:
+		case Opcodes.I2F:
+		case Opcodes.I2D:
+		case Opcodes.I2B:
+		case Opcodes.I2C:
+		case Opcodes.I2S:
+		case Opcodes.INEG:
+			recordPopPush(1, int.class);
+			break;
+		case Opcodes.ARRAYLENGTH:
+			recordPopPush(1, int.class);
+			break;
+		case Opcodes.MONITORENTER:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new MonitorEnter(lineNumber));
+				}
+			});
+			break;
+		case Opcodes.MONITOREXIT:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new MonitorExit(lineNumber));
 				}
 			});
 			break;
 		}
 	}
 
-	@Override
-	public void visitMethodInsn(final int opcode, final String owner,
-			final String name, final String desc) {
+	private void recordArrayLoad() {
 		recorder.add(new Runnable() {
 			public void run() {
-				blockDecomposer.methodInvokation(opcode, owner
-						.replace('/', '.'), name, desc);
+				block.addOp(new ArrayLoad(lineNumber));
 			}
 		});
+	}
+
+	private void recordArrayStore() {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new ArrayStore(lineNumber));
+			}
+		});
+	}
+
+	private void recordConstant(final int constant, final Class<?> type) {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Load(lineNumber, new Constant(constant, type)));
+			}
+		});
+	}
+
+	private void recordPopPush(final int popCount, final Class<?> type) {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Transform(lineNumber, popCount, new Constant(
+						"?", type)));
+			}
+		});
+	}
+
+	private void recorderPop() {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Pop(lineNumber));
+			}
+		});
+	}
+
+	private void recorderPop2() {
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Pop2(lineNumber));
+			}
+		});
+	}
+
+	public void visitFieldInsn(final int opcode, final String owner,
+			final String name, final String desc) {
+		switch (opcode) {
+		case Opcodes.PUTSTATIC:
+		case Opcodes.PUTFIELD:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new PutField(lineNumber, classInfo
+							.getField(name)));
+				}
+			});
+			break;
+		case Opcodes.GETSTATIC:
+		case Opcodes.GETFIELD:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new GetField(lineNumber, classInfo
+							.getField(name)));
+				}
+			});
+			break;
+		}
+	}
+
+	public void visitMethodInsn(final int opcode, final String clazz,
+			final String name, final String desc) {
+		SignatureReader signatureReader = new SignatureReader(desc);
+		ParameterCountVisitor counter = new ParameterCountVisitor();
+		signatureReader.accept(counter);
+		final int paramCount = counter.getParameterCount();
+		final Class<?> returnType = counter.getReturnType();
+		recorder.add(new Runnable() {
+			public void run() {
+				block.addOp(new Invoke(lineNumber, clazz.replace('/', '.'),
+						name, desc, paramCount, opcode == Opcodes.INVOKESTATIC,
+						returnType == null ? null : returnType.getName()));
+			}
+		});
+	}
+
+	public AnnotationVisitor visitAnnotation(String arg0, boolean arg1) {
+		return null;
+	}
+
+	public AnnotationVisitor visitAnnotationDefault() {
+		return null;
+	}
+
+	public void visitAttribute(Attribute arg0) {
+	}
+
+	public void visitCode() {
+	}
+
+	public void visitFrame(int arg0, int arg1, Object[] arg2, int arg3,
+			Object[] arg4) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void visitIincInsn(int arg0, int arg1) {
+	}
+
+	public void visitIntInsn(int opcode, int operand) {
+		switch (opcode) {
+		case Opcodes.NEWARRAY:
+			recordPopPush(1, Object[].class);
+			break;
+		case Opcodes.BIPUSH:
+			recordConstant(operand, byte.class);
+			break;
+		case Opcodes.SIPUSH:
+			recordConstant(operand, short.class);
+			break;
+		default:
+			throw new UnsupportedOperationException("Unexpected opcode: "
+					+ opcode);
+		}
+	}
+
+	public void visitMaxs(int arg0, int arg1) {
+	}
+
+	public void visitMultiANewArrayInsn(String arg0, int arg1) {
+		throw new UnsupportedOperationException();
+	}
+
+	public AnnotationVisitor visitParameterAnnotation(int arg0, String arg1,
+			boolean arg2) {
+		return null;
 	}
 }

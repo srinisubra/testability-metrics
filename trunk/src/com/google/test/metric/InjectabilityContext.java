@@ -21,7 +21,14 @@ import java.util.Set;
 
 public class InjectabilityContext {
 
+	private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
 	private Set<Variable> injectables = new HashSet<Variable>();
+	private long totalCost = 0;
+	private final ClassRepository classRepository;
+	
+	public InjectabilityContext(ClassRepository classRepository) {
+		this.classRepository = classRepository;
+	}
 	
 	public boolean isInjectable(Variable var) {
 		return injectables.contains(var);
@@ -33,6 +40,39 @@ public class InjectabilityContext {
 
 	public Collection<Variable> getInjectables() {
 		return injectables;
+	}
+
+	public void addMethodCost(long cost) {
+		totalCost += cost;
+	}
+	
+	public long getTotalCost() {
+		return totalCost;
+	}
+
+	public long getGlobalState() {
+		return 0;
+	}
+
+	public long getGlobalMutableState() {
+		return 0;
+	}
+
+	public MethodInfo getMethod(String clazzName, String methodName) {
+		return classRepository.getClass(clazzName).getMethod(methodName);
+	}
+
+	public void visitMethod(MethodInfo method) {
+		visitedMethods.add(method);
+	}
+
+	public boolean methodAlreadyVisited(MethodInfo method) {
+		return visitedMethods.contains(method);
+	}
+	
+	@Override
+	public String toString() {
+		return injectables.toString();
 	}
 
 }

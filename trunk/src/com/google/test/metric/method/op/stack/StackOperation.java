@@ -13,26 +13,36 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method;
+package com.google.test.metric.method.op.stack;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import com.google.test.metric.Variable;
+import com.google.test.metric.method.op.turing.Operation;
 
-public class Constant extends Variable {
-	private final Object value;
-	private final Class<?> type;
-
-	public Constant(Object value, Class<?> type) {
-		super("CONST: " + String.valueOf(value));
-		this.value = value;
-		this.type = type;
+public abstract class StackOperation {
+	
+	protected final int lineNumber;
+	
+	public StackOperation(int lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
+	public List<Variable> apply(List<Variable> input){
+		return Collections.emptyList(); 
 	}
 
-	public Class<?> getType() {
-		return type;
+	public int getOperatorCount(){
+		return 0;
+	}
+
+	public Operation toOperation(List<Variable> input) {
+		return null;
+	}
+
+	protected List<Variable> list(Variable...vars) {
+		return Arrays.asList(vars);
 	}
 }

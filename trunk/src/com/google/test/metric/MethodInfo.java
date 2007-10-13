@@ -15,11 +15,10 @@
  */
 package com.google.test.metric;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.test.metric.asm.Visibility;
-import com.google.test.metric.method.Block;
+import com.google.test.metric.method.op.turing.Operation;
 
 public class MethodInfo {
 
@@ -27,23 +26,25 @@ public class MethodInfo {
 	private final String name;
 	private final List<ParameterInfo> parameters;
 	private final List<LocalVariableInfo> localVariables;
-	private final Block block;
 	private final String desc;
 	private final long cyclomaticComplexity;
 	private final Visibility visibility;
+	private final List<Operation> operations;
+	private final boolean isStatic;
 
 	public MethodInfo(ClassInfo classInfo, String methodName, String desc,
-			Block block, List<ParameterInfo> parameters,
+			boolean isStatic, List<ParameterInfo> parameters,
 			List<LocalVariableInfo> localVariables, Visibility visibility,
-			long cylomaticComplexity) {
+			long cylomaticComplexity, List<Operation> operations) {
 		this.classInfo = classInfo;
 		this.name = methodName;
 		this.desc = desc;
-		this.block = block;
+		this.isStatic = isStatic;
 		this.parameters = parameters;
 		this.localVariables = localVariables;
 		this.cyclomaticComplexity = cylomaticComplexity;
 		this.visibility = visibility;
+		this.operations = operations;
 	}
 
 	public String getNameDesc() {
@@ -71,10 +72,6 @@ public class MethodInfo {
 		return localVariables;
 	}
 
-	public Block getBlock() {
-		return block;
-	}
-
 	public boolean isConstructor() {
 		return name.equals("<init>");
 	}
@@ -83,14 +80,31 @@ public class MethodInfo {
 		return visibility;
 	}
 
-	public void applyInjectability(InjectabilityContext context) {
-		List<Block> blocks = new ArrayList<Block>(10);
-		blocks.add(getBlock());
-		while (!blocks.isEmpty()) {
-			Block block = blocks.remove(0);
-			block.applyInjectability(context);
-			blocks.addAll(block.getNextBlocks());
+	public List<Operation> getOperations() {
+		return operations;
+	}
+
+	public void computeMetric(InjectabilityContext context) {
+		context.visitMethod(this);
+		// Why -1? a method with a cyclomatic complexity of 1 can
+		// be split to n smaller methods. The one single method and
+		// N small ones are same cost, but the sum of cyclomatic is not
+		// the same unless we change the offset of the method and say that
+		// a simple method is 0 and hence splitting 0 to N 0 is still zero
+		// and we gain the equivalence.
+		context.addMethodCost(cyclomaticComplexity - 1);
+
+		for (Operation operation : getOperations()) {
+			operation.computeMetric(context);
 		}
+	}
+
+	public boolean isStatic() {
+		return isStatic;
+	}
+
+	public boolean canOverride() {
+		return !isConstructor() && (!isStatic()) && getVisibility() != Visibility.PRIVATE;
 	}
 
 }

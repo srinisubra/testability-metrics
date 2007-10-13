@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 public class InjectabilityContextTest extends TestCase {
 
 	public void testIsInjectable() throws Exception {
-		InjectabilityContext context = new InjectabilityContext();
+		InjectabilityContext context = new InjectabilityContext(null);
 		Variable var = new Variable("");
 		assertFalse(context.isInjectable(var));
 		context.setInjectable(var);

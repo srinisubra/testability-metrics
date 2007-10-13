@@ -13,26 +13,37 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method;
+package com.google.test.metric.method.op.stack;
+
+import java.util.List;
 
 import com.google.test.metric.Variable;
+import com.google.test.metric.method.Constant;
 
-public class Constant extends Variable {
-	private final Object value;
-	private final Class<?> type;
+public class Transform extends StackOperation {
 
-	public Constant(Object value, Class<?> type) {
-		super("CONST: " + String.valueOf(value));
-		this.value = value;
-		this.type = type;
+	private final int operatorCount;
+	private final Constant constant;
+
+	public Transform(int lineNumber, int popCount, Constant constant) {
+		super(lineNumber);
+		this.operatorCount = popCount;
+		this.constant = constant;
 	}
-
+	
+	@Override
+	public int getOperatorCount() {
+		return operatorCount;
+	}
+	
+	@Override
+	public List<Variable> apply(List<Variable> input) {
+		return constant == null ? list() : list(constant);
+	}
+	
 	@Override
 	public String toString() {
-		return String.valueOf(value);
+		return "pop X " + operatorCount + (constant == null ? "" : " push " + constant); 
 	}
 
-	public Class<?> getType() {
-		return type;
-	}
 }
