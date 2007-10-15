@@ -20,23 +20,31 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 import com.google.test.metric.ClassInfo;
+import com.google.test.metric.ClassRepository;
 
 public class ClassInfoBuilderVisitor extends NoopClassVisitor {
 
+	private final ClassRepository repository;
 	private ClassInfo classInfo;
+	
+	public ClassInfoBuilderVisitor(ClassRepository repository) {
+		this.repository = repository;
+	}
 
 	@Override
 	public void visit(int version, int access, String name, String signature,
 			String superName, String[] interfaces) {
-		String classNmae = name.replace("/", ".");
-		classInfo = new ClassInfo(classNmae);
+		ClassInfo superClass;
+		superClass = superName == null ? null : repository.getClass(superName);
+		classInfo = new ClassInfo(name, superClass);
+		repository.addClass(classInfo);
 	}
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc,
 			String signature, String[] exceptions) {
 		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		return new MethodVisitorBuilder(classInfo, name, desc, signature,
+		return new MethodVisitorBuilder(repository, classInfo, name, desc, signature,
 				exceptions, isStatic, Visibility.valueOf(access));
 	}
 

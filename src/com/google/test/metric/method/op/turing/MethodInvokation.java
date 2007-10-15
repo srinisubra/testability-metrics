@@ -42,7 +42,7 @@ public class MethodInvokation extends Operation {
 	public List<Variable> getParameters() {
 		return parameters;
 	}
-	
+
 	public String getMethodName() {
 		return clazzName + "." + name;
 	}
@@ -63,14 +63,14 @@ public class MethodInvokation extends Operation {
 	@Override
 	public void computeMetric(InjectabilityContext context) {
 		MethodInfo method = context.getMethod(clazzName, name + signature);
-		if (method.canOverride() && context.isInjectable(methodThis)) {
+		if (context.methodAlreadyVisited(method)) {
+			// Method already counted, skip (to prevent recursion)
+		} else if (method.canOverride() && context.isInjectable(methodThis)) {
 			// Method can be overridden
 		} else {
 			// Method can not be intercepted we have to add the cost
 			// recursively
-			if (!context.methodAlreadyVisited(method)) {
-				method.computeMetric(context);
-			}
+			method.computeMetric(context);
 		}
 	}
 

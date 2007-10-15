@@ -24,6 +24,7 @@ public class MethodInfo {
 
 	private final ClassInfo classInfo;
 	private final String name;
+	private final Variable methodThis;
 	private final List<ParameterInfo> parameters;
 	private final List<LocalVariableInfo> localVariables;
 	private final String desc;
@@ -33,13 +34,14 @@ public class MethodInfo {
 	private final boolean isStatic;
 
 	public MethodInfo(ClassInfo classInfo, String methodName, String desc,
-			boolean isStatic, List<ParameterInfo> parameters,
+			boolean isStatic, Variable methodThis, List<ParameterInfo> parameters,
 			List<LocalVariableInfo> localVariables, Visibility visibility,
 			long cylomaticComplexity, List<Operation> operations) {
 		this.classInfo = classInfo;
 		this.name = methodName;
 		this.desc = desc;
 		this.isStatic = isStatic;
+		this.methodThis = methodThis;
 		this.parameters = parameters;
 		this.localVariables = localVariables;
 		this.cyclomaticComplexity = cylomaticComplexity;
@@ -105,6 +107,10 @@ public class MethodInfo {
 
 	public boolean canOverride() {
 		return !isConstructor() && (!isStatic()) && getVisibility() != Visibility.PRIVATE;
+	}
+
+	public Variable getMethodThis() {
+		return methodThis;
 	}
 
 }

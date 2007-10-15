@@ -21,12 +21,18 @@ import com.google.test.metric.Variable;
 
 public class Duplicate extends StackOperation {
 
-	public Duplicate(int lineNumber) {
+	private final int offset;
+
+	public Duplicate(int lineNumber, int offset) {
 		super(lineNumber);
+		this.offset = offset;
 	}
-	
+
 	@Override
 	public int getOperatorCount() {
+		if (offset != 0) {
+			throw new UnsupportedOperationException("offset=" + offset);
+		}
 		return 1;
 	}
 
@@ -35,10 +41,10 @@ public class Duplicate extends StackOperation {
 		Variable var = input.get(0);
 		return list(var, var);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "duplicate";
+		return "duplicate" + (offset > 0 ? "_X" + offset : "");
 	}
 
 }

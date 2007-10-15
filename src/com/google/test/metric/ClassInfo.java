@@ -19,15 +19,16 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class ClassInfo {
 
 	private final Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
 	private final Map<String, FieldInfo> fields = new HashMap<String, FieldInfo>();
 	private final String name;
+	private final ClassInfo superClass;
 
-	public ClassInfo(String name) {
-		this.name = name;
+	public ClassInfo(String name, ClassInfo superClass) {
+		this.superClass = superClass;
+		this.name = name.replace("/", ".");
 	}
 
 	public String getName() {
@@ -45,18 +46,22 @@ public class ClassInfo {
 	public void addMethod(MethodInfo methodInfo) {
 		methods.put(methodInfo.getNameDesc(), methodInfo);
 	}
-	
+
 	@Override
 	public String toString() {
 		return name;
 	}
 
 	public FieldInfo getField(String fieldName) {
-		FieldInfo fieldInfo = fields.get(fieldName);
-		if (fieldInfo == null) {
-			throw new FieldNotFoundException(this, fieldName);
+		ClassInfo clazz = this;
+		while(clazz != null) {
+			FieldInfo fieldInfo = fields.get(fieldName);
+			if (fieldInfo != null) {
+				return fieldInfo;
+			}
+			clazz = clazz.superClass;
 		}
-		return fieldInfo;
+		throw new FieldNotFoundException(this, fieldName);
 	}
 
 	public void addField(FieldInfo fieldInfo) {
