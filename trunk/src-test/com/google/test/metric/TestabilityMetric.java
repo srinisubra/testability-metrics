@@ -20,14 +20,22 @@ import junit.framework.TestCase;
 public class TestabilityMetric extends TestCase {
 
 	private ClassRepository repo = new ClassRepository();
-	private InjectabilityContext context = new InjectabilityContext(repo);
+	public InjectabilityContext context = new InjectabilityContext(repo);
 
 	private void assertCost(long cost, Class<?> clazz, String methodName) {
 		ClassInfo classInfo = repo.getClass(clazz);
 		MethodInfo method = classInfo.getMethod(methodName);
 		if (method.canOverride()) {
-			classInfo.getMethod("<init>()V").computeMetric(context);
+			MethodInfo constructor = classInfo.getMethod("<init>()V");
+			context.setInjectable(constructor);
+			constructor.computeMetric(context);
 		}
+		for (FieldInfo field : classInfo.getFields()) {
+			if (!field.isPrivate()) {
+				context.setInjectable(field);
+			}
+		}
+		context.setInjectable(method);
 		method.computeMetric(context);
 		assertEquals(cost, context.getTotalCost());
 	}
@@ -160,11 +168,11 @@ public class TestabilityMetric extends TestCase {
 		public Tree() {
 		}
 		
-		public int titleLength() {
-			return title.length();
+		public String titleLength() {
+			return title.toLowerCase();
 		}
-		public int subTitleLength() {
-			return subTitle.length();
+		public String subTitleLength() {
+			return subTitle.toLowerCase();
 		}
 	}
 	
@@ -173,7 +181,11 @@ public class TestabilityMetric extends TestCase {
 	}
 	
 	public void testTreeTitleLength() throws Exception {
-		assertCost(10l, Tree.class, "titleLength()I");
+		assertCost(0l, Tree.class, "titleLength()Ljava/lang/String;");
+	}
+
+	public void testTreeSubTitleLength() throws Exception {
+		assertCost(10l, Tree.class, "subTitleLength()Ljava/lang/String;");
 	}
 
 }

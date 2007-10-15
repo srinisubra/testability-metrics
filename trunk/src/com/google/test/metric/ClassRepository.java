@@ -33,10 +33,9 @@ public class ClassRepository {
 	}
 
 	public ClassInfo getClass(String clazzName) {
-		ClassInfo classInfo = classes.get(clazzName);
+		ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
 		if (classInfo == null) {
 			classInfo = parseClass(inputStreamForClass(clazzName));
-			classes.put(clazzName, classInfo);
 		}
 		return classInfo;
 	}
@@ -53,12 +52,16 @@ public class ClassRepository {
 	private ClassInfo parseClass(InputStream classBytes) {
 		try {
 			ClassReader classReader = new ClassReader(classBytes);
-			ClassInfoBuilderVisitor visitor = new ClassInfoBuilderVisitor();
+			ClassInfoBuilderVisitor visitor = new ClassInfoBuilderVisitor(this);
 			classReader.accept(visitor, 0);
 			return visitor.getClassInfo();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void addClass(ClassInfo classInfo) {
+		classes.put(classInfo.getName(), classInfo);
 	}
 
 }

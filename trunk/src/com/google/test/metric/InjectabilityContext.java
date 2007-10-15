@@ -17,6 +17,7 @@ package com.google.test.metric;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class InjectabilityContext {
@@ -73,6 +74,19 @@ public class InjectabilityContext {
 	@Override
 	public String toString() {
 		return injectables.toString();
+	}
+
+	public void setInjectable(List<? extends Variable> parameters) {
+		for (Variable variable : parameters) {
+			setInjectable(variable);
+		}
+	}
+
+	public void setInjectable(MethodInfo method) {
+		if (method.getMethodThis()!=null) {
+			setInjectable(method.getMethodThis());
+		}
+		setInjectable(method.getParameters());
 	}
 
 }

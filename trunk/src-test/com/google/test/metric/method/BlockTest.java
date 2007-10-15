@@ -20,6 +20,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import com.google.test.metric.FieldInfo;
+import com.google.test.metric.Variable;
 import com.google.test.metric.method.op.stack.GetField;
 import com.google.test.metric.method.op.stack.Invoke;
 import com.google.test.metric.method.op.stack.Load;
@@ -33,14 +34,14 @@ public class BlockTest extends TestCase {
 		Block block = new Block("1");
 		assertEquals("Block[1]{\n}", block.toString());
 		
-		block.addOp(new Load(-1, 1));
+		block.addOp(new Load(-1, var(1)));
 		assertEquals("Block[1]{\n  push 1\n}", block.toString());
 	}
 	
 	public void testVariableStaticAssignment() throws Exception {
 		Block block = new Block("1");
-		block.addOp(new Load(-1, 1));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", true)));
+		block.addOp(new Load(-1, var(1)));
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", true, false)));
 		
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.abc <- 1]", operations.toString());
@@ -49,8 +50,8 @@ public class BlockTest extends TestCase {
 	public void testVariableAssignment() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, null)); // this
-		block.addOp(new Load(-1, 1));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", false)));
+		block.addOp(new Load(-1, var(1)));
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", false, false)));
 		
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.abc <- 1]", operations.toString());
@@ -58,8 +59,8 @@ public class BlockTest extends TestCase {
 	
 	public void testGetField() throws Exception {
 		Block block = new Block("1");
-		block.addOp(new GetField(-1, new FieldInfo(null, "src", true)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", true)));
+		block.addOp(new GetField(-1, new FieldInfo(null, "src", true, false)));
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", true, false)));
 		
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.dst <- null.src]", operations.toString());
@@ -67,16 +68,20 @@ public class BlockTest extends TestCase {
 	
 	public void testMethodInvocation() throws Exception {
 		Block block = new Block("1");
-		block.addOp(new Load(-1, "methodThis")); // this
-		block.addOp(new GetField(-1, new FieldInfo(null, "p1", true)));
-		block.addOp(new GetField(-1, new FieldInfo(null, "p2", true)));
+		block.addOp(new Load(-1, var("methodThis"))); // this
+		block.addOp(new GetField(-1, new FieldInfo(null, "p1", true, false)));
+		block.addOp(new GetField(-1, new FieldInfo(null, "p2", true, false)));
 		block.addOp(new Invoke(-1, null, "methodA", "(II)I", 2, false, "returnType"));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", true)));
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", true, false)));
 		
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.methodA(II)I, null.dst <- ?]", operations.toString());
 	}
 	
+	private Variable var(Object value) {
+		return new Constant(value, Object.class);
+	}
+
 	public void testDiamondBlockArrangment() throws Exception {
 		Block root = new Block("root");
 		Block branchA = new Block("branchA");
@@ -87,11 +92,11 @@ public class BlockTest extends TestCase {
 		branchA.addNextBlock(joined);
 		branchB.addNextBlock(joined);
 		
-		root.addOp(new Load(-1, "this"));
-		root.addOp(new Load(-1, "root"));
-		branchA.addOp(new Load(-1, "A"));
-		branchB.addOp(new Load(-1, "B"));
-		joined.addOp(new Load(-1, "joined"));
+		root.addOp(new Load(-1, var("this")));
+		root.addOp(new Load(-1, var("root")));
+		branchA.addOp(new Load(-1, var("A")));
+		branchB.addOp(new Load(-1, var("B")));
+		joined.addOp(new Load(-1, var("joined")));
 		joined.addOp(new Invoke(-1, null, "m", "(III)V", 3, false, null));
 		
 		List<Operation> operations = new Stack2Turing(root).translate();

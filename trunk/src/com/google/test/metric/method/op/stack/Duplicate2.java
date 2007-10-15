@@ -15,10 +15,33 @@
  */
 package com.google.test.metric.method.op.stack;
 
-public class Pop2 extends StackOperation {
+import java.util.List;
 
-	public Pop2(int lineNumber) {
+import com.google.test.metric.Variable;
+
+public class Duplicate2 extends StackOperation {
+
+	private final int offset;
+
+	public Duplicate2(int lineNumber, int offset) {
 		super(lineNumber);
+		this.offset = offset;
+	}
+
+	@Override
+	public int getOperatorCount() {
+		throw new UnsupportedOperationException("offset=" + offset);
+	}
+
+	@Override
+	public List<Variable> apply(List<Variable> input) {
+		Variable var = input.get(0);
+		return list(var, var);
+	}
+
+	@Override
+	public String toString() {
+		return "duplicate2" + (offset > 0 ? "_X" + offset : "");
 	}
 
 }

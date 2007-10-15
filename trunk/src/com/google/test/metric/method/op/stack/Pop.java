@@ -17,17 +17,23 @@ package com.google.test.metric.method.op.stack;
 
 public class Pop extends StackOperation {
 
-	public Pop(int lineNumber) {
+	private final int offset;
+
+	public Pop(int lineNumber, int offset) {
 		super(lineNumber);
+		this.offset = offset;
 	}
 
 	@Override
 	public int getOperatorCount() {
+		if (offset != 0) {
+			throw new UnsupportedOperationException("offset=" + offset);
+		}
 		return 1;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "pop";
+		return "pop" + (offset > 0 ? "" + offset : "");
 	}
 }

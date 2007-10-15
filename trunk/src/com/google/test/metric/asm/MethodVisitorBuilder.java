@@ -27,6 +27,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.signature.SignatureReader;
 
 import com.google.test.metric.ClassInfo;
+import com.google.test.metric.ClassRepository;
+import com.google.test.metric.FieldInfo;
 import com.google.test.metric.LocalVariableInfo;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.ParameterInfo;
@@ -36,36 +38,41 @@ import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.stack.ArrayLoad;
 import com.google.test.metric.method.op.stack.ArrayStore;
 import com.google.test.metric.method.op.stack.Duplicate;
+import com.google.test.metric.method.op.stack.Duplicate2;
 import com.google.test.metric.method.op.stack.GetField;
 import com.google.test.metric.method.op.stack.Invoke;
 import com.google.test.metric.method.op.stack.Load;
 import com.google.test.metric.method.op.stack.MonitorEnter;
 import com.google.test.metric.method.op.stack.MonitorExit;
 import com.google.test.metric.method.op.stack.Pop;
-import com.google.test.metric.method.op.stack.Pop2;
 import com.google.test.metric.method.op.stack.PutField;
 import com.google.test.metric.method.op.stack.Return;
 import com.google.test.metric.method.op.stack.Store;
+import com.google.test.metric.method.op.stack.Swap;
 import com.google.test.metric.method.op.stack.Throw;
 import com.google.test.metric.method.op.stack.Transform;
 
 public class MethodVisitorBuilder implements MethodVisitor {
 
-	protected static int lineNumber;
 	private final ClassInfo classInfo;
 	private final String name;
 	private final String desc;
 	private final int parameterCount;
 	private final Visibility visibility;
-	private List<Variable> variables = new ArrayList<Variable>();
+	private final List<Variable> variables = new ArrayList<Variable>();
 	private final BlockDecomposer block = new BlockDecomposer();
-	private List<Runnable> recorder = new LinkedList<Runnable>();
-	private long cyclomaticComplexity = 1;
+	private final List<Runnable> recorder = new LinkedList<Runnable>();
 	private final boolean isStatic;
+	private final ClassRepository repository;
 
-	public MethodVisitorBuilder(ClassInfo classInfo, String name, String desc,
-			String signature, String[] exceptions, boolean isStatic,
-			Visibility visibility) {
+	private long cyclomaticComplexity = 1;
+	private Variable methodThis;
+	private int lineNumber;
+
+	public MethodVisitorBuilder(ClassRepository repository,
+			ClassInfo classInfo, String name, String desc, String signature,
+			String[] exceptions, boolean isStatic, Visibility visibility) {
+		this.repository = repository;
 		this.classInfo = classInfo;
 		this.name = name;
 		this.desc = desc;
@@ -122,7 +129,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		}
 		recorder.add(new Runnable() {
 			public void run() {
-				block.addOp(new Pop(lineNumber));
+				block.addOp(new Pop(lineNumber, 0));
 				block.tableSwitch(dflt, labels);
 			}
 		});
@@ -137,7 +144,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		}
 		recorder.add(new Runnable() {
 			public void run() {
-				block.addOp(new Pop(lineNumber));
+				block.addOp(new Pop(lineNumber, 0));
 				block.tableSwitch(dflt, labels);
 			}
 		});
@@ -147,7 +154,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			Label start, Label end, int index) {
 		Variable variable;
 		if (index == 0 && name.equals("this")) {
-			variable = new LocalVariableInfo(name);
+			variable = methodThis = new LocalVariableInfo(name);
 		} else if (index < parameterCount + (isInstanceMethod() ? 1 : 0)) {
 			variable = new ParameterInfo(name);
 		} else {
@@ -187,8 +194,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		block.done();
 		try {
 			MethodInfo methodInfo = new MethodInfo(classInfo, name, desc,
-					isStatic, parameters, localVariables, visibility,
-					cyclomaticComplexity, block.getOperations());
+					isStatic, methodThis, parameters, localVariables,
+					visibility, cyclomaticComplexity, block.getOperations());
 			classInfo.addMethod(methodInfo);
 		} catch (IllegalStateException e) {
 			throw new IllegalStateException("Error in " + classInfo + "."
@@ -255,10 +262,11 @@ public class MethodVisitorBuilder implements MethodVisitor {
 	private Variable variable(int var) {
 		if (variables.size() > var) {
 			return variables.get(var);
+		} else if (var == 0 && !isStatic) {
+			variables.add(new Constant("this", Object.class));
+			return variable(var);
 		} else {
-			boolean isThis = var == 0 && !isStatic;
-			String varName = isThis ? "this" : "local_" + variables.size();
-			variables.add(new LocalVariableInfo(varName));
+			variables.add(new LocalVariableInfo(("local_" + variables.size())));
 			return variable(var);
 		}
 	}
@@ -332,26 +340,39 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		case Opcodes.SASTORE:
 			recordArrayStore();
 			break;
-		case Opcodes.POP2:
-			recorderPop2();
-			break;
 		case Opcodes.POP:
-			recorderPop();
+		case Opcodes.POP2:
+			recorder.add(new Runnable() {
+					public void run() {
+						block.addOp(new Pop(lineNumber, opcode - Opcodes.POP));
+					}
+				});
 			break;
 		case Opcodes.DUP:
+		case Opcodes.DUP_X1:
+		case Opcodes.DUP_X2:
 			recorder.add(new Runnable() {
 				public void run() {
-					block.addOp(new Duplicate(lineNumber));
+					block.addOp(new Duplicate(lineNumber, opcode - Opcodes.DUP));
 				}
 			});
 			break;
-		case Opcodes.DUP_X1:
-		case Opcodes.DUP_X2:
 		case Opcodes.DUP2:
 		case Opcodes.DUP2_X1:
 		case Opcodes.DUP2_X2:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new Duplicate2(lineNumber, opcode - Opcodes.DUP2));
+				}
+			});
+			break;
 		case Opcodes.SWAP:
-			throw new UnsupportedOperationException("" + opcode);
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new Swap(lineNumber));
+				}
+			});
+			break;
 		case Opcodes.IRETURN:
 		case Opcodes.LRETURN:
 		case Opcodes.FRETURN:
@@ -503,22 +524,6 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		});
 	}
 
-	private void recorderPop() {
-		recorder.add(new Runnable() {
-			public void run() {
-				block.addOp(new Pop(lineNumber));
-			}
-		});
-	}
-
-	private void recorderPop2() {
-		recorder.add(new Runnable() {
-			public void run() {
-				block.addOp(new Pop2(lineNumber));
-			}
-		});
-	}
-
 	public void visitFieldInsn(final int opcode, final String owner,
 			final String name, final String desc) {
 		switch (opcode) {
@@ -535,9 +540,10 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		case Opcodes.GETFIELD:
 			recorder.add(new Runnable() {
 				public void run() {
-					block.addOp(new GetField(lineNumber, classInfo
-							.getField(name)));
+					FieldInfo field = repository.getClass(owner).getField(name);
+					block.addOp(new GetField(lineNumber, field));
 				}
+
 			});
 			break;
 		}

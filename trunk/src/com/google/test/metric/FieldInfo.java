@@ -19,11 +19,14 @@ public class FieldInfo extends Variable {
 
 	private final ClassInfo classInfo;
 	private final boolean isStatic;
+	private final boolean isPrivate;
 
-	public FieldInfo(ClassInfo classInfo, String name, boolean isStatic) {
+	public FieldInfo(ClassInfo classInfo, String name, boolean isStatic,
+			boolean isPrivate) {
 		super(name);
 		this.classInfo = classInfo;
 		this.isStatic = isStatic;
+		this.isPrivate = isPrivate;
 	}
 
 	@Override
@@ -33,5 +36,9 @@ public class FieldInfo extends Variable {
 
 	public boolean isStatic() {
 		return isStatic;
+	}
+
+	public boolean isPrivate() {
+		return isPrivate;
 	}
 }

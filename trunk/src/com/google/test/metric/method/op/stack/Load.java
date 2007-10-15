@@ -19,15 +19,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.google.test.metric.Variable;
-import com.google.test.metric.method.Constant;
 
 public class Load extends StackOperation {
 
 	private final Variable variable;
 
-	public Load(int lineNumber, Object value) {
+	public Load(int lineNumber, Variable variable) {
 		super(lineNumber);
-		variable = new Constant(value, value == null ? null : value.getClass());
+		this.variable = variable;
 	}
 
 	@Override

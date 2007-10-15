@@ -27,7 +27,8 @@ public class FieldVisitorBuilder extends NoopFieldVisitor implements
 	public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
 			String desc, String signature, Object value) {
 		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic);
+		boolean isPrivate = Visibility.valueOf(access) == Visibility.PRIVATE;
+		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic, isPrivate);
 		classInfo.addField(fieldInfo);
 	}
 
