@@ -161,18 +161,22 @@ public class TestabilityMetric extends TestCase {
 	}
 	
 	public static class Node {
+		public String cost1() {
+			int a=0;
+			return a == 2 ? "" : null;
+		}
 	}
 	public static class Tree {
-		private String subTitle; // non-injectable
-		public String title = "Title"; // injectable (only after constructor)
+		private Node subTitle; // non-injectable
+		public Node title = new Node(); // injectable (only after constructor)
 		public Tree() {
 		}
 		
 		public String titleLength() {
-			return title.toLowerCase();
+			return title.cost1();
 		}
 		public String subTitleLength() {
-			return subTitle.toLowerCase();
+			return subTitle.cost1();
 		}
 	}
 	
@@ -185,7 +189,7 @@ public class TestabilityMetric extends TestCase {
 	}
 
 	public void testTreeSubTitleLength() throws Exception {
-		assertCost(10l, Tree.class, "subTitleLength()Ljava/lang/String;");
+		assertCost(1l, Tree.class, "subTitleLength()Ljava/lang/String;");
 	}
 
 }
