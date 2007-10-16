@@ -28,20 +28,20 @@ public class GetField extends StackOperation {
 		super(lineNumber);
 		this.fieldInfo = fieldInfo;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "get " + fieldInfo;
+		return "get " + (fieldInfo.isStatic() ? "static " : "") + fieldInfo;
 	}
 
 	@Override
 	public int getOperatorCount() {
 		return fieldInfo.isStatic() ? 0 : 1;
 	}
-	
+
 	@Override
 	public List<Variable> apply(List<Variable> input) {
 		return list(fieldInfo);
 	}
-	
+
 }

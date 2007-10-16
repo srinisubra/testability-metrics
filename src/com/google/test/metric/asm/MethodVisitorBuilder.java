@@ -268,25 +268,27 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		final String clazz = desc.replace('/', '.');
 		recorder.add(new Runnable() {
 			public void run() {
-				Constant constant;
 				switch (opcode) {
 				case Opcodes.NEW:
-					constant = new Constant("new " + clazz, Type.ADDRESS);
+					block.addOp(new Load(lineNumber, new Constant("new "
+							+ clazz, Type.ADDRESS)));
 					break;
 				case Opcodes.NEWARRAY:
 				case Opcodes.ANEWARRAY:
-					constant = new Constant("new " + clazz, Type.ADDRESS);
+					block.addOp(new Transform(lineNumber, "newarray", Type.INT,
+							null, Type.ADDRESS));
 					break;
 				case Opcodes.INSTANCEOF:
 					block.addOp(new Transform(lineNumber, "instanceof",
 							Type.ADDRESS, null, Type.INT));
-					return;
+					break;
 				case Opcodes.CHECKCAST:
-					return;
+					block.addOp(new Transform(lineNumber, "checkcast",
+							Type.ADDRESS, null, Type.ADDRESS));
+					break;
 				default:
 					throw new UnsupportedOperationException("" + opcode);
 				}
-				block.addOp(new Load(lineNumber, constant));
 			}
 		});
 	}
@@ -794,12 +796,12 @@ public class MethodVisitorBuilder implements MethodVisitor {
 	public void visitMethodInsn(final int opcode, final String clazz,
 			final String name, final String desc) {
 		SignatureParser signature = parse(desc);
-		final int paramCount = signature.getParameters().size();
+		final List<Type> params = signature.getParameters();
 		final Type returnType = signature.getReturnType();
 		recorder.add(new Runnable() {
 			public void run() {
 				block.addOp(new Invoke(lineNumber, clazz.replace('/', '.'),
-						name, desc, paramCount, opcode == Opcodes.INVOKESTATIC,
+						name, desc, params, opcode == Opcodes.INVOKESTATIC,
 						returnType));
 			}
 		});

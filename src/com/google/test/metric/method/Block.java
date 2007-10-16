@@ -86,4 +86,8 @@ public class Block implements StackOperations {
 		return isTerminal ;
 	}
 
+	public String getId() {
+		return id;
+	}
+
 }
