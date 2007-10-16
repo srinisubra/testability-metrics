@@ -15,14 +15,19 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import com.google.test.metric.Type;
+
 public class Return extends Pop {
 
-	public Return(int lineNumber) {
-		super(lineNumber, 0);
+	private final Type type;
+
+	public Return(int lineNumber, Type type) {
+		super(lineNumber, type == Type.VOID ? 0 : (type.isDouble() ? 2 : 1));
+		this.type = type;
 	}
 
 	@Override
 	public String toString() {
-		return "return";
+		return "return " + type;
 	}
 }

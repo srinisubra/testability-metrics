@@ -15,6 +15,7 @@
  */
 package com.google.test.metric.method;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,17 +49,17 @@ public class Stack2Turing {
 			List<Block> nextBlocks = new LinkedList<Block>(block
 					.getNextBlocks());
 			nextBlocks.removeAll(processed); // Don't visit already visited
-												// blocks
+			// blocks
 			if (nextBlocks.size() > 0) {
 				stack.split(block, nextBlocks);
 			}
 			blocks.addAll(nextBlocks);
 			blocks.removeAll(processed);
 		}
-		// It appears that when exceptions are involved a method might have 
+		// It appears that when exceptions are involved a method might have
 		// paths where stacks are not emptied. So we can't assert this.
 		// Verdict is still out.
-		//stack.assertEmpty();
+		// stack.assertEmpty();
 		return operations;
 	}
 
@@ -68,7 +69,9 @@ public class Stack2Turing {
 		stack.pop(block, consumes, new PopClosure<Block, Variable>() {
 			@Override
 			public void pop(Block key, List<Variable> input) {
-				for (Variable output : operation.apply(input)) {
+				List<Variable> variables = operation.apply(input);
+				assertValid(variables);
+				for (Variable output : variables) {
 					stack.push(key, output);
 				}
 				Operation turingOp = operation.toOperation(input);
@@ -77,6 +80,22 @@ public class Stack2Turing {
 				}
 			}
 		});
+	}
+
+	protected void assertValid(List<Variable> variables) {
+		Iterator<Variable> iter = variables.iterator();
+		while (iter.hasNext()) {
+			final Variable variable = iter.next();
+			if (variable.getType().isDouble()) {
+				Variable varNext = iter.hasNext() ? iter.next() : null;
+				if (variable != varNext) {
+					throw new IllegalStateException("Variable list '"
+							+ variables + "' contanins variable '" + variable
+							+ "' which is a double but the next "
+							+ "variable in the list is not a duplicate.");
+				}
+			}
+		}
 	}
 
 }

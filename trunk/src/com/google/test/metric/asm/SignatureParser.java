@@ -15,76 +15,53 @@
  */
 package com.google.test.metric.asm;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
 
+import com.google.test.metric.Type;
 
-public class ParameterCountVisitor extends NoopSignatureVisitor {
+
+public class SignatureParser extends NoopSignatureVisitor {
 
 	public class ReturnTypeVisitor extends NoopSignatureVisitor {
 		@Override
 		public SignatureVisitor visitArrayType() {
-			returnType = Object[].class;
+			returnType = Type.ADDRESS;
 			return new NoopSignatureVisitor();
 		}
 		
 		@Override
 		public void visitBaseType(char descriptor) {
-			switch (descriptor) {
-			case 'V':
-				break;
-			case 'B':
-				returnType = byte.class;
-				break;
-			case 'S':
-				returnType = short.class;
-				break;
-			case 'I':
-				returnType = int.class;
-				break;
-			case 'Z':
-				returnType = boolean.class;
-				break;
-			case 'C':
-				returnType = char.class;
-				break;
-			case 'J':
-				returnType = long.class;
-				break;
-			case 'D':
-				returnType = double.class;
-				break;
-			case 'F':
-				returnType = float.class;
-				break;
-			default:
-				throw new IllegalStateException("Unexpected type: " + descriptor);
-			}
+			returnType = Type.fromCode(descriptor);
 		}
 		
 		@Override
 		public void visitClassType(String name) {
-			returnType = Object.class;
+			returnType = Type.ADDRESS;
 		}
 		
 	}
 
-	private int count = 0;
-	private Class<?> returnType;
+	private List<Type> parameters = new LinkedList<Type>();
+	private Type returnType;
 
 	@Override
 	public SignatureVisitor visitArrayType() {
-		count++;
+		parameters.add(Type.ADDRESS);
 		return new NoopSignatureVisitor();
 	}
 	
 	@Override
 	public void visitBaseType(char descriptor) {
-		count++;
+		parameters.add(Type.fromCode(descriptor));
 	}
 	
 	@Override
 	public void visitClassType(String name) {
-		count++;
+		parameters.add(Type.ADDRESS);
 	}
 	
 	@Override
@@ -92,17 +69,23 @@ public class ParameterCountVisitor extends NoopSignatureVisitor {
 		return this;
 	}
 	
-	public int getParameterCount() {
-		return count;
-	}
-	
 	@Override
 	public SignatureVisitor visitReturnType() {
 		return new ReturnTypeVisitor();
 	}
 	
-	public Class<?> getReturnType() {
+	public List<Type> getParameters() {
+		return parameters;
+	}
+	
+	public Type getReturnType() {
 		return returnType;
+	}
+	
+	public static SignatureParser parse(String signature) {
+		SignatureParser parser = new SignatureParser();
+		new SignatureReader(signature).accept(parser);
+		return parser;
 	}
 
 }

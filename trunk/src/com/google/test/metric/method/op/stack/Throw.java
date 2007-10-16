@@ -18,7 +18,7 @@ package com.google.test.metric.method.op.stack;
 public class Throw extends Pop {
 
 	public Throw(int lineNumber) {
-		super(lineNumber, 0);
+		super(lineNumber, 1);
 	}
 
 	@Override

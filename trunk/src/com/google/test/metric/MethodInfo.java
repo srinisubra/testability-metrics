@@ -15,6 +15,8 @@
  */
 package com.google.test.metric;
 
+import static java.util.Collections.unmodifiableList;
+
 import java.util.List;
 
 import com.google.test.metric.asm.Visibility;
@@ -83,7 +85,7 @@ public class MethodInfo {
 	}
 
 	public List<Operation> getOperations() {
-		return operations;
+		return unmodifiableList(operations);
 	}
 
 	public void computeMetric(InjectabilityContext context) {

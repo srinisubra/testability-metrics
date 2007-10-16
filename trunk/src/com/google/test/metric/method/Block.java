@@ -15,19 +15,22 @@
  */
 package com.google.test.metric.method;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.test.metric.method.op.stack.Return;
 import com.google.test.metric.method.op.stack.StackOperation;
 
 public class Block implements StackOperations {
 
-	private final List<Block> previousBlocks = new ArrayList<Block>();
-	private final List<Block> nextBlocks = new ArrayList<Block>();
-	private final List<StackOperation> operations = new ArrayList<StackOperation>();
 	private final String id;
+	private final List<Block> previousBlocks = new ArrayList<Block>();
+	private List<StackOperation> operations = new ArrayList<StackOperation>();
+	private List<Block> nextBlocks = new ArrayList<Block>();
+	private boolean isTerminal = false;
 
 	public Block(String id) {
 		this.id = id;
@@ -42,6 +45,12 @@ public class Block implements StackOperations {
 
 	public void addOp(StackOperation operation) {
 		operations.add(operation);
+		if (operation instanceof Return) {
+			// Return statement must be last one. Freeze the block!
+			isTerminal = true;
+			nextBlocks = emptyList();
+			operations = unmodifiableList(operations);
+		}
 	}
 
 	public List<StackOperation> getOperations() {
@@ -71,6 +80,10 @@ public class Block implements StackOperations {
 
 	public List<Block> getNextBlocks() {
 		return unmodifiableList(nextBlocks);
+	}
+
+	public boolean isTerminal() {
+		return isTerminal ;
 	}
 
 }

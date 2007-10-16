@@ -93,7 +93,7 @@ public class ClassInfoTest extends TestCase {
 		ClassInfo clazz = repo.getClass(SingleFieldClass.class);
 		FieldInfo field = clazz.getField("fieldA");
 		assertEquals("fieldA", field.getName());
-		assertEquals(SingleFieldClass.class.getName() + ".fieldA", field
+		assertEquals(SingleFieldClass.class.getName() + ".fieldA{object}", field
 				.toString());
 		assertSame(field, clazz.getField("fieldA"));
 	}
