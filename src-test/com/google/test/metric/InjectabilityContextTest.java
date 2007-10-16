@@ -21,7 +21,7 @@ public class InjectabilityContextTest extends TestCase {
 
 	public void testIsInjectable() throws Exception {
 		InjectabilityContext context = new InjectabilityContext(null);
-		Variable var = new Variable("");
+		Variable var = new Variable("", Type.ADDRESS);
 		assertFalse(context.isInjectable(var));
 		context.setInjectable(var);
 		assertTrue(context.isInjectable(var));

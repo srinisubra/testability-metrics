@@ -17,33 +17,47 @@ package com.google.test.metric.method.op.stack;
 
 import java.util.List;
 
+import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Constant;
 
 public class Transform extends StackOperation {
 
-	private final int operatorCount;
-	private final Constant constant;
+	private final String operation;
+	private final Type op1;
+	private final Type op2;
+	private final Type result;
 
-	public Transform(int lineNumber, int popCount, Constant constant) {
+	public Transform(int lineNumber, String operation, Type op1, Type op2,
+			Type result) {
 		super(lineNumber);
-		this.operatorCount = popCount;
-		this.constant = constant;
+		this.operation = operation;
+		this.op1 = op1;
+		this.op2 = op2;
+		this.result = result;
 	}
-	
+
 	@Override
 	public int getOperatorCount() {
-		return operatorCount;
+		return size(op1) + size(op2);
 	}
-	
+
+	private int size(Type op) {
+		return op == null ? 0 : op.isDouble() ? 2 : 1;
+	}
+
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		return constant == null ? list() : list(constant);
+		if (result == null) {
+			return super.apply(input);
+		} else {
+			return list(new Constant("?", result));
+		}
 	}
-	
+
 	@Override
 	public String toString() {
-		return "pop X " + operatorCount + (constant == null ? "" : " push " + constant); 
+		return operation + " " + op1 + ", " + op2 + " -> " + result;
 	}
 
 }

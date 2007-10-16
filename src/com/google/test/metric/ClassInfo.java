@@ -55,7 +55,7 @@ public class ClassInfo {
 	public FieldInfo getField(String fieldName) {
 		ClassInfo clazz = this;
 		while(clazz != null) {
-			FieldInfo fieldInfo = fields.get(fieldName);
+			FieldInfo fieldInfo = clazz.fields.get(fieldName);
 			if (fieldInfo != null) {
 				return fieldInfo;
 			}

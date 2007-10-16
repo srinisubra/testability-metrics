@@ -17,11 +17,12 @@ package com.google.test.metric.method.op.stack;
 
 import java.util.List;
 
+import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 
 public class ArrayLoad extends StackOperation {
 
-	public ArrayLoad(int lineNumber) {
+	public ArrayLoad(int lineNumber, Type type) {
 		super(lineNumber);
 	}
 

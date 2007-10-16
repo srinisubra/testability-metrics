@@ -17,13 +17,8 @@ package com.google.test.metric;
 
 public class LocalVariableInfo extends Variable {
 
-	public LocalVariableInfo(String name) {
-		super(name);
+	public LocalVariableInfo(String name, Type type) {
+		super(name, type);
 	}
 	
-	@Override
-	public String toString() {
-		return getName();
-	}
-
 }

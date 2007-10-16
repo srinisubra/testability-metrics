@@ -15,7 +15,6 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import com.google.test.metric.Variable;
@@ -31,14 +30,12 @@ public class Load extends StackOperation {
 
 	@Override
 	public String toString() {
-		return "push " + variable;
+		return "load " + variable;
 	}
 
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		LinkedList<Variable> vars = new LinkedList<Variable>();
-		vars.add(variable);
-		return vars;
+		return list(variable);
 	}
 
 	@Override

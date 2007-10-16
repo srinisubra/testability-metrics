@@ -15,25 +15,23 @@
  */
 package com.google.test.metric.method.op.stack;
 
+
 public class Pop extends StackOperation {
 
-	private final int offset;
+	private final int count;
 
-	public Pop(int lineNumber, int offset) {
+	public Pop(int lineNumber, int count) {
 		super(lineNumber);
-		this.offset = offset;
+		this.count = count;
 	}
 
 	@Override
 	public int getOperatorCount() {
-		if (offset != 0) {
-			throw new UnsupportedOperationException("offset=" + offset);
-		}
-		return 1;
+		return count;
 	}
-
+	
 	@Override
 	public String toString() {
-		return "pop" + (offset > 0 ? "" + offset : "");
+		return "pop" + (count > 1 ? "" + count : "");
 	}
 }

@@ -20,6 +20,7 @@ import org.objectweb.asm.Opcodes;
 
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.FieldInfo;
+import com.google.test.metric.Type;
 
 public class FieldVisitorBuilder extends NoopFieldVisitor implements
 		FieldVisitor {
@@ -28,8 +29,9 @@ public class FieldVisitorBuilder extends NoopFieldVisitor implements
 			String desc, String signature, Object value) {
 		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
 		boolean isPrivate = Visibility.valueOf(access) == Visibility.PRIVATE;
-		FieldInfo fieldInfo = new FieldInfo(classInfo, name, isStatic, isPrivate);
-		classInfo.addField(fieldInfo);
+		Type type = Type.fromCode(desc);
+		classInfo.addField(new FieldInfo(classInfo, name, type, isStatic,
+				isPrivate));
 	}
 
 }

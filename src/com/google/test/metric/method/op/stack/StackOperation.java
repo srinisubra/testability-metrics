@@ -15,7 +15,7 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,6 +43,13 @@ public abstract class StackOperation {
 	}
 
 	protected List<Variable> list(Variable...vars) {
-		return Arrays.asList(vars);
+		ArrayList<Variable> list = new ArrayList<Variable>(vars.length);
+		for (Variable variable : vars) {
+			list.add(variable);
+			if (variable.getType().isDouble()) {
+				list.add(variable);
+			}
+		}
+		return list;
 	}
 }

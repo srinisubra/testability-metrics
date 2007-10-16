@@ -18,18 +18,24 @@ package com.google.test.metric;
 public class Variable {
 
 	private final String name;
+	protected Type type;
 
-	public Variable(String name) {
+	public Variable(String name, Type type) {
 		this.name = name;
+		this.type = type;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	@Override
 	public String toString() {
-		return name;
+		return name + "{" + type + "}";
 	}
-	
+
+	public Type getType() {
+		return type;
+	}
+
 }

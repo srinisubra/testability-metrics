@@ -54,7 +54,7 @@ public class MethodBlockTest extends TestCase {
 		assertOperations(operations, 
 				"java.lang.Object.<init>()V",
 				"java.lang.Object.<init>()V",
-				"com.google.test.metric.method.MethodBlockTest$Simple.a <- new java.lang.Object");
+				"com.google.test.metric.method.MethodBlockTest$Simple.a{object} <- new java.lang.Object{object}");
 	}
 
 	public static class TryCatchFinally {
@@ -77,21 +77,21 @@ public class MethodBlockTest extends TestCase {
 		List<Operation> operations = method.getOperations();
 
 		assertOperations(operations, 
-				"b <- 1", 
+				"b{int} <- 1{int}", 
 				// try {
-				"b <- 2",
+				"b{int} <- 2{int}",
 				// } catch (RuntimeException e ) {
-				"e <- java.lang.Throwable", 
-				"b <- 3",
+				"e{object} <- java.lang.Throwable{object}", 
+				"b{int} <- 3{int}",
 				// } Finally uncaught {
-				"local_3 <- java.lang.Throwable",
-				"b <- 4",
+				"local_3{object} <- java.lang.Throwable{object}",
+				"b{int} <- 4{int}",
 				// } Finally caught {
-				"b <- 4",
+				"b{int} <- 4{int}",
 				// } Finally normal {
-				"b <- 4",
+				"b{int} <- 4{int}",
 				// }
-				"b <- 5");
+				"b{int} <- 5{int}");
 	}
 
 	public static class IIF {
@@ -115,11 +115,11 @@ public class MethodBlockTest extends TestCase {
 		Class<IIF> clazz = IIF.class;
 		MethodInfo method = getMethod("method()V", clazz);
 		assertOperations(method.getOperations(), 
-				"b <- 1",
+				"b{int} <- 1{int}",
 				"java.lang.Object.<init>()V", 
-				clazz.getName() + ".a <- null", 
-				clazz.getName() + ".a <- new java.lang.Object", 
-				"b <- 2");
+				clazz.getName() + ".a{object} <- null{object}", 
+				clazz.getName() + ".a{object} <- new java.lang.Object{object}", 
+				"b{int} <- 2{int}");
 	}
 
 	public class SwitchTable {
@@ -145,12 +145,12 @@ public class MethodBlockTest extends TestCase {
 	public void testSwitchTable() throws Exception {
 		MethodInfo method = getMethod("method()V", SwitchTable.class);
 		assertOperations(method.getOperations(), 
-				"a <- 0", 
-				"a <- 1", 
-				"a <- 2",
-				"a <- 3",
-				"a <- 4", 
-				"a <- 5");
+				"a{int} <- 0{int}", 
+				"a{int} <- 1{int}", 
+				"a{int} <- 2{int}",
+				"a{int} <- 3{int}",
+				"a{int} <- 4{int}", 
+				"a{int} <- 5{int}");
 	}
 
 	public static class CallMethods {

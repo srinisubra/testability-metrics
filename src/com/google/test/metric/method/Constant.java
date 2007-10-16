@@ -15,24 +15,12 @@
  */
 package com.google.test.metric.method;
 
+import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 
 public class Constant extends Variable {
-	private final Object value;
-	private final Class<?> type;
-
-	public Constant(Object value, Class<?> type) {
-		super("CONST: " + String.valueOf(value));
-		this.value = value;
-		this.type = type;
+	public Constant(Object value, Type type) {
+		super(String.valueOf(value), type);
 	}
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
-
-	public Class<?> getType() {
-		return type;
-	}
 }

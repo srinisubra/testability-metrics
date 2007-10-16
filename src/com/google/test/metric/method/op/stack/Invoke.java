@@ -18,6 +18,7 @@ package com.google.test.metric.method.op.stack;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.turing.MethodInvokation;
@@ -30,10 +31,10 @@ public class Invoke extends StackOperation {
 	private final String signature;
 	private final int parameterCount;
 	private final boolean isStatic;
-	private final String returnType;
+	private final Type returnType;
 
 	public Invoke(int lineNumber, String clazz, String name, String signature,
-			int parameterCount, boolean isStatic, String returnType) {
+			int parameterCount, boolean isStatic, Type returnType) {
 		super(lineNumber);
 		this.clazz = clazz;
 		this.name = name;
@@ -51,10 +52,10 @@ public class Invoke extends StackOperation {
 
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		if (returnType == null) {
+		if (returnType == Type.VOID) {
 			return Collections.emptyList();
 		} else {
-			return list(new Constant("?", Object.class));
+			return list(new Constant("?", returnType));
 		}
 	}
 
