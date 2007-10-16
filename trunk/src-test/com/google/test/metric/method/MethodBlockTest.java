@@ -117,8 +117,8 @@ public class MethodBlockTest extends TestCase {
 		assertOperations(method.getOperations(), 
 				"b{int} <- 1{int}",
 				"java.lang.Object.<init>()V", 
-				clazz.getName() + ".a{object} <- null{object}", 
 				clazz.getName() + ".a{object} <- new java.lang.Object{object}", 
+				clazz.getName() + ".a{object} <- null{object}", 
 				"b{int} <- 2{int}");
 	}
 

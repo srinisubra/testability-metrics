@@ -98,10 +98,11 @@ public class BlockDecomposer implements StackOperations {
 	}
 
 	public void conditionalGoto(Label label) {
-		Block nextBlock = newBlock("if_false_");
-		currentBlock.addNextBlock(newLookAheadBlock("if_true_", label));
-		currentBlock.addNextBlock(nextBlock);
-		currentBlock = nextBlock;
+		Block falseBlock = newBlock("if_false_");
+		Block trueBlock = newLookAheadBlock("if_true_", label);
+		currentBlock.addNextBlock(falseBlock);
+		currentBlock.addNextBlock(trueBlock);
+		currentBlock = falseBlock;
 	}
 
 	private Block newBlock(String prefix) {
@@ -119,9 +120,9 @@ public class BlockDecomposer implements StackOperations {
 
 	public void tryCatchBlock(Label start, Label end, Label handler, String type) {
 		Block startBlock = newLookAheadBlock("try_", start);
-		Block handlerBlock = newLookAheadBlock("try_end_", handler);
+		newLookAheadBlock("try_end_", end);
+		Block handlerBlock = newLookAheadBlock("handle_" + type + "_", handler);
 		startBlock.addNextBlock(handlerBlock);
-		startBlock.addNextBlock(newLookAheadBlock("handle_" + type + "_", end));
 		if (handlerBlock.getOperations().size() == 0) {
 			handlerBlock.addOp(new Load(-1, new Constant(Throwable.class
 					.getName(), Type.ADDRESS)));

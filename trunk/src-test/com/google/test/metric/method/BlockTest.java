@@ -15,6 +15,8 @@
  */
 package com.google.test.metric.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -34,51 +36,61 @@ public class BlockTest extends TestCase {
 	public void testBlockToString() throws Exception {
 		Block block = new Block("1");
 		assertEquals("Block[1]{\n}", block.toString());
-		
+
 		block.addOp(new Load(-1, var(1)));
 		assertEquals("Block[1]{\n  load 1{object}\n}", block.toString());
 	}
-	
+
 	public void testVariableStaticAssignment() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS, true, false)));
-		
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS,
+				true, false)));
+
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.abc{object} <- 1{object}]", operations.toString());
 	}
-	
+
 	public void testVariableAssignment() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var("this"))); // this
 		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS, false, false)));
-		
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS,
+				false, false)));
+
 		List<Operation> operations = new Stack2Turing(block).translate();
 		assertEquals("[null.abc{object} <- 1{object}]", operations.toString());
 	}
-	
+
 	public void testGetField() throws Exception {
 		Block block = new Block("1");
-		block.addOp(new GetField(-1, new FieldInfo(null, "src", Type.ADDRESS, true, false)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS, true, false)));
-		
+		block.addOp(new GetField(-1, new FieldInfo(null, "src", Type.ADDRESS,
+				true, false)));
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS,
+				true, false)));
+
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.dst{object} <- null.src{object}]", operations.toString());
+		assertEquals("[null.dst{object} <- null.src{object}]", operations
+				.toString());
 	}
-	
+
 	public void testMethodInvocation() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var("methodThis"))); // this
-		block.addOp(new GetField(-1, new FieldInfo(null, "p1", Type.ADDRESS, true, false)));
-		block.addOp(new GetField(-1, new FieldInfo(null, "p2", Type.ADDRESS, true, false)));
-		block.addOp(new Invoke(-1, null, "methodA", "(II)I", 2, false, Type.INT));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS, true, false)));
-		
+		block.addOp(new GetField(-1, new FieldInfo(null, "p1", Type.ADDRESS,
+				true, false)));
+		block.addOp(new GetField(-1, new FieldInfo(null, "p2", Type.ADDRESS,
+				true, false)));
+		block.addOp(new Invoke(-1, null, "methodA", "(II)A", asList(Type.INT,
+				Type.INT), false, Type.ADDRESS));
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS,
+				true, false)));
+
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.methodA(II)I, null.dst{object} <- ?{object}]", operations.toString());
+		assertEquals("[null.methodA(II)A, null.dst{object} <- ?{object}]",
+				operations.toString());
 	}
-	
+
 	private Variable var(Object value) {
 		return new Constant(value, Type.ADDRESS);
 	}
@@ -92,22 +104,25 @@ public class BlockTest extends TestCase {
 		root.addNextBlock(branchB);
 		branchA.addNextBlock(joined);
 		branchB.addNextBlock(joined);
-		
+
 		root.addOp(new Load(-1, var("this")));
 		root.addOp(new Load(-1, var("root")));
 		branchA.addOp(new Load(-1, var("A")));
 		branchB.addOp(new Load(-1, var("B")));
 		joined.addOp(new Load(-1, var("joined")));
-		joined.addOp(new Invoke(-1, null, "m", "(III)V", 3, false, null));
-		
+		joined.addOp(new Invoke(-1, null, "m", "(III)V", asList(Type.INT,
+				Type.INT, Type.INT), false, Type.VOID));
+
 		List<Operation> operations = new Stack2Turing(root).translate();
 		assertEquals(2, operations.size());
 		MethodInvokation m1 = (MethodInvokation) operations.get(0);
 		MethodInvokation m2 = (MethodInvokation) operations.get(1);
-		
-		assertEquals("[root{object}, B{object}, joined{object}]", m1.getParameters().toString());
+
+		assertEquals("[root{object}, B{object}, joined{object}]", m1
+				.getParameters().toString());
 		assertEquals("this{object}", m1.getMethodThis().toString());
-		assertEquals("[root{object}, A{object}, joined{object}]", m2.getParameters().toString());
+		assertEquals("[root{object}, A{object}, joined{object}]", m2
+				.getParameters().toString());
 		assertEquals("this{object}", m2.getMethodThis().toString());
 	}
 

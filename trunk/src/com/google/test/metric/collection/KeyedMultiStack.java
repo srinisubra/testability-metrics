@@ -71,8 +71,11 @@ public class KeyedMultiStack<KEY, VALUE> {
 		private Entry(List<Entry<VALUE>> parents, VALUE value) {
 			this.value = value;
 			this.parents = parents;
-			this.depth = parents.size() == 0 ? -1
-					: parents.iterator().next().depth + 1;
+			if (parents.size() == 0) {
+				this.depth = 0;
+			} else {
+				this.depth = parents.iterator().next().depth + 1;
+			}
 		}
 
 		@Override
@@ -123,7 +126,7 @@ public class KeyedMultiStack<KEY, VALUE> {
 	}
 
 	public void init(KEY key) {
-		head.put(key, set(root));
+		head.put(key, list(root));
 	}
 
 	/**
@@ -136,7 +139,7 @@ public class KeyedMultiStack<KEY, VALUE> {
 	 */
 	public void push(KEY key, VALUE value) {
 		List<Entry<VALUE>> parents = removeHead(key);
-		head.put(key, set(new Entry<VALUE>(parents, value)));
+		head.put(key, list(new Entry<VALUE>(parents, value)));
 	}
 
 	private List<Entry<VALUE>> getHead(KEY key) {
@@ -156,7 +159,7 @@ public class KeyedMultiStack<KEY, VALUE> {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<Entry<VALUE>> set(Entry<VALUE> entries) {
+	private List<Entry<VALUE>> list(Entry<VALUE> entries) {
 		return new LinkedList<Entry<VALUE>>(asList(entries));
 	}
 
@@ -201,7 +204,8 @@ public class KeyedMultiStack<KEY, VALUE> {
 				if (entry.depth < size - 1) {
 					throw new StackUnderflowException();
 				}
-				for (List<VALUE> path : fillPopPaths(entry.getParents(), size - 1)) {
+				for (List<VALUE> path : fillPopPaths(entry.getParents(),
+						size - 1)) {
 					path.add(entry.value);
 					paths.add(path);
 				}

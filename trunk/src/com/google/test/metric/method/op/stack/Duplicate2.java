@@ -15,6 +15,7 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import com.google.test.metric.Variable;
@@ -30,13 +31,18 @@ public class Duplicate2 extends StackOperation {
 
 	@Override
 	public int getOperatorCount() {
-		throw new UnsupportedOperationException("offset=" + offset);
+		return 2 + offset;
 	}
 
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		Variable var = input.get(0);
-		return list(var, var);
+		LinkedList<Variable> list = new LinkedList<Variable>();
+		list.add(input.get(input.size() - 2));
+		list.add(input.get(input.size() - 1));
+		for (Variable in : input) {
+			list.add(in);
+		}
+		return list;
 	}
 
 	@Override

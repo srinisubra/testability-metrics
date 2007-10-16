@@ -37,7 +37,7 @@ public class Store extends StackOperation {
 
 	@Override
 	public int getOperatorCount() {
-		return 1;
+		return variable.getType().isDouble() ? 2 : 1;
 	}
 
 	@Override

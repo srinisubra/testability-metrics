@@ -57,7 +57,19 @@ public class Transform extends StackOperation {
 
 	@Override
 	public String toString() {
-		return operation + " " + op1 + ", " + op2 + " -> " + result;
+		String sep = " ";
+		String buf = operation;
+		if (op1 != null){
+			 buf += sep + op1;
+			 sep = ", ";
+		}
+		if (op2 != null){
+			buf += sep + op1;
+		}
+		if (result != null){
+			buf += " -> " + result;
+		}
+		return buf;
 	}
 
 }

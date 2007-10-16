@@ -36,11 +36,15 @@ public class ClassInfo {
 	}
 
 	public MethodInfo getMethod(String methodName) {
-		MethodInfo methodInfo = methods.get(methodName);
-		if (methodInfo == null) {
-			throw new MethodNotFoundException(this, methodName);
+		ClassInfo clazz = this;
+		while(clazz != null) {
+			MethodInfo methodInfo = clazz.methods.get(methodName);
+			if (methodInfo != null) {
+				return methodInfo;
+			}
+			clazz = clazz.superClass;
 		}
-		return methodInfo;
+		throw new MethodNotFoundException(this, methodName);
 	}
 
 	public void addMethod(MethodInfo methodInfo) {

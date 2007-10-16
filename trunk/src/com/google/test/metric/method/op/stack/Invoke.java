@@ -29,25 +29,28 @@ public class Invoke extends StackOperation {
 	private final String clazz;
 	private final String name;
 	private final String signature;
-	private final int parameterCount;
 	private final boolean isStatic;
 	private final Type returnType;
+	private final List<Type> params;
 
 	public Invoke(int lineNumber, String clazz, String name, String signature,
-			int parameterCount, boolean isStatic, Type returnType) {
+			List<Type> params, boolean isStatic, Type returnType) {
 		super(lineNumber);
 		this.clazz = clazz;
 		this.name = name;
 		this.signature = signature;
-		this.parameterCount = parameterCount;
+		this.params = params;
 		this.isStatic = isStatic;
 		this.returnType = returnType;
 	}
 
 	@Override
 	public int getOperatorCount() {
-		int instanceOffset = isStatic ? 0 : 1;
-		return parameterCount + instanceOffset;
+		int count = isStatic ? 0 : 1;
+		for (Type type : params) {
+			count += type.isDouble() ? 2 : 1;
+		}
+		return count;
 	}
 
 	@Override
@@ -62,6 +65,7 @@ public class Invoke extends StackOperation {
 	@Override
 	public Operation toOperation(List<Variable> input) {
 		Variable methodThis = isStatic ? null: input.remove(0);
+		//TODO: inputs are dupped due to longs, etc... Fix it.
 		return new MethodInvokation(lineNumber, clazz, name, signature,
 				methodThis, input);
 	}
