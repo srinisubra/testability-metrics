@@ -17,72 +17,10 @@ package com.google.test.metric;
 
 import junit.framework.TestCase;
 
-public class TestabilityMetric extends TestCase {
+public class MetricComputerTest extends TestCase {
 
 	private ClassRepository repo = new ClassRepository();
-	public InjectabilityContext context = new InjectabilityContext(repo);
-
-	private void assertCost(long cost, Class<?> clazz, String methodName) {
-		ClassInfo classInfo = repo.getClass(clazz);
-		MethodInfo method = classInfo.getMethod(methodName);
-		if (method.canOverride()) {
-			MethodInfo constructor = classInfo.getMethod("<init>()V");
-			context.setInjectable(constructor);
-			constructor.computeMetric(context);
-		}
-		for (FieldInfo field : classInfo.getFields()) {
-			if (!field.isPrivate()) {
-				context.setInjectable(field);
-			}
-		}
-		context.setInjectable(method);
-		method.computeMetric(context);
-		assertEquals(cost, context.getTotalCost());
-	}
-
-	private static class Simple {
-		public static void staticMethod() {
-		}
-
-		public void instanceMethod() {
-		}
-
-		public static int ifMethod() {
-			int i = 0;
-			if (i > 2)
-				return 1;
-			else
-				return 2;
-		}
-
-		public static int loopMethod() {
-			int i = 0;
-			while (i < 10) {
-				i++;
-			}
-			return 1;
-		}
-	}
-
-	public void testSimpleInit() throws Exception {
-		assertCost(0l, Simple.class, "<init>()V");
-	}
-
-	public void testSimpleStaticMethod() throws Exception {
-		assertCost(0l, Simple.class, "staticMethod()V");
-	}
-
-	public void testSimpleInstanceMethod() throws Exception {
-		assertCost(0l, Simple.class, "instanceMethod()V");
-	}
-
-	public void testSimpleIfMethod() throws Exception {
-		assertCost(1l, Simple.class, "ifMethod()I");
-	}
-
-	public void testSimpleLoopMethod() throws Exception {
-		assertCost(1l, Simple.class, "loopMethod()I");
-	}
+	private MetricComputer computer = new MetricComputer(repo);
 
 	public static class Medium {
 		public Medium() {
@@ -99,14 +37,14 @@ public class TestabilityMetric extends TestCase {
 		}
 
 		/**
-		 * I cost 2, but I am instance method so I can be overridden.
-		 * so my cost may be avoided in most cases.
+		 * I cost 2, but I am instance method so I can be overridden. so my cost
+		 * may be avoided in most cases.
 		 */
 		public int cost2() {
 			int i = 0;
 			return i > 0 ? i > 1 ? 1 : 2 : 2;
 		}
-		
+
 		/**
 		 * I am instance method hence you will have to add the cost of
 		 * constructor to me. (by myself I cost 4)
@@ -122,20 +60,23 @@ public class TestabilityMetric extends TestCase {
 	}
 
 	public void testMediumCost1() throws Exception {
-		MethodInfo method = repo.getClass(Medium.class).getMethod("statiCost1()I");
+		MethodInfo method = repo.getClass(Medium.class).getMethod(
+				"statiCost1()I");
 		assertFalse(method.canOverride());
-		assertCost(1l, Medium.class, "statiCost1()I");
+		MethodCost cost = computer.compute(Medium.class, "statiCost1()I");
+		assertEquals(1l, cost.getComplexity());
 	}
 
 	/**
-	 * Since cost2 is called twice, once by our test and once by constructor
-	 * we don't want to add it twice. But the constructor adds 1 so total cost
-	 * is 3.
+	 * Since cost2 is called twice, once by our test and once by constructor we
+	 * don't want to add it twice. But the constructor adds 1 so total cost is
+	 * 3.
 	 */
 	public void testMediumCost2() throws Exception {
 		MethodInfo method = repo.getClass(Medium.class).getMethod("cost2()I");
 		assertTrue(method.canOverride());
-		assertCost(3l, Medium.class, "cost2()I");
+		MethodCost cost = computer.compute(Medium.class, "cost2()I");
+		assertEquals(3l, cost.getComplexity());
 	}
 
 	/**
@@ -146,50 +87,71 @@ public class TestabilityMetric extends TestCase {
 	public void testMediumInit() throws Exception {
 		MethodInfo method = repo.getClass(Medium.class).getMethod("<init>()V");
 		assertFalse(method.canOverride());
-		assertCost(1l, Medium.class, "<init>()V");
+		MethodCost cost = computer.compute(Medium.class, "<init>()V");
+		assertEquals(1l, cost.getComplexity());
 	}
-	
+
 	/**
-	 * Method4 is cost of 4 by itself, but one has the add the cost of 
+	 * Method4 is cost of 4 by itself, but one has the add the cost of
 	 * constructor since it is an instance method. The constructor is 0 but
-	 * calls to methods: cost1 method is static and can not be intercepted
-	 * hence it has to be added. cost2 method is instance and can be overridden
-	 * hence we don't add that cost.
+	 * calls to methods: cost1 method is static and can not be intercepted hence
+	 * it has to be added. cost2 method is instance and can be overridden hence
+	 * we don't add that cost.
 	 */
 	public void testMediumMethod4() throws Exception {
-		assertCost(5l, Medium.class, "testMethod4()Ljava/lang/Object;");
+		MethodCost cost = computer.compute(Medium.class,
+				"testMethod4()Ljava/lang/Object;");
+		assertEquals(5l, cost.getComplexity());
 	}
-	
+
 	public static class Node {
 		public String cost1() {
-			int a=0;
+			int a = 0;
 			return a == 2 ? "" : null;
 		}
 	}
+
 	public static class Tree {
 		private Node subTitle; // non-injectable
 		public Node title = new Node(); // injectable (only after constructor)
+
 		public Tree() {
 		}
-		
+
 		public String titleLength() {
 			return title.cost1();
 		}
+
 		public String subTitleLength() {
 			return subTitle.cost1();
 		}
+
+		public String veryExpensive() {
+			return "".toLowerCase();
+		}
 	}
-	
+
 	public void testTree() throws Exception {
-		assertCost(0l, Tree.class, "<init>()V");
+		MethodCost cost = computer.compute(Tree.class, "<init>()V");
+		assertEquals(0l, cost.getComplexity());
 	}
-	
+
 	public void testTreeTitleLength() throws Exception {
-		assertCost(0l, Tree.class, "titleLength()Ljava/lang/String;");
+		MethodCost cost = computer.compute(Tree.class,
+				"titleLength()Ljava/lang/String;");
+		assertEquals(0l, cost.getComplexity());
 	}
 
 	public void testTreeSubTitleLength() throws Exception {
-		assertCost(1l, Tree.class, "subTitleLength()Ljava/lang/String;");
+		MethodCost cost = computer.compute(Tree.class,
+				"subTitleLength()Ljava/lang/String;");
+		assertEquals(1l, cost.getComplexity());
+	}
+
+	public void testVeryExpensive() throws Exception {
+		MethodCost cost = computer.compute(Tree.class,
+				"veryExpensive()Ljava/lang/String;");
+		assertTrue(100l < cost.getComplexity());
 	}
 
 }
