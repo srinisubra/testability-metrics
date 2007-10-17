@@ -20,6 +20,7 @@ public class Duplicate2Test extends TestCase {
 		Variable v2 = var(2);
 		List<Variable> out = dup2.apply(asList(v1, v2));
 		assertList(out, v1, v2, v1, v2);
+		assertEquals("duplicate2", dup2.toString());
 	}
 	
 	public void testDup2Double() throws Exception {
@@ -28,6 +29,7 @@ public class Duplicate2Test extends TestCase {
 		Variable v1 = var(1l);
 		List<Variable> out = dup2.apply(asList(v1, v1));
 		assertList(out, v1, v1, v1, v1);
+		assertEquals("duplicate2", dup2.toString());
 	}
 	
 	public void testDup2Offset1Single() throws Exception {
@@ -38,6 +40,7 @@ public class Duplicate2Test extends TestCase {
 		Variable v3 = var(3);
 		List<Variable> out = dup2.apply(asList(v3, v2, v1));
 		assertList(out, v2, v1, v3, v2, v1);
+		assertEquals("duplicate2_X1", dup2.toString());
 	}
 
 	public void testDup2Offset1Double() throws Exception {
@@ -47,27 +50,30 @@ public class Duplicate2Test extends TestCase {
 		Variable v2 = var(2);
 		List<Variable> out = dup2.apply(asList(v2, v1, v1));
 		assertList(out, v1, v1, v2, v1, v1);
+		assertEquals("duplicate2_X1", dup2.toString());
 	}
 
 	public void testDup2Offset2Single() throws Exception {
-		Duplicate2 dup2 = new Duplicate2(1, 1);
-		assertEquals(3, dup2.getOperatorCount());
+		Duplicate2 dup2 = new Duplicate2(1, 2);
+		assertEquals(4, dup2.getOperatorCount());
 		Variable v1 = var(1);
 		Variable v2 = var(2);
 		Variable v3 = var(3);
 		Variable v4 = var(4);
 		List<Variable> out = dup2.apply(asList(v4, v3, v2, v1));
 		assertList(out, v2, v1, v4, v3, v2, v1);
+		assertEquals("duplicate2_X2", dup2.toString());
 	}
 
 	public void testDup2Offset3Double() throws Exception {
-		Duplicate2 dup2 = new Duplicate2(1, 1);
-		assertEquals(3, dup2.getOperatorCount());
+		Duplicate2 dup2 = new Duplicate2(1, 2);
+		assertEquals(4, dup2.getOperatorCount());
 		Variable v1 = var(1l);
 		Variable v2 = var(2);
 		Variable v3 = var(3);
 		List<Variable> out = dup2.apply(asList(v3, v2, v1, v1));
 		assertList(out, v1, v1, v3, v2, v1, v1);
+		assertEquals("duplicate2_X2", dup2.toString());
 	}
 
 	private void assertList(List<Variable> actual, Variable... expected) {

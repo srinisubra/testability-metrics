@@ -146,7 +146,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 						if2("IF_ICMPNE");
 						break;
 					default:
-						throw new UnsupportedOperationException();
+						throw new UnsupportedOperationException("" + opcode);
 					}
 					block.conditionalGoto(label);
 				}
