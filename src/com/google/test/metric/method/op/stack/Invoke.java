@@ -64,16 +64,16 @@ public class Invoke extends StackOperation {
 
 	@Override
 	public Operation toOperation(List<Variable> input) {
-		Variable methodThis = isStatic ? null: input.remove(0);
-		//TODO: inputs are dupped due to longs, etc... Fix it.
+		Variable methodThis = isStatic ? null : input.remove(0);
+		// TODO: inputs are dupped due to longs, etc... Fix it.
 		return new MethodInvokation(lineNumber, clazz, name, signature,
 				methodThis, input);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "invoke " + clazz + "." + name + signature 
-			+ (returnType == null ?  "" : " : " + returnType);
+		return (isStatic ? "invokestatic " : "invoke ") + clazz + "." + name
+				+ signature + (returnType == null ? "" : " : " + returnType);
 	}
 
 }

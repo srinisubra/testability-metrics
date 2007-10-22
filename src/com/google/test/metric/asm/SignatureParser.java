@@ -23,26 +23,37 @@ import org.objectweb.asm.signature.SignatureVisitor;
 
 import com.google.test.metric.Type;
 
-
 public class SignatureParser extends NoopSignatureVisitor {
 
-	public class ReturnTypeVisitor extends NoopSignatureVisitor {
-		@Override
-		public SignatureVisitor visitArrayType() {
-			returnType = Type.ADDRESS;
-			return new NoopSignatureVisitor();
+	interface Setter {
+		void set(Type type);
+	}
+
+	public static class TypeVisitor extends NoopSignatureVisitor {
+		private final Setter setter;
+
+		public TypeVisitor(Setter setter) {
+			this.setter = setter;
 		}
-		
+
+		public SignatureVisitor visitArrayType() {
+			return new TypeVisitor(new Setter() {
+				public void set(Type type) {
+					setter.set(type.toArray());
+				}
+			});
+		}
+
 		@Override
 		public void visitBaseType(char descriptor) {
-			returnType = Type.fromCode(descriptor);
+			setter.set(Type.fromDesc(""+descriptor));
 		}
-		
+
 		@Override
 		public void visitClassType(String name) {
-			returnType = Type.ADDRESS;
+			setter.set(Type.fromJava(name));
 		}
-		
+
 	}
 
 	private List<Type> parameters = new LinkedList<Type>();
@@ -50,38 +61,45 @@ public class SignatureParser extends NoopSignatureVisitor {
 
 	@Override
 	public SignatureVisitor visitArrayType() {
-		parameters.add(Type.ADDRESS);
-		return new NoopSignatureVisitor();
+		return new TypeVisitor(new Setter() {
+			public void set(Type type) {
+				parameters.add(type.toArray());
+			}
+		});
 	}
-	
+
 	@Override
 	public void visitBaseType(char descriptor) {
-		parameters.add(Type.fromCode(descriptor));
+		parameters.add(Type.fromDesc(""+descriptor));
 	}
-	
+
 	@Override
 	public void visitClassType(String name) {
-		parameters.add(Type.ADDRESS);
+		parameters.add(Type.fromJava(name));
 	}
-	
+
 	@Override
 	public SignatureVisitor visitParameterType() {
 		return this;
 	}
-	
+
 	@Override
 	public SignatureVisitor visitReturnType() {
-		return new ReturnTypeVisitor();
+		return new TypeVisitor(new Setter() {
+			public void set(Type type) {
+				returnType = type;
+			}
+		});
 	}
-	
+
 	public List<Type> getParameters() {
 		return parameters;
 	}
-	
+
 	public Type getReturnType() {
 		return returnType;
 	}
-	
+
 	public static SignatureParser parse(String signature) {
 		SignatureParser parser = new SignatureParser();
 		new SignatureReader(signature).accept(parser);

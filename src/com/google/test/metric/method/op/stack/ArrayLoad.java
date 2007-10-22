@@ -19,11 +19,15 @@ import java.util.List;
 
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
+import com.google.test.metric.method.Constant;
 
 public class ArrayLoad extends StackOperation {
 
+	private final Type type;
+
 	public ArrayLoad(int lineNumber, Type type) {
 		super(lineNumber);
+		this.type = type;
 	}
 
 	@Override
@@ -33,12 +37,14 @@ public class ArrayLoad extends StackOperation {
 
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		return list(input.get(0));
+		if (!input.get(0).getType().isObject())
+			throw new IllegalStateException();
+		return list(new Constant("?", type));
 	}
-	
+
 	@Override
 	public String toString() {
-		return "arrayload";
+		return "arrayload:" + type;
 	}
-	
+
 }

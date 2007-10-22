@@ -115,4 +115,8 @@ public class MethodInfo {
 		return methodThis;
 	}
 
+	public ClassInfo getClassInfo() {
+		return classInfo;
+	}
+
 }

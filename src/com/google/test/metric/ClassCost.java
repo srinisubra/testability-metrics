@@ -15,24 +15,28 @@
  */
 package com.google.test.metric;
 
-public class MethodCost {
+import java.util.List;
 
-	private final long complexity;
-	private final MethodInfo method;
+public class ClassCost {
 
-	public MethodCost(MethodInfo method, long totalCost) {
-		this.method = method;
-		this.complexity = totalCost;
+	private final List<MethodCost> methods;
+	private final ClassInfo classInfo;
+
+	public ClassCost(ClassInfo classInfo, List<MethodCost> methods) {
+		this.classInfo = classInfo;
+		this.methods = methods;
 	}
 
-	public long getComplexity() {
-		return complexity;
+	public MethodCost getMethodCost(String methodName) {
+		for (MethodCost cost : methods) {
+			if (cost.getNameDesc().equals(methodName)) {
+				return cost;
+			}
+		}
+		throw new IllegalArgumentException("Method '" + methodName
+				+ "' does not exist.");
 	}
 	
-	public String getNameDesc() {
-		return method.getNameDesc();
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
@@ -41,9 +45,11 @@ public class MethodCost {
 	}
 
 	public void toString(StringBuilder buf) {
-		buf.append(method.getNameDesc());
-		buf.append(" cost: ");
-		buf.append(complexity);
+		buf.append(classInfo.toString());
+		for (MethodCost cost : methods) {
+			buf.append("\n   ");
+			cost.toString(buf);
+		}
 	}
 
 }

@@ -93,8 +93,8 @@ public class ClassInfoTest extends TestCase {
 		ClassInfo clazz = repo.getClass(SingleFieldClass.class);
 		FieldInfo field = clazz.getField("fieldA");
 		assertEquals("fieldA", field.getName());
-		assertEquals(SingleFieldClass.class.getName() + ".fieldA{object}", field
-				.toString());
+		assertEquals(SingleFieldClass.class.getName()
+				+ ".fieldA{java.lang.Object}", field.toString());
 		assertSame(field, clazz.getField("fieldA"));
 	}
 
@@ -109,6 +109,7 @@ public class ClassInfoTest extends TestCase {
 			Object d = null;
 			a = d;
 		}
+
 		public static void staticMethod3(Object a, int b, int[] c) {
 			Object d = null;
 			a = d;
@@ -129,8 +130,8 @@ public class ClassInfoTest extends TestCase {
 	}
 
 	public void testLocalVarsStaticMethod3() throws Exception {
-		assertLocalVars("staticMethod3(Ljava/lang/Object;I[I)V",
-				params("a", "b", "c"), locals("d"));
+		assertLocalVars("staticMethod3(Ljava/lang/Object;I[I)V", params("a",
+				"b", "c"), locals("d"));
 	}
 
 	private void assertLocalVars(String method, String[] params, String[] locals) {
@@ -157,23 +158,23 @@ public class ClassInfoTest extends TestCase {
 	private String[] locals(String... strings) {
 		return strings;
 	}
-	
 
 	public void testJavaLangObject() throws Exception {
 		repo.getClass(Object.class);
 	}
-	
+
 	public void testJavaLangString() throws Exception {
 		repo.getClass(String.class);
 	}
-	
+
 	private static class Monitor {
-		public void  method() {
+		public void method() {
 			synchronized (this) {
 				hashCode();
 			}
 		}
-		public void  method2() {
+
+		public void method2() {
 			hashCode();
 			synchronized (this) {
 				hashCode();
@@ -181,7 +182,7 @@ public class ClassInfoTest extends TestCase {
 			hashCode();
 		}
 	}
-	
+
 	public void testMonitor() throws Exception {
 		repo.getClass(Monitor.class);
 	}

@@ -154,4 +154,97 @@ public class MetricComputerTest extends TestCase {
 		assertTrue(100l < cost.getComplexity());
 	}
 
+	static class ChoseConstructor {
+		ChoseConstructor() {
+		}
+
+		ChoseConstructor(Object a) {
+		}
+
+		ChoseConstructor(Object a, int c, int d) {
+		}
+
+		ChoseConstructor(Object a, Object b) {
+		}
+	}
+
+	public void testChooseConstructorWithMostParameters() throws Exception {
+		ClassInfo classInfo = repo.getClass(ChoseConstructor.class);
+		MethodInfo constructor = computer.getPrefferedConstructor(classInfo);
+		assertEquals("<init>(Ljava/lang/Object;Ljava/lang/Object;)V",
+				constructor.getNameDesc());
+	}
+
+	static class Singleton {
+		private Singleton() {
+			CostUtil.staticCost1();
+		}
+
+		public void doWork() {
+			CostUtil.staticCost2();
+		}
+	}
+
+	public void testIgnoreConstructorsIfAllConstructorsArePrivate()
+			throws Exception {
+		assertEquals(2L, computer.compute(Singleton.class, "doWork()V")
+				.getComplexity());
+	}
+	
+	static class StaticInit {
+		static {
+			CostUtil.staticCost1();
+		}
+		public void doWork() {
+			CostUtil.staticCost2();
+		}
+	}
+	
+	public void testAddStaticInitializationCost() throws Exception {
+		assertEquals(3L, computer.compute(StaticInit.class, "doWork()V")
+				.getComplexity());
+	}
+	
+	static class Setters {
+		private Object o;
+		public void setO(Object o) {
+			this.o = o;
+		}
+		public void doWork() {
+			o.toString();
+		}
+	}
+	
+	public void testSetterInjection() throws Exception {
+		assertEquals(0L, computer.compute(Setters.class, "doWork()V")
+				.getComplexity());
+	}
+	
+	static class WholeClassCost {
+		void methodA(){
+			CostUtil.staticCost1();
+		}
+		void methodB(){
+			CostUtil.staticCost1();
+		}
+	}
+	
+	public void testComputeClassCost() throws Exception {
+		ClassCost cost = computer.compute(WholeClassCost.class);
+		assertEquals(1L, cost.getMethodCost("methodA()V").getComplexity());
+		assertEquals(1L, cost.getMethodCost("methodB()V").getComplexity());
+	}
+	
+	static class Array {
+		String[] strings;
+		public void method() {
+			strings.clone();
+		}
+	}
+	
+	public void testArray() throws Exception {
+		repo.getClass(String[].class);
+		computer.compute(repo.getClass(Array.class).getMethod("method()V"));
+	}
+
 }

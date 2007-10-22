@@ -29,7 +29,7 @@ public class FieldVisitorBuilder extends NoopFieldVisitor implements
 			String desc, String signature, Object value) {
 		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
 		boolean isPrivate = Visibility.valueOf(access) == Visibility.PRIVATE;
-		Type type = Type.fromCode(desc);
+		Type type = Type.fromDesc(desc);
 		classInfo.addField(new FieldInfo(classInfo, name, type, isStatic,
 				isPrivate));
 	}

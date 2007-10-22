@@ -33,6 +33,9 @@ public class ClassRepository {
 	}
 
 	public ClassInfo getClass(String clazzName) {
+		if (clazzName.startsWith("[")) {
+			return getClass(Object.class);
+		}
 		ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
 		if (classInfo == null) {
 			classInfo = parseClass(inputStreamForClass(clazzName));

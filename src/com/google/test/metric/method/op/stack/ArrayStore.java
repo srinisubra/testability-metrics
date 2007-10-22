@@ -24,23 +24,28 @@ import com.google.test.metric.method.op.turing.Operation;
 
 public class ArrayStore extends StackOperation {
 
+	private final Type type;
+
 	public ArrayStore(int lineNumber, Type type) {
 		super(lineNumber);
+		this.type = type;
 	}
-	
+
 	@Override
 	public int getOperatorCount() {
-		return 3;
+		return 2 + (type.isDouble() ? 2 : 1);
 	}
-	
+
 	@Override
 	public Operation toOperation(List<Variable> input) {
+		if (!input.get(0).getType().isObject())
+			throw new IllegalStateException();
 		return new Assignment(lineNumber, input.get(0), input.get(2));
 	}
-	
+
 	@Override
 	public String toString() {
 		return "arraystore";
 	}
-	
+
 }

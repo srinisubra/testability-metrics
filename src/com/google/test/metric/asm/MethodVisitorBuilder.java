@@ -208,7 +208,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 
 	public void visitLocalVariable(String name, String desc, String signature,
 			Label start, Label end, int index) {
-		Type type = Type.fromCode(desc);
+		Type type = Type.fromDesc(desc);
 		Variable variable;
 		if (index == 0 && !isStatic) {
 			variable = methodThis = new LocalVariableInfo(name, type);
@@ -265,26 +265,31 @@ public class MethodVisitorBuilder implements MethodVisitor {
 	}
 
 	public void visitTypeInsn(final int opcode, final String desc) {
-		final String clazz = desc.replace('/', '.');
+		if (desc.length() == 1) {
+			throw new IllegalStateException("WARNING! I don't expect primitive types:"
+					+ desc);
+		}
+		final Type type = desc.contains(";") ? Type.fromDesc(desc) : Type
+				.fromJava(desc);
 		recorder.add(new Runnable() {
 			public void run() {
 				switch (opcode) {
 				case Opcodes.NEW:
-					block.addOp(new Load(lineNumber, new Constant("new "
-							+ clazz, Type.ADDRESS)));
+					Constant constant = new Constant("new", type);
+					block.addOp(new Load(lineNumber, constant));
 					break;
 				case Opcodes.NEWARRAY:
 				case Opcodes.ANEWARRAY:
 					block.addOp(new Transform(lineNumber, "newarray", Type.INT,
-							null, Type.ADDRESS));
+							null, type.toArray()));
 					break;
 				case Opcodes.INSTANCEOF:
 					block.addOp(new Transform(lineNumber, "instanceof",
-							Type.ADDRESS, null, Type.INT));
+							Type.OBJECT, null, Type.INT));
 					break;
 				case Opcodes.CHECKCAST:
-					block.addOp(new Transform(lineNumber, "checkcast",
-							Type.ADDRESS, null, Type.ADDRESS));
+					block.addOp(new Transform(lineNumber, "checkcast", type,
+							null, type));
 					break;
 				default:
 					throw new UnsupportedOperationException("" + opcode);
@@ -308,7 +313,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			load(var, Type.DOUBLE);
 			break;
 		case Opcodes.ALOAD:
-			load(var, Type.ADDRESS);
+			load(var, Type.OBJECT);
 			break;
 
 		case Opcodes.ISTORE:
@@ -324,7 +329,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			store(var, Type.DOUBLE);
 			break;
 		case Opcodes.ASTORE:
-			store(var, Type.ADDRESS);
+			store(var, Type.OBJECT);
 			break;
 
 		}
@@ -350,7 +355,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		Variable variable = variables.get(varIndex);
 		if (variable == null) {
 			if (varIndex == 0 && !isStatic) {
-				variable = new LocalVariableInfo("this", Type.ADDRESS);
+				variable = new LocalVariableInfo("this", type);
 				variables.set(varIndex, variable);
 			} else {
 				variable = new LocalVariableInfo("local_" + varIndex, type);
@@ -362,7 +367,9 @@ public class MethodVisitorBuilder implements MethodVisitor {
 				}
 			}
 		}
-		if (variable.getType() != type) {
+		Type varType = variable.getType();
+		if (!varType.equals(type)
+				&& (type.isPrimitive() || varType.isPrimitive())) {
 			// Apparently the compiler reuses local variables and it is possible
 			// that the types change. So if types change we have to drop
 			// the variable and try again.
@@ -395,7 +402,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			recorder.add(new Runnable() {
 				public void run() {
 					block.addOp(new Load(lineNumber, new Constant(null,
-							Type.ADDRESS)));
+							Type.OBJECT)));
 				}
 			});
 			break;
@@ -434,7 +441,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			recordArrayLoad(Type.DOUBLE);
 			break;
 		case Opcodes.AALOAD:
-			recordArrayLoad(Type.ADDRESS);
+			recordArrayLoad(Type.OBJECT);
 			break;
 		case Opcodes.BALOAD:
 			recordArrayLoad(Type.BYTE);
@@ -459,7 +466,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			recordArrayStore(Type.DOUBLE);
 			break;
 		case Opcodes.AASTORE:
-			recordArrayStore(Type.ADDRESS);
+			recordArrayStore(Type.OBJECT);
 			break;
 		case Opcodes.BASTORE:
 			recordArrayStore(Type.BYTE);
@@ -512,7 +519,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			_return(Type.FLOAT);
 			break;
 		case Opcodes.ARETURN:
-			_return(Type.ADDRESS);
+			_return(Type.OBJECT);
 			break;
 		case Opcodes.LRETURN:
 			_return(Type.LONG);
@@ -699,7 +706,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			operation("neg", Type.INT, null, Type.INT);
 			break;
 		case Opcodes.ARRAYLENGTH:
-			operation("arraylength", Type.ADDRESS, null, Type.INT);
+			operation("arraylength", Type.OBJECT.toArray(), null, Type.INT);
 			break;
 		case Opcodes.MONITORENTER:
 			recorder.add(new Runnable() {
@@ -832,7 +839,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
 	public void visitIntInsn(int opcode, int operand) {
 		switch (opcode) {
 		case Opcodes.NEWARRAY:
-			newArray(operand);
+			newArray(operand, toType(operand));
 			break;
 		case Opcodes.BIPUSH:
 			loadConstant(operand, Type.INT);
@@ -846,11 +853,34 @@ public class MethodVisitorBuilder implements MethodVisitor {
 		}
 	}
 
-	private void newArray(final int operand) {
+	private Type toType(int operand) {
+		switch (operand) {
+		case Opcodes.T_BOOLEAN:
+			return Type.BOOLEAN;
+		case Opcodes.T_BYTE:
+			return Type.BYTE;
+		case Opcodes.T_CHAR:
+			return Type.CHAR;
+		case Opcodes.T_DOUBLE:
+			return Type.DOUBLE;
+		case Opcodes.T_FLOAT:
+			return Type.FLOAT;
+		case Opcodes.T_INT:
+			return Type.INT;
+		case Opcodes.T_LONG:
+			return Type.LONG;
+		case Opcodes.T_SHORT:
+			return Type.SHORT;
+		default:
+			throw new IllegalArgumentException();
+		}
+	}
+
+	private void newArray(final int operand, final Type type) {
 		recorder.add(new Runnable() {
 			public void run() {
 				block.addOp(new Transform(lineNumber, "newarray", Type.INT,
-						null, Type.ADDRESS));
+						null, type.toArray()));
 			}
 		});
 	}
@@ -864,7 +894,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
 	public void visitMultiANewArrayInsn(final String clazz, final int dims) {
 		recorder.add(new Runnable() {
 			public void run() {
-				block.addOp(new MultiANewArrayIns(lineNumber, clazz, dims));
+				block.addOp(new MultiANewArrayIns(lineNumber, Type
+						.fromDesc(clazz), dims));
 			}
 		});
 	}

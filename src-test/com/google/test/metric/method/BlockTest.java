@@ -33,66 +33,68 @@ import com.google.test.metric.method.op.turing.Operation;
 
 public class BlockTest extends TestCase {
 
+	private static final Type OBJECT = Type.fromClass(Object.class);
+
 	public void testBlockToString() throws Exception {
 		Block block = new Block("1");
 		assertEquals("Block[1]{\n}", block.toString());
 
 		block.addOp(new Load(-1, var(1)));
-		assertEquals("Block[1]{\n  load 1{object}\n}", block.toString());
+		assertEquals("Block[1]{\n  load 1{java.lang.Object}\n}", block.toString());
 	}
 
 	public void testVariableStaticAssignment() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS,
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
 				true, false)));
 
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.abc{object} <- 1{object}]", operations.toString());
+		assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
 	}
 
 	public void testVariableAssignment() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var("this"))); // this
 		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", Type.ADDRESS,
+		block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
 				false, false)));
 
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.abc{object} <- 1{object}]", operations.toString());
+		assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
 	}
 
 	public void testGetField() throws Exception {
 		Block block = new Block("1");
-		block.addOp(new GetField(-1, new FieldInfo(null, "src", Type.ADDRESS,
+		block.addOp(new GetField(-1, new FieldInfo(null, "src", OBJECT,
 				true, false)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS,
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
 				true, false)));
 
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.dst{object} <- null.src{object}]", operations
+		assertEquals("[null.dst{java.lang.Object} <- null.src{java.lang.Object}]", operations
 				.toString());
 	}
 
 	public void testMethodInvocation() throws Exception {
 		Block block = new Block("1");
 		block.addOp(new Load(-1, var("methodThis"))); // this
-		block.addOp(new GetField(-1, new FieldInfo(null, "p1", Type.ADDRESS,
+		block.addOp(new GetField(-1, new FieldInfo(null, "p1", OBJECT,
 				true, false)));
-		block.addOp(new GetField(-1, new FieldInfo(null, "p2", Type.ADDRESS,
+		block.addOp(new GetField(-1, new FieldInfo(null, "p2", OBJECT,
 				true, false)));
 		block.addOp(new Invoke(-1, null, "methodA", "(II)A", asList(Type.INT,
-				Type.INT), false, Type.ADDRESS));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", Type.ADDRESS,
+				Type.INT), false, OBJECT));
+		block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
 				true, false)));
 
 		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.methodA(II)A, null.dst{object} <- ?{object}]",
+		assertEquals("[null.methodA(II)A, null.dst{java.lang.Object} <- ?{java.lang.Object}]",
 				operations.toString());
 	}
 
 	private Variable var(Object value) {
-		return new Constant(value, Type.ADDRESS);
+		return new Constant(value, OBJECT);
 	}
 
 	public void testDiamondBlockArrangment() throws Exception {
@@ -118,12 +120,12 @@ public class BlockTest extends TestCase {
 		MethodInvokation m1 = (MethodInvokation) operations.get(0);
 		MethodInvokation m2 = (MethodInvokation) operations.get(1);
 
-		assertEquals("[root{object}, B{object}, joined{object}]", m1
+		assertEquals("[root{java.lang.Object}, B{java.lang.Object}, joined{java.lang.Object}]", m1
 				.getParameters().toString());
-		assertEquals("this{object}", m1.getMethodThis().toString());
-		assertEquals("[root{object}, A{object}, joined{object}]", m2
+		assertEquals("this{java.lang.Object}", m1.getMethodThis().toString());
+		assertEquals("[root{java.lang.Object}, A{java.lang.Object}, joined{java.lang.Object}]", m2
 				.getParameters().toString());
-		assertEquals("this{object}", m2.getMethodThis().toString());
+		assertEquals("this{java.lang.Object}", m2.getMethodThis().toString());
 	}
 
 }
