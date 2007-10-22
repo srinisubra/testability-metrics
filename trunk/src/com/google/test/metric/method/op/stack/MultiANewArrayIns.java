@@ -8,10 +8,10 @@ import com.google.test.metric.method.Constant;
 
 public class MultiANewArrayIns extends StackOperation {
 
-	private final String clazz;
+	private final Type clazz;
 	private final int dims;
 
-	public MultiANewArrayIns(int lineNumber, String clazz, int dims) {
+	public MultiANewArrayIns(int lineNumber, Type clazz, int dims) {
 		super(lineNumber);
 		this.clazz = clazz;
 		this.dims = dims;
@@ -24,15 +24,11 @@ public class MultiANewArrayIns extends StackOperation {
 
 	@Override
 	public List<Variable> apply(List<Variable> input) {
-		return list(new Constant(getType(), Type.ADDRESS));
-	}
-
-	private String getType() {
-		String type = clazz;
-		for (int i = 0; i < dims; i++) {
-			type += "[]";
+		Type array = clazz;
+		for (int i=0; i<dims; i++) {
+			array = array.toArray();
 		}
-		return type;
+		return list(new Constant("?", array));
 	}
 
 	@Override

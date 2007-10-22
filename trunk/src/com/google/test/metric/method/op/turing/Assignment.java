@@ -43,5 +43,8 @@ public class Assignment extends Operation {
 	}
 
 	public void computeMetric(InjectabilityContext context) {
+		if (context.isInjectable(value)) {
+			context.setInjectable(variable);
+		}
 	}
 }

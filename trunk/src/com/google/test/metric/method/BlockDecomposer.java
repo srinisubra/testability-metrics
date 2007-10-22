@@ -15,6 +15,9 @@
  */
 package com.google.test.metric.method;
 
+import static com.google.test.metric.Type.fromClass;
+import static com.google.test.metric.Type.fromJava;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -118,14 +121,16 @@ public class BlockDecomposer implements StackOperations {
 		return lookaheadBlock;
 	}
 
-	public void tryCatchBlock(Label start, Label end, Label handler, String type) {
+	public void tryCatchBlock(Label start, Label end, Label handler,
+			String eType) {
 		Block startBlock = newLookAheadBlock("try_", start);
 		newLookAheadBlock("try_end_", end);
-		Block handlerBlock = newLookAheadBlock("handle_" + type + "_", handler);
+		Block handlerBlock = newLookAheadBlock("handle_" + eType + "_", handler);
 		startBlock.addNextBlock(handlerBlock);
 		if (handlerBlock.getOperations().size() == 0) {
-			handlerBlock.addOp(new Load(-1, new Constant(Throwable.class
-					.getName(), Type.ADDRESS)));
+			Type type = eType == null ? fromClass(Throwable.class)
+					: fromJava(eType);
+			handlerBlock.addOp(new Load(-1, new Constant("?", type)));
 		}
 	}
 
@@ -133,7 +138,7 @@ public class BlockDecomposer implements StackOperations {
 		for (Label caseLabel : labels) {
 			currentBlock.addNextBlock(newLookAheadBlock("case_", caseLabel));
 		}
-		currentBlock.addNextBlock(newLookAheadBlock("dflt_",dflt));
+		currentBlock.addNextBlock(newLookAheadBlock("dflt_", dflt));
 		currentBlock = null;
 	}
 
@@ -144,6 +149,9 @@ public class BlockDecomposer implements StackOperations {
 				currentBlock.addNextBlock(nextBlock);
 			}
 			currentBlock = nextBlock;
+		} else if (currentBlock == null) {
+			currentBlock = newBlock("");
+			lookAheadBlocks.put(label, currentBlock);
 		}
 	}
 

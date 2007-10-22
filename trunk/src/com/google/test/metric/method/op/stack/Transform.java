@@ -64,7 +64,7 @@ public class Transform extends StackOperation {
 			 sep = ", ";
 		}
 		if (op2 != null){
-			buf += sep + op1;
+			buf += sep + op2;
 		}
 		if (result != null){
 			buf += " -> " + result;

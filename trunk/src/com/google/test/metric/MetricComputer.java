@@ -15,6 +15,12 @@
  */
 package com.google.test.metric;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.google.test.metric.asm.Visibility;
+
 public class MetricComputer {
 
 	private final ClassRepository classRepository;
@@ -26,29 +32,95 @@ public class MetricComputer {
 	public MethodCost compute(Class<?> clazz, String methodName) {
 		ClassInfo classInfo = classRepository.getClass(clazz);
 		MethodInfo method = classInfo.getMethod(methodName);
-		return compute(classInfo, method);
+		return compute(method);
 	}
 
-	private MethodCost compute(ClassInfo classInfo, MethodInfo method) {
+	public MethodCost compute(MethodInfo method) {
 		InjectabilityContext context = new InjectabilityContext(classRepository);
-		if (method.canOverride()) {
-			getPrefferedConstructor(classInfo, context).computeMetric(context);
-		}
-		for (FieldInfo field : classInfo.getFields()) {
-			if (!field.isPrivate()) {
-				context.setInjectable(field);
-			}
-		}
+		ClassInfo classInfo = method.getClassInfo();
+		addStaticCost(classInfo, context);
+		addConstructorCost(classInfo, method, context);
+		addSetterInjection(classInfo, context);
+		addFieldCost(classInfo, context);
 		context.setInjectable(method);
 		method.computeMetric(context);
 		return new MethodCost(method, context.getTotalCost());
 	}
 
-	private MethodInfo getPrefferedConstructor(ClassInfo classInfo,
+	private void addSetterInjection(ClassInfo classInfo, InjectabilityContext context) {
+		for (MethodInfo method : classInfo.getMethods()) {
+			if (method.getName().startsWith("set")) {
+				context.setInjectable(method);
+				method.computeMetric(context);
+			}
+		}
+	}
+
+	private void addConstructorCost(ClassInfo classInfo,
+			MethodInfo method, InjectabilityContext context) {
+		if (method.canOverride()) {
+			MethodInfo constructor = getPrefferedConstructor(classInfo);
+			if (constructor != null) {
+				context.setInjectable(constructor);
+				constructor.computeMetric(context);
+			}
+		}
+	}
+
+	private void addFieldCost(ClassInfo classInfo,
 			InjectabilityContext context) {
-		MethodInfo constructor = classInfo.getMethod("<init>()V");
-		context.setInjectable(constructor);
+		for (FieldInfo field : classInfo.getFields()) {
+			if (!field.isPrivate()) {
+				context.setInjectable(field);
+			}
+		}
+	}
+
+	private void addStaticCost(ClassInfo classInfo, InjectabilityContext context) {
+		for (MethodInfo method : classInfo.getMethods()) {
+			if (method.getName().startsWith("<clinit>")) {
+				method.computeMetric(context);
+			}
+		}
+	}
+
+	MethodInfo getPrefferedConstructor(ClassInfo classInfo) {
+		Collection<MethodInfo> methods = classInfo.getMethods();
+		MethodInfo constructor = null;
+		int currentArgsCount = -1;
+		for (MethodInfo methodInfo : methods) {
+			if (methodInfo.getVisibility() != Visibility.PRIVATE
+					&& methodInfo.getName().startsWith("<init>")) {
+				int count = countNonPrimitiveArgs(methodInfo.getParameters());
+				if (currentArgsCount < count) {
+					constructor = methodInfo;
+					currentArgsCount = count;
+				}
+			}
+		}
 		return constructor;
+	}
+
+	private int countNonPrimitiveArgs(List<ParameterInfo> parameters) {
+		int count = 0;
+		for (ParameterInfo parameter : parameters) {
+			if (parameter.getType().isObject()) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	public ClassCost compute(Class<?> clazz) {
+		return compute(classRepository.getClass(clazz));
+	}
+
+	public ClassCost compute(ClassInfo clazz) {
+		List<MethodCost> methods = new LinkedList<MethodCost>();
+		for (MethodInfo method : clazz.getMethods()) {
+			methods.add(compute(method));
+		}
+		return new ClassCost(clazz, methods);
 	}
 
 }

@@ -18,12 +18,12 @@ package com.google.test.metric.method;
 import java.util.Arrays;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.method.op.turing.Operation;
-
-import junit.framework.TestCase;
 
 public class MethodBlockTest extends TestCase {
 
@@ -54,7 +54,7 @@ public class MethodBlockTest extends TestCase {
 		assertOperations(operations, 
 				"java.lang.Object.<init>()V",
 				"java.lang.Object.<init>()V",
-				"com.google.test.metric.method.MethodBlockTest$Simple.a{object} <- new java.lang.Object{object}");
+				"com.google.test.metric.method.MethodBlockTest$Simple.a{java.lang.Object} <- new{java.lang.Object}");
 	}
 
 	public static class TryCatchFinally {
@@ -81,10 +81,10 @@ public class MethodBlockTest extends TestCase {
 				// try {
 				"b{int} <- 2{int}",
 				// } catch (RuntimeException e ) {
-				"e{object} <- java.lang.Throwable{object}", 
+				"e{java.lang.RuntimeException} <- ?{java.lang.RuntimeException}", 
 				"b{int} <- 3{int}",
 				// } Finally uncaught {
-				"local_3{object} <- java.lang.Throwable{object}",
+				"local_3{java.lang.Object} <- ?{java.lang.Throwable}",
 				"b{int} <- 4{int}",
 				// } Finally caught {
 				"b{int} <- 4{int}",
@@ -117,8 +117,8 @@ public class MethodBlockTest extends TestCase {
 		assertOperations(method.getOperations(), 
 				"b{int} <- 1{int}",
 				"java.lang.Object.<init>()V", 
-				clazz.getName() + ".a{object} <- new java.lang.Object{object}", 
-				clazz.getName() + ".a{object} <- null{object}", 
+				clazz.getName() + ".a{java.lang.Object} <- new{java.lang.Object}", 
+				clazz.getName() + ".a{java.lang.Object} <- null{java.lang.Object}", 
 				"b{int} <- 2{int}");
 	}
 
@@ -174,6 +174,18 @@ public class MethodBlockTest extends TestCase {
 	public void testCallMethodsStaticLength() throws Exception {
 		MethodInfo method = getMethod("staticLength()I", CallMethods.class);
 		assertOperations(method.getOperations(), "java.lang.String.length()I");
+	}
+	
+	static class Foreach {
+		public void method() {
+			for (String names : new String[0]) {
+			}
+		}
+	}
+	
+	public void testForEach() throws Exception {
+		ClassRepository repo = new ClassRepository();
+		repo.getClass(Foreach.class).getMethod("method()V");
 	}
 
 }
