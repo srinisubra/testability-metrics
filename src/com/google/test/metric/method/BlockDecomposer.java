@@ -89,15 +89,29 @@ import com.google.test.metric.method.op.turing.Operation;
 public class BlockDecomposer implements StackOperations {
 
 	private int nextBlockId = 0;
+	private final List<Block> blocksInOrder = new LinkedList<Block>();
 	private final Block mainBlock = newBlock("");
 	private final Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
-	private Block currentBlock = mainBlock;
+	private Block currentBlock;
+
+	public BlockDecomposer() {
+		setCurrentBlock(mainBlock);
+	}
+
+	private void setCurrentBlock(Block block) {
+		if (blocksInOrder.contains(block)) {
+			throw new IllegalStateException();
+		}
+		if (block != null) {
+			blocksInOrder.add(block);
+		}
+		currentBlock = block;
+	}
 
 	public void unconditionalGoto(Label label) {
-		Block lookaheadBlock = newBlock("goto_");
-		lookAheadBlocks.put(label, lookaheadBlock);
+		Block lookaheadBlock = newLookAheadBlock("goto_", label);
 		currentBlock.addNextBlock(lookaheadBlock);
-		currentBlock = null;
+		setCurrentBlock(null);
 	}
 
 	public void conditionalGoto(Label label) {
@@ -105,7 +119,7 @@ public class BlockDecomposer implements StackOperations {
 		Block trueBlock = newLookAheadBlock("if_true_", label);
 		currentBlock.addNextBlock(falseBlock);
 		currentBlock.addNextBlock(trueBlock);
-		currentBlock = falseBlock;
+		setCurrentBlock(falseBlock);
 	}
 
 	private Block newBlock(String prefix) {
@@ -139,7 +153,7 @@ public class BlockDecomposer implements StackOperations {
 			currentBlock.addNextBlock(newLookAheadBlock("case_", caseLabel));
 		}
 		currentBlock.addNextBlock(newLookAheadBlock("dflt_", dflt));
-		currentBlock = null;
+		setCurrentBlock(null);
 	}
 
 	public void label(Label label) {
@@ -148,10 +162,21 @@ public class BlockDecomposer implements StackOperations {
 			if (currentBlock != null && !currentBlock.isTerminal()) {
 				currentBlock.addNextBlock(nextBlock);
 			}
-			currentBlock = nextBlock;
-		} else if (currentBlock == null) {
-			currentBlock = newBlock("");
-			lookAheadBlocks.put(label, currentBlock);
+			setCurrentBlock(nextBlock);
+		} else {
+			if (currentBlock == null) {
+				setCurrentBlock(newBlock(""));
+				lookAheadBlocks.put(label, currentBlock);
+			} else if (currentBlock.getOperations().size() == 0) {
+				lookAheadBlocks.put(label, currentBlock);
+			} else {
+				Block nextBlock = newBlock("");
+				if (!currentBlock.isTerminal()) {
+					currentBlock.addNextBlock(nextBlock);
+				}
+				setCurrentBlock(nextBlock);
+				lookAheadBlocks.put(label, currentBlock);
+			}
 		}
 	}
 
@@ -169,14 +194,9 @@ public class BlockDecomposer implements StackOperations {
 	@Override
 	public String toString() {
 		StringBuilder buf = new StringBuilder();
-		List<Block> blocks = new LinkedList<Block>();
 		List<Block> processed = new LinkedList<Block>();
-		blocks.add(mainBlock);
-		while (!blocks.isEmpty()) {
-			Block block = blocks.remove(0);
+		for (Block block : blocksInOrder) {
 			processed.add(block);
-			blocks.addAll(block.getNextBlocks());
-			blocks.removeAll(processed);
 			buf.append(block);
 			buf.append("\n");
 		}

@@ -17,13 +17,10 @@ package com.google.test.metric.collection;
 
 import java.util.List;
 
-public class PopClosure<KEY, VALUE> {
-	
-	public void pop(KEY key, List<VALUE> list){
-		pop(key, list.get(0));
-	}
-	
-	public void pop(KEY key, VALUE value){
-	}
+public abstract class PopClosure<KEY, VALUE> {
 
+	public abstract int getSize();
+	
+	public abstract List<VALUE> pop(KEY key, List<VALUE> list);
+	
 }

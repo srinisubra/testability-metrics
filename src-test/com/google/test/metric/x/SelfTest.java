@@ -37,11 +37,11 @@ public class SelfTest extends TestCase {
 		System.out.println(computer.compute(ClassCost.class));
 	}
 
-	public void XtestClassRepository() throws Exception {
+	public void testClassRepository() throws Exception {
 		System.out.println(computer.compute(ClassRepository.class));
 	}
 
-	public void XtestClassReader() throws Exception {
+	public void testClassReader() throws Exception {
 		System.out.println(computer.compute(ClassReader.class));
 	}
 

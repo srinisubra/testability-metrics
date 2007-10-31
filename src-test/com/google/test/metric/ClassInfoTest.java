@@ -17,6 +17,7 @@
 package com.google.test.metric;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -165,6 +166,25 @@ public class ClassInfoTest extends TestCase {
 
 	public void testJavaLangString() throws Exception {
 		repo.getClass(String.class);
+	}
+
+	public void testJavaUtilBitSet() throws Exception {
+		repo.getClass(BitSet.class);
+	}
+
+	static class BitSetGetMethod {
+		private long[] bits;
+
+		public BitSetGetMethod get(int fromIndex, int toIndex) {
+			int startBitIndex = 0;
+			while (true) {
+				bits[0] = bits[1] | (startBitIndex == 2 ? 0 : 2);
+			}
+		}
+	}
+
+	public void testJavaUtilBitSetGetMethod() throws Exception {
+		repo.getClass(BitSetGetMethod.class);
 	}
 
 	private static class Monitor {

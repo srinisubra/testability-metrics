@@ -65,19 +65,21 @@ public class Stack2Turing {
 
 	private void translateStackOperation(Block block,
 			final StackOperation operation) {
-		int consumes = operation.getOperatorCount();
-		stack.pop(block, consumes, new PopClosure<Block, Variable>() {
+		stack.apply(block, new PopClosure<Block, Variable>() {
 			@Override
-			public void pop(Block key, List<Variable> input) {
+			public List<Variable> pop(Block key, List<Variable> input) {
 				List<Variable> variables = operation.apply(input);
 				assertValid(variables);
-				for (Variable output : variables) {
-					stack.push(key, output);
-				}
 				Operation turingOp = operation.toOperation(input);
 				if (turingOp != null) {
 					operations.add(turingOp);
 				}
+				return variables;
+			}
+
+			@Override
+			public int getSize() {
+				return operation.getOperatorCount();
 			}
 		});
 	}
