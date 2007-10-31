@@ -23,6 +23,7 @@ import java.util.List;
 
 import com.google.test.metric.method.op.stack.Return;
 import com.google.test.metric.method.op.stack.StackOperation;
+import com.google.test.metric.method.op.stack.Throw;
 
 public class Block implements StackOperations {
 
@@ -45,7 +46,7 @@ public class Block implements StackOperations {
 
 	public void addOp(StackOperation operation) {
 		operations.add(operation);
-		if (operation instanceof Return) {
+		if (operation instanceof Return || operation instanceof Throw) {
 			// Return statement must be last one. Freeze the block!
 			isTerminal = true;
 			nextBlocks = emptyList();
@@ -64,6 +65,12 @@ public class Block implements StackOperations {
 		buf.append(id);
 		String sep = " -> ";
 		for (Block next : nextBlocks) {
+			buf.append(sep);
+			buf.append(next.id);
+			sep = ", ";
+		}
+		sep = " <- ";
+		for (Block next : previousBlocks) {
 			buf.append(sep);
 			buf.append(next.id);
 			sep = ", ";

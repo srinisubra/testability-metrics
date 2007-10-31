@@ -126,20 +126,8 @@ public class KeyedMultiStack<KEY, VALUE> {
 	}
 
 	public void init(KEY key) {
+		head.clear();
 		head.put(key, list(root));
-	}
-
-	/**
-	 * Push a value on the stack
-	 * 
-	 * @param key
-	 *            which could represent more then one stack.
-	 * @param value
-	 *            value to push
-	 */
-	public void push(KEY key, VALUE value) {
-		List<Entry<VALUE>> parents = removeHead(key);
-		head.put(key, list(new Entry<VALUE>(parents, value)));
 	}
 
 	private List<Entry<VALUE>> getHead(KEY key) {
@@ -174,11 +162,33 @@ public class KeyedMultiStack<KEY, VALUE> {
 	 * @param popClosure
 	 *            Closer which will be called once per each virtual stack.
 	 */
-	public void pop(KEY key, int size, PopClosure<KEY, VALUE> popClosure) {
-		List<List<VALUE>> paths = fillPopPaths(getHead(key), size);
-		popPaths(key, size);
+	@SuppressWarnings("unchecked")
+	public void apply(KEY key, PopClosure<KEY, VALUE> popClosure) {
+		int popSize = popClosure.getSize();
+		List<List<VALUE>> paths = fillPopPaths(getHead(key), popSize);
+		popPaths(key, popSize);
+		VALUE[][] values = (VALUE[][]) new Object[paths.size()][];
+		int i = 0;
+		int pushSize = -1;
 		for (List<VALUE> path : paths) {
-			popClosure.pop(key, path);
+			VALUE[] pushSet = (VALUE[]) popClosure.pop(key, path).toArray();
+			if (pushSize == -1) {
+				pushSize = pushSet.length;
+			} else if (pushSize != pushSet.length) {
+				throw new IllegalStateException(
+						"All push pushes must be of same size.");
+			}
+			values[i++] = pushSet;
+		}
+		for (int depth = 0; depth < pushSize; depth++) {
+			List<Entry<VALUE>> parent = head.get(key);
+			List<Entry<VALUE>> newHead = new LinkedList<Entry<VALUE>>();
+			for (int set = 0; set < values.length; set++) {
+				List<Entry<VALUE>> list;
+				list = depth == 0 ? parent : asList(parent.get(set));
+				newHead.add(new Entry<VALUE>(list, values[set][depth]));
+			}
+			head.put(key, newHead);
 		}
 	}
 
@@ -188,6 +198,7 @@ public class KeyedMultiStack<KEY, VALUE> {
 		}
 		List<Entry<VALUE>> newEntries = new LinkedList<Entry<VALUE>>();
 		for (Entry<VALUE> entry : getHead(key)) {
+			newEntries.removeAll(entry.getParents());
 			newEntries.addAll(entry.getParents());
 		}
 		head.put(key, newEntries);
