@@ -15,6 +15,8 @@
  */
 package com.google.test.metric.method;
 
+import static java.util.Arrays.asList;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.List;
 import com.google.test.metric.Variable;
 import com.google.test.metric.collection.KeyedMultiStack;
 import com.google.test.metric.collection.PopClosure;
+import com.google.test.metric.method.op.stack.JSR;
 import com.google.test.metric.method.op.stack.StackOperation;
 import com.google.test.metric.method.op.turing.Operation;
 
@@ -36,15 +39,28 @@ public class Stack2Turing {
 	}
 
 	public List<Operation> translate() {
+		stack.init(rootBlock);
+		translate(rootBlock);
+		return operations;
+	}
+
+	private Block translate(Block block) {
 		List<Block> blocks = new LinkedList<Block>();
 		List<Block> processed = new LinkedList<Block>();
-		stack.init(rootBlock);
-		blocks.add(rootBlock);
+		blocks.add(block);
 		while (!blocks.isEmpty()) {
-			Block block = blocks.remove(0);
+			block = blocks.remove(0);
 			processed.add(block);
 			for (StackOperation operation : block.getOperations()) {
 				translateStackOperation(block, operation);
+				if (operation instanceof JSR) {
+					JSR jsr = (JSR) operation;
+					Block jsrBlock = jsr.getBlock();
+					stack.split(block, asList(jsrBlock));
+					Block terminalBlock = translate(jsrBlock);
+					stack.join(asList(terminalBlock), block);
+					processed.add(jsrBlock);
+				}
 			}
 			List<Block> nextBlocks = new LinkedList<Block>(block
 					.getNextBlocks());
@@ -60,7 +76,7 @@ public class Stack2Turing {
 		// paths where stacks are not emptied. So we can't assert this.
 		// Verdict is still out.
 		// stack.assertEmpty();
-		return operations;
+		return block;
 	}
 
 	private void translateStackOperation(Block block,

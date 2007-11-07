@@ -50,6 +50,7 @@ import com.google.test.metric.method.op.stack.MonitorExit;
 import com.google.test.metric.method.op.stack.MultiANewArrayIns;
 import com.google.test.metric.method.op.stack.Pop;
 import com.google.test.metric.method.op.stack.PutField;
+import com.google.test.metric.method.op.stack.RetSub;
 import com.google.test.metric.method.op.stack.Return;
 import com.google.test.metric.method.op.stack.Store;
 import com.google.test.metric.method.op.stack.Swap;
@@ -144,6 +145,10 @@ public class MethodVisitorBuilder implements MethodVisitor {
 						break;
 					case Opcodes.IF_ICMPNE:
 						if2("IF_ICMPNE");
+						break;
+					case Opcodes.JSR:
+						// TODO: This is not quite right.
+						block.jumpSubroutine(label, lineNumber);
 						break;
 					default:
 						throw new UnsupportedOperationException("" + opcode);
@@ -266,8 +271,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
 
 	public void visitTypeInsn(final int opcode, final String desc) {
 		if (desc.length() == 1) {
-			throw new IllegalStateException("WARNING! I don't expect primitive types:"
-					+ desc);
+			throw new IllegalStateException(
+					"WARNING! I don't expect primitive types:" + desc);
 		}
 		final Type type = desc.contains(";") ? Type.fromDesc(desc) : Type
 				.fromJava(desc);
@@ -332,6 +337,16 @@ public class MethodVisitorBuilder implements MethodVisitor {
 			store(var, Type.OBJECT);
 			break;
 
+		case Opcodes.RET:
+			recorder.add(new Runnable() {
+				public void run() {
+					block.addOp(new RetSub(lineNumber));
+				}
+			});
+			break;
+			
+		default:
+			throw new UnsupportedOperationException("opcode: " + opcode);
 		}
 	}
 
