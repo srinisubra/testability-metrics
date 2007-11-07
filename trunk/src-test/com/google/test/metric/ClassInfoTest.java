@@ -16,6 +16,7 @@
 
 package com.google.test.metric;
 
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -205,5 +206,9 @@ public class ClassInfoTest extends TestCase {
 
 	public void testMonitor() throws Exception {
 		repo.getClass(Monitor.class);
+	}
+
+	public void testJSRinstructionInTryCatchFinally() throws Exception {
+		repo.getClass(InetAddress.class);
 	}
 }

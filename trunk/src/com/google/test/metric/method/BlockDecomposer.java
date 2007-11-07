@@ -26,6 +26,7 @@ import java.util.Map;
 import org.objectweb.asm.Label;
 
 import com.google.test.metric.Type;
+import com.google.test.metric.method.op.stack.JSR;
 import com.google.test.metric.method.op.stack.Load;
 import com.google.test.metric.method.op.stack.StackOperation;
 import com.google.test.metric.method.op.turing.Operation;
@@ -122,6 +123,11 @@ public class BlockDecomposer implements StackOperations {
 		setCurrentBlock(falseBlock);
 	}
 
+	public void jumpSubroutine(Label sub, int lineNumber) {
+	    Block subBlock = newLookAheadBlock("subroutine", sub);
+	    currentBlock.addOp(new JSR(lineNumber, subBlock));
+	}
+
 	private Block newBlock(String prefix) {
 		return new Block("" + (prefix + nextBlockId++));
 	}
@@ -202,5 +208,10 @@ public class BlockDecomposer implements StackOperations {
 		}
 		return buf.toString();
 	}
+
+	public Block getMainBlock() {
+		return mainBlock;
+	}
+
 
 }
