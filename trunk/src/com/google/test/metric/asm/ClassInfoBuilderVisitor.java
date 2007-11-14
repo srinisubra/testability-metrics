@@ -15,48 +15,57 @@
  */
 package com.google.test.metric.asm;
 
+import com.google.test.metric.ClassInfo;
+import com.google.test.metric.ClassRepository;
+
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import com.google.test.metric.ClassInfo;
-import com.google.test.metric.ClassRepository;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClassInfoBuilderVisitor extends NoopClassVisitor {
 
-	private final ClassRepository repository;
-	private ClassInfo classInfo;
-	
-	public ClassInfoBuilderVisitor(ClassRepository repository) {
-		this.repository = repository;
-	}
+  private final ClassRepository repository;
+  private ClassInfo classInfo;
 
-	@Override
-	public void visit(int version, int access, String name, String signature,
-			String superName, String[] interfaces) {
-		ClassInfo superClass = null;
-		superClass = superName == null ? null : repository.getClass(superName);
-		classInfo = new ClassInfo(name, superClass);
-		repository.addClass(classInfo);
-	}
+  public ClassInfoBuilderVisitor(ClassRepository repository) {
+    this.repository = repository;
+  }
 
-	@Override
-	public MethodVisitor visitMethod(int access, String name, String desc,
-			String signature, String[] exceptions) {
-		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		return new MethodVisitorBuilder(repository, classInfo, name, desc, signature,
-				exceptions, isStatic, Visibility.valueOf(access));
-	}
+  @Override
+  public void visit(int version, int access, String name, String signature,
+      String superName, String[] interfaces) {
+    ClassInfo superClass = null;
+    superClass = superName == null ? null : repository.getClass(superName);
 
-	@Override
-	public FieldVisitor visitField(int access, String name, String desc,
-			String signature, Object value) {
-		return new FieldVisitorBuilder(classInfo, access, name, desc,
-				signature, value);
-	}
+    List<ClassInfo> interfaceList = new ArrayList<ClassInfo>();
+    for (String interfaze : interfaces) {
+      interfaceList.add(repository.getClass(interfaze));
+    }
+    boolean isInterface = (access & Opcodes.ACC_INTERFACE) == Opcodes.ACC_INTERFACE;
+    classInfo = new ClassInfo(name, isInterface, superClass, interfaceList);
+    repository.addClass(classInfo);
+  }
 
-	public ClassInfo getClassInfo() {
-		return classInfo;
-	}
+  @Override
+  public MethodVisitor visitMethod(int access, String name, String desc,
+      String signature, String[] exceptions) {
+    boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
+    return new MethodVisitorBuilder(repository, classInfo, name, desc, signature,
+        exceptions, isStatic, Visibility.valueOf(access));
+  }
+
+  @Override
+  public FieldVisitor visitField(int access, String name, String desc,
+      String signature, Object value) {
+    return new FieldVisitorBuilder(classInfo, access, name, desc,
+        signature, value);
+  }
+
+  public ClassInfo getClassInfo() {
+    return classInfo;
+  }
 
 }
