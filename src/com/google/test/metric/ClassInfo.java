@@ -17,67 +17,90 @@ package com.google.test.metric;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public class ClassInfo {
 
-	private final Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
-	private final Map<String, FieldInfo> fields = new HashMap<String, FieldInfo>();
-	private final String name;
-	private final ClassInfo superClass;
+  private final Map<String, MethodInfo> methods = new HashMap<String, MethodInfo>();
+  private final Map<String, FieldInfo> fields = new HashMap<String, FieldInfo>();
+  private final String name;
+  private boolean isInterface;
+  private final ClassInfo superClass;
+  private final List<ClassInfo> interfaces;
 
-	public ClassInfo(String name, ClassInfo superClass) {
-		this.superClass = superClass;
-		this.name = name.replace("/", ".");
-	}
+  public ClassInfo(String name, boolean isInterface, ClassInfo superClass,
+      List<ClassInfo> interfaces) {
+    this.isInterface = isInterface;
+    this.superClass = superClass;
+    this.interfaces = interfaces;
+    this.name = name.replace("/", ".");
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public MethodInfo getMethod(String methodName) {
-		ClassInfo clazz = this;
-		while(clazz != null) {
-			MethodInfo methodInfo = clazz.methods.get(methodName);
-			if (methodInfo != null) {
-				return methodInfo;
-			}
-			clazz = clazz.superClass;
-		}
-		throw new MethodNotFoundException(this, methodName);
-	}
+  public ClassInfo getSuperClass() {
+    return superClass;
+  }
 
-	public void addMethod(MethodInfo methodInfo) {
-		methods.put(methodInfo.getNameDesc(), methodInfo);
-	}
+  public boolean isInterface() {
+    return isInterface;
+  }
 
-	@Override
-	public String toString() {
-		return name;
-	}
+  public MethodInfo getMethod(String methodName) {
+    List<ClassInfo> superClasses = new LinkedList<ClassInfo>();
+    superClasses.add(this);
+    while (!superClasses.isEmpty()) {
+      ClassInfo clazz = superClasses.remove(0);
+      MethodInfo methodInfo = clazz.methods.get(methodName);
+      if (methodInfo != null) {
+        return methodInfo;
+      }
+      if (clazz.superClass != null) {
+        superClasses.add(0, clazz.superClass);
+      }
+      superClasses.addAll(clazz.interfaces);
+    }
+    throw new MethodNotFoundException(this, methodName);
+  }
 
-	public FieldInfo getField(String fieldName) {
-		ClassInfo clazz = this;
-		while(clazz != null) {
-			FieldInfo fieldInfo = clazz.fields.get(fieldName);
-			if (fieldInfo != null) {
-				return fieldInfo;
-			}
-			clazz = clazz.superClass;
-		}
-		throw new FieldNotFoundException(this, fieldName);
-	}
+  public void addMethod(MethodInfo methodInfo) {
+    methods.put(methodInfo.getNameDesc(), methodInfo);
+  }
 
-	public void addField(FieldInfo fieldInfo) {
-		fields.put(fieldInfo.getName(), fieldInfo);
-	}
+  @Override
+  public String toString() {
+    return name;
+  }
 
-	public Collection<MethodInfo> getMethods() {
-		return methods.values();
-	}
+  public FieldInfo getField(String fieldName) {
+    ClassInfo clazz = this;
+    while (clazz != null) {
+      FieldInfo fieldInfo = clazz.fields.get(fieldName);
+      if (fieldInfo != null) {
+        return fieldInfo;
+      }
+      clazz = clazz.superClass;
+    }
+    throw new FieldNotFoundException(this, fieldName);
+  }
 
-	public Collection<FieldInfo> getFields() {
-		return fields.values();
-	}
+  public void addField(FieldInfo fieldInfo) {
+    fields.put(fieldInfo.getName(), fieldInfo);
+  }
 
+  public Collection<MethodInfo> getMethods() {
+    return methods.values();
+  }
+
+  public Collection<FieldInfo> getFields() {
+    return fields.values();
+  }
+
+  public List<ClassInfo> getInterfaces() {
+    return interfaces;
+  }
 }
