@@ -19,13 +19,13 @@ import com.google.test.metric.Type;
 
 public class RetSub extends Return {
 
-	public RetSub(int lineNumber) {
-		super(lineNumber, Type.VOID);
-	}
-	
-	@Override
-	public String toString() {
-		return "RETSUB";
-	}
+  public RetSub(int lineNumber) {
+    super(lineNumber, Type.VOID);
+  }
+
+  @Override
+  public String toString() {
+    return "RETSUB";
+  }
 
 }

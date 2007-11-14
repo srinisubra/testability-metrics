@@ -15,34 +15,34 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.op.turing.Assignment;
 import com.google.test.metric.method.op.turing.Operation;
 
+import java.util.List;
+
 public class Store extends StackOperation {
 
-	private final Variable variable;
+  private final Variable variable;
 
-	public Store(int lineNumber, Variable variable) {
-		super(lineNumber);
-		this.variable = variable;
-	}
+  public Store(int lineNumber, Variable variable) {
+    super(lineNumber);
+    this.variable = variable;
+  }
 
-	@Override
-	public String toString() {
-		return "store " + variable;
-	}
+  @Override
+  public String toString() {
+    return "store " + variable;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return variable.getType().isDouble() ? 2 : 1;
-	}
+  @Override
+  public int getOperatorCount() {
+    return variable.getType().isDouble() ? 2 : 1;
+  }
 
-	@Override
-	public Operation toOperation(List<Variable> input) {
-		return new Assignment(lineNumber, variable, input.get(0));
-	}
-	
+  @Override
+  public Operation toOperation(List<Variable> input) {
+    return new Assignment(lineNumber, variable, input.get(0));
+  }
+
 }

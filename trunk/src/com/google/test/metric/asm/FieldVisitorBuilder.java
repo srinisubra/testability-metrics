@@ -15,23 +15,23 @@
  */
 package com.google.test.metric.asm;
 
-import org.objectweb.asm.FieldVisitor;
-import org.objectweb.asm.Opcodes;
-
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.FieldInfo;
 import com.google.test.metric.Type;
 
-public class FieldVisitorBuilder extends NoopFieldVisitor implements
-		FieldVisitor {
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Opcodes;
 
-	public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
-			String desc, String signature, Object value) {
-		boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
-		boolean isPrivate = Visibility.valueOf(access) == Visibility.PRIVATE;
-		Type type = Type.fromDesc(desc);
-		classInfo.addField(new FieldInfo(classInfo, name, type, isStatic,
-				isPrivate));
-	}
+public class FieldVisitorBuilder extends NoopFieldVisitor implements
+    FieldVisitor {
+
+  public FieldVisitorBuilder(ClassInfo classInfo, int access, String name,
+      String desc, String signature, Object value) {
+    boolean isStatic = (access & Opcodes.ACC_STATIC) == Opcodes.ACC_STATIC;
+    boolean isPrivate = Visibility.valueOf(access) == Visibility.PRIVATE;
+    Type type = Type.fromDesc(desc);
+    classInfo.addField(new FieldInfo(classInfo, name, type, isStatic,
+        isPrivate));
+  }
 
 }

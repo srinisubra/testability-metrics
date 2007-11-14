@@ -18,5 +18,5 @@ package com.google.test.metric.method;
 import com.google.test.metric.method.op.stack.StackOperation;
 
 public interface StackOperations {
-	void addOp(StackOperation operation);
+  void addOp(StackOperation operation);
 }

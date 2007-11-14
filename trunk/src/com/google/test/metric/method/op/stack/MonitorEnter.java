@@ -17,17 +17,17 @@ package com.google.test.metric.method.op.stack;
 
 public class MonitorEnter extends StackOperation {
 
-	public MonitorEnter(int lineNumber) {
-		super(lineNumber);
-	}
+  public MonitorEnter(int lineNumber) {
+    super(lineNumber);
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 1;
-	}
-	
-	@Override
-	public String toString() {
-		return "monitor enter";
-	}
+  @Override
+  public int getOperatorCount() {
+    return 1;
+  }
+
+  @Override
+  public String toString() {
+    return "monitor enter";
+  }
 }

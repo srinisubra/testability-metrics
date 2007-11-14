@@ -19,37 +19,37 @@ import junit.framework.Assert;
 
 public class InjectabilityVerifier {
 
-	private String errors = "";
+  private String errors = "";
 
-	public void assertInjectable(ClassInfo classInfo, InjectabilityContext context) {
-		for (Variable field : classInfo.getFields()) {
-			verify(field, context);
-		}
-		for (MethodInfo method : classInfo.getMethods()) {
-			for (Variable param : method.getParameters()) {
-				verify(param, context);
-			}
-			for (Variable param : method.getLocalVariables()) {
-				verify(param, context);
-			}
-		}
-		Assert.assertTrue(errors, errors.length() == 0);
-	}
+  public void assertInjectable(ClassInfo classInfo, InjectabilityContext context) {
+    for (Variable field : classInfo.getFields()) {
+      verify(field, context);
+    }
+    for (MethodInfo method : classInfo.getMethods()) {
+      for (Variable param : method.getParameters()) {
+        verify(param, context);
+      }
+      for (Variable param : method.getLocalVariables()) {
+        verify(param, context);
+      }
+    }
+    Assert.assertTrue(errors, errors.length() == 0);
+  }
 
-	public void verify(Variable variable, InjectabilityContext context) {
-		if (variable.getName().equals("this")) {
-		} else if (variable.getName().endsWith("_I")) {
-			if (!context.isInjectable(variable)) {
-				errors += "\n" + variable + " should be injectable";
-			}
-		} else if (variable.getName().endsWith("_NI")) {
-			if (context.isInjectable(variable)) {
-				errors += "\n" + variable + " should be non injectable";
-			}
-		} else {
-			errors += "\n" + variable + " should end with '_I' or '_NI'.";
-		}
-	}
+  public void verify(Variable variable, InjectabilityContext context) {
+    if (variable.getName().equals("this")) {
+    } else if (variable.getName().endsWith("_I")) {
+      if (!context.isInjectable(variable)) {
+        errors += "\n" + variable + " should be injectable";
+      }
+    } else if (variable.getName().endsWith("_NI")) {
+      if (context.isInjectable(variable)) {
+        errors += "\n" + variable + " should be non injectable";
+      }
+    } else {
+      errors += "\n" + variable + " should end with '_I' or '_NI'.";
+    }
+  }
 
 
 }

@@ -15,35 +15,35 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import com.google.test.metric.Variable;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.test.metric.Variable;
-
 public class Duplicate extends StackOperation {
 
-	private final int offset;
+  private final int offset;
 
-	public Duplicate(int lineNumber, int offset) {
-		super(lineNumber);
-		this.offset = offset;
-	}
+  public Duplicate(int lineNumber, int offset) {
+    super(lineNumber);
+    this.offset = offset;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 1 + offset;
-	}
+  @Override
+  public int getOperatorCount() {
+    return 1 + offset;
+  }
 
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		LinkedList<Variable> list = new LinkedList<Variable>(input);
-		list.add(0, input.get(input.size() - 1));
-		return list;
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    LinkedList<Variable> list = new LinkedList<Variable>(input);
+    list.add(0, input.get(input.size() - 1));
+    return list;
+  }
 
-	@Override
-	public String toString() {
-		return "duplicate" + (offset > 0 ? "_X" + offset : "");
-	}
+  @Override
+  public String toString() {
+    return "duplicate" + (offset > 0 ? "_X" + offset : "");
+  }
 
 }

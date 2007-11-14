@@ -18,18 +18,18 @@ package com.google.test.metric.asm;
 import org.objectweb.asm.Opcodes;
 
 public enum Visibility {
-	PUBLIC, PACKAGE, PROTECTED, PRIVATE;
+  PUBLIC, PACKAGE, PROTECTED, PRIVATE;
 
-	public static Visibility valueOf(int access) {
-		if ((access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC) {
-			return PUBLIC;
-		} else if ((access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED) {
-			return PROTECTED;
-		} else if ((access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE) {
-			return PRIVATE;
-		} else {
-			return PACKAGE;
-		}
-	}
+  public static Visibility valueOf(int access) {
+    if ((access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC) {
+      return PUBLIC;
+    } else if ((access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED) {
+      return PROTECTED;
+    } else if ((access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE) {
+      return PRIVATE;
+    } else {
+      return PACKAGE;
+    }
+  }
 
 }

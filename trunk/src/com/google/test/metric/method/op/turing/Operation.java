@@ -19,15 +19,15 @@ import com.google.test.metric.InjectabilityContext;
 
 public abstract class Operation {
 
-	private final int lineNumber;
+  private final int lineNumber;
 
-	public Operation(int lineNumber) {
-		this.lineNumber = lineNumber;
-	}
+  public Operation(int lineNumber) {
+    this.lineNumber = lineNumber;
+  }
 
-	public int getLineNumber() {
-		return lineNumber;
-	}
+  public int getLineNumber() {
+    return lineNumber;
+  }
 
-	public abstract void computeMetric(InjectabilityContext context);
+  public abstract void computeMetric(InjectabilityContext context);
 }

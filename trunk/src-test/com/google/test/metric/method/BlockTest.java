@@ -15,12 +15,6 @@
  */
 package com.google.test.metric.method;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
-import junit.framework.TestCase;
-
 import com.google.test.metric.FieldInfo;
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
@@ -31,101 +25,106 @@ import com.google.test.metric.method.op.stack.PutField;
 import com.google.test.metric.method.op.turing.MethodInvokation;
 import com.google.test.metric.method.op.turing.Operation;
 
+import junit.framework.TestCase;
+
+import static java.util.Arrays.asList;
+import java.util.List;
+
 public class BlockTest extends TestCase {
 
-	private static final Type OBJECT = Type.fromClass(Object.class);
+  private static final Type OBJECT = Type.fromClass(Object.class);
 
-	public void testBlockToString() throws Exception {
-		Block block = new Block("1");
-		assertEquals("Block[1]{\n}", block.toString());
+  public void testBlockToString() throws Exception {
+    Block block = new Block("1");
+    assertEquals("Block[1]{\n}", block.toString());
 
-		block.addOp(new Load(-1, var(1)));
-		assertEquals("Block[1]{\n  load 1{java.lang.Object}\n}", block.toString());
-	}
+    block.addOp(new Load(-1, var(1)));
+    assertEquals("Block[1]{\n  load 1{java.lang.Object}\n}", block.toString());
+  }
 
-	public void testVariableStaticAssignment() throws Exception {
-		Block block = new Block("1");
-		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
-				true, false)));
+  public void testVariableStaticAssignment() throws Exception {
+    Block block = new Block("1");
+    block.addOp(new Load(-1, var(1)));
+    block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
+        true, false)));
 
-		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
-	}
+    List<Operation> operations = new Stack2Turing(block).translate();
+    assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
+  }
 
-	public void testVariableAssignment() throws Exception {
-		Block block = new Block("1");
-		block.addOp(new Load(-1, var("this"))); // this
-		block.addOp(new Load(-1, var(1)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
-				false, false)));
+  public void testVariableAssignment() throws Exception {
+    Block block = new Block("1");
+    block.addOp(new Load(-1, var("this"))); // this
+    block.addOp(new Load(-1, var(1)));
+    block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
+        false, false)));
 
-		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
-	}
+    List<Operation> operations = new Stack2Turing(block).translate();
+    assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
+  }
 
-	public void testGetField() throws Exception {
-		Block block = new Block("1");
-		block.addOp(new GetField(-1, new FieldInfo(null, "src", OBJECT,
-				true, false)));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
-				true, false)));
+  public void testGetField() throws Exception {
+    Block block = new Block("1");
+    block.addOp(new GetField(-1, new FieldInfo(null, "src", OBJECT,
+        true, false)));
+    block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
+        true, false)));
 
-		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.dst{java.lang.Object} <- null.src{java.lang.Object}]", operations
-				.toString());
-	}
+    List<Operation> operations = new Stack2Turing(block).translate();
+    assertEquals("[null.dst{java.lang.Object} <- null.src{java.lang.Object}]", operations
+        .toString());
+  }
 
-	public void testMethodInvocation() throws Exception {
-		Block block = new Block("1");
-		block.addOp(new Load(-1, var("methodThis"))); // this
-		block.addOp(new GetField(-1, new FieldInfo(null, "p1", OBJECT,
-				true, false)));
-		block.addOp(new GetField(-1, new FieldInfo(null, "p2", OBJECT,
-				true, false)));
-		block.addOp(new Invoke(-1, null, "methodA", "(II)A", asList(Type.INT,
-				Type.INT), false, OBJECT));
-		block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
-				true, false)));
+  public void testMethodInvocation() throws Exception {
+    Block block = new Block("1");
+    block.addOp(new Load(-1, var("methodThis"))); // this
+    block.addOp(new GetField(-1, new FieldInfo(null, "p1", OBJECT,
+        true, false)));
+    block.addOp(new GetField(-1, new FieldInfo(null, "p2", OBJECT,
+        true, false)));
+    block.addOp(new Invoke(-1, null, "methodA", "(II)A", asList(Type.INT,
+        Type.INT), false, OBJECT));
+    block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
+        true, false)));
 
-		List<Operation> operations = new Stack2Turing(block).translate();
-		assertEquals("[null.methodA(II)A, null.dst{java.lang.Object} <- ?{java.lang.Object}]",
-				operations.toString());
-	}
+    List<Operation> operations = new Stack2Turing(block).translate();
+    assertEquals("[null.methodA(II)A, null.dst{java.lang.Object} <- ?{java.lang.Object}]",
+        operations.toString());
+  }
 
-	private Variable var(Object value) {
-		return new Constant(value, OBJECT);
-	}
+  private Variable var(Object value) {
+    return new Constant(value, OBJECT);
+  }
 
-	public void testDiamondBlockArrangment() throws Exception {
-		Block root = new Block("root");
-		Block branchA = new Block("branchA");
-		Block branchB = new Block("branchB");
-		Block joined = new Block("joined");
-		root.addNextBlock(branchA);
-		root.addNextBlock(branchB);
-		branchA.addNextBlock(joined);
-		branchB.addNextBlock(joined);
+  public void testDiamondBlockArrangment() throws Exception {
+    Block root = new Block("root");
+    Block branchA = new Block("branchA");
+    Block branchB = new Block("branchB");
+    Block joined = new Block("joined");
+    root.addNextBlock(branchA);
+    root.addNextBlock(branchB);
+    branchA.addNextBlock(joined);
+    branchB.addNextBlock(joined);
 
-		root.addOp(new Load(-1, var("this")));
-		root.addOp(new Load(-1, var("root")));
-		branchA.addOp(new Load(-1, var("A")));
-		branchB.addOp(new Load(-1, var("B")));
-		joined.addOp(new Load(-1, var("joined")));
-		joined.addOp(new Invoke(-1, null, "m", "(III)V", asList(Type.INT,
-				Type.INT, Type.INT), false, Type.VOID));
+    root.addOp(new Load(-1, var("this")));
+    root.addOp(new Load(-1, var("root")));
+    branchA.addOp(new Load(-1, var("A")));
+    branchB.addOp(new Load(-1, var("B")));
+    joined.addOp(new Load(-1, var("joined")));
+    joined.addOp(new Invoke(-1, null, "m", "(III)V", asList(Type.INT,
+        Type.INT, Type.INT), false, Type.VOID));
 
-		List<Operation> operations = new Stack2Turing(root).translate();
-		assertEquals(2, operations.size());
-		MethodInvokation m1 = (MethodInvokation) operations.get(0);
-		MethodInvokation m2 = (MethodInvokation) operations.get(1);
+    List<Operation> operations = new Stack2Turing(root).translate();
+    assertEquals(2, operations.size());
+    MethodInvokation m1 = (MethodInvokation) operations.get(0);
+    MethodInvokation m2 = (MethodInvokation) operations.get(1);
 
-		assertEquals("[root{java.lang.Object}, B{java.lang.Object}, joined{java.lang.Object}]", m1
-				.getParameters().toString());
-		assertEquals("this{java.lang.Object}", m1.getMethodThis().toString());
-		assertEquals("[root{java.lang.Object}, A{java.lang.Object}, joined{java.lang.Object}]", m2
-				.getParameters().toString());
-		assertEquals("this{java.lang.Object}", m2.getMethodThis().toString());
-	}
+    assertEquals("[root{java.lang.Object}, B{java.lang.Object}, joined{java.lang.Object}]", m1
+        .getParameters().toString());
+    assertEquals("this{java.lang.Object}", m1.getMethodThis().toString());
+    assertEquals("[root{java.lang.Object}, A{java.lang.Object}, joined{java.lang.Object}]", m2
+        .getParameters().toString());
+    assertEquals("this{java.lang.Object}", m2.getMethodThis().toString());
+  }
 
 }

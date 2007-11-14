@@ -15,34 +15,34 @@
  */
 package com.google.test.metric.x;
 
-import org.objectweb.asm.ClassReader;
-
-import junit.framework.TestCase;
-
 import com.google.test.metric.ClassCost;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
 
+import junit.framework.TestCase;
+
+import org.objectweb.asm.ClassReader;
+
 public class SelfTest extends TestCase {
 
-	ClassRepository repo = new ClassRepository();
-	MetricComputer computer = new MetricComputer(repo);
+  ClassRepository repo = new ClassRepository();
+  MetricComputer computer = new MetricComputer(repo);
 
-	public void testMethodCost() throws Exception {
-		System.out.println(computer.compute(MethodCost.class));
-	}
+  public void testMethodCost() throws Exception {
+    System.out.println(computer.compute(MethodCost.class));
+  }
 
-	public void testClassCost() throws Exception {
-		System.out.println(computer.compute(ClassCost.class));
-	}
+  public void testClassCost() throws Exception {
+    System.out.println(computer.compute(ClassCost.class));
+  }
 
-	public void testClassRepository() throws Exception {
-		System.out.println(computer.compute(ClassRepository.class));
-	}
+  public void testClassRepository() throws Exception {
+    System.out.println(computer.compute(ClassRepository.class));
+  }
 
-	public void testClassReader() throws Exception {
-		System.out.println(computer.compute(ClassReader.class));
-	}
+  public void testClassReader() throws Exception {
+    System.out.println(computer.compute(ClassReader.class));
+  }
 
 }

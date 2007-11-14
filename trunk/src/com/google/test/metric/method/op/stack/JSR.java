@@ -15,34 +15,34 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Block;
 import com.google.test.metric.method.Constant;
 
+import java.util.List;
+
 public class JSR extends StackOperation {
 
-	private final Block block;
+  private final Block block;
 
-	public JSR(int lineNumber, Block block) {
-		super(lineNumber);
-		this.block = block;
-	}
-	
-	public Block getBlock() {
-		return block;
-	}
-	
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		return list(new Constant("return address", Type.OBJECT));
-	}
+  public JSR(int lineNumber, Block block) {
+    super(lineNumber);
+    this.block = block;
+  }
 
-	@Override
-	public String toString() {
-		return "JSR " + block.getId();
-	}
-	
+  public Block getBlock() {
+    return block;
+  }
+
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    return list(new Constant("return address", Type.OBJECT));
+  }
+
+  @Override
+  public String toString() {
+    return "JSR " + block.getId();
+  }
+
 }

@@ -15,61 +15,61 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Constant;
 
+import java.util.List;
+
 public class Transform extends StackOperation {
 
-	private final String operation;
-	private final Type op1;
-	private final Type op2;
-	private final Type result;
+  private final String operation;
+  private final Type op1;
+  private final Type op2;
+  private final Type result;
 
-	public Transform(int lineNumber, String operation, Type op1, Type op2,
-			Type result) {
-		super(lineNumber);
-		this.operation = operation;
-		this.op1 = op1;
-		this.op2 = op2;
-		this.result = result;
-	}
+  public Transform(int lineNumber, String operation, Type op1, Type op2,
+      Type result) {
+    super(lineNumber);
+    this.operation = operation;
+    this.op1 = op1;
+    this.op2 = op2;
+    this.result = result;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return size(op1) + size(op2);
-	}
+  @Override
+  public int getOperatorCount() {
+    return size(op1) + size(op2);
+  }
 
-	private int size(Type op) {
-		return op == null ? 0 : op.isDouble() ? 2 : 1;
-	}
+  private int size(Type op) {
+    return op == null ? 0 : op.isDouble() ? 2 : 1;
+  }
 
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		if (result == null) {
-			return super.apply(input);
-		} else {
-			return list(new Constant("?", result));
-		}
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    if (result == null) {
+      return super.apply(input);
+    } else {
+      return list(new Constant("?", result));
+    }
+  }
 
-	@Override
-	public String toString() {
-		String sep = " ";
-		String buf = operation;
-		if (op1 != null){
-			 buf += sep + op1;
-			 sep = ", ";
-		}
-		if (op2 != null){
-			buf += sep + op2;
-		}
-		if (result != null){
-			buf += " -> " + result;
-		}
-		return buf;
-	}
+  @Override
+  public String toString() {
+    String sep = " ";
+    String buf = operation;
+    if (op1 != null) {
+      buf += sep + op1;
+      sep = ", ";
+    }
+    if (op2 != null) {
+      buf += sep + op2;
+    }
+    if (result != null) {
+      buf += " -> " + result;
+    }
+    return buf;
+  }
 
 }

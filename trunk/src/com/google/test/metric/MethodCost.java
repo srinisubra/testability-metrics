@@ -17,33 +17,33 @@ package com.google.test.metric;
 
 public class MethodCost {
 
-	private final long complexity;
-	private final MethodInfo method;
+  private final long complexity;
+  private final MethodInfo method;
 
-	public MethodCost(MethodInfo method, long totalCost) {
-		this.method = method;
-		this.complexity = totalCost;
-	}
+  public MethodCost(MethodInfo method, long totalCost) {
+    this.method = method;
+    this.complexity = totalCost;
+  }
 
-	public long getComplexity() {
-		return complexity;
-	}
-	
-	public String getNameDesc() {
-		return method.getNameDesc();
-	}
+  public long getComplexity() {
+    return complexity;
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		toString(buf);
-		return buf.toString();
-	}
+  public String getNameDesc() {
+    return method.getNameDesc();
+  }
 
-	public void toString(StringBuilder buf) {
-		buf.append(method.getNameDesc());
-		buf.append(" cost: ");
-		buf.append(complexity);
-	}
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    toString(buf);
+    return buf.toString();
+  }
+
+  public void toString(StringBuilder buf) {
+    buf.append(method.getNameDesc());
+    buf.append(" cost: ");
+    buf.append(complexity);
+  }
 
 }

@@ -15,56 +15,56 @@
  */
 package com.google.test.metric;
 
+import com.google.test.metric.asm.ClassInfoBuilderVisitor;
+
+import org.objectweb.asm.ClassReader;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.asm.ClassReader;
-
-import com.google.test.metric.asm.ClassInfoBuilderVisitor;
-
 public class ClassRepository {
 
-	private final Map<String, ClassInfo> classes = new HashMap<String, ClassInfo>();
-	
-	public ClassInfo getClass(Class<?> clazz) {
-		return getClass(clazz.getName());
-	}
+  private final Map<String, ClassInfo> classes = new HashMap<String, ClassInfo>();
 
-	public ClassInfo getClass(String clazzName) {
-		if (clazzName.startsWith("[")) {
-			return getClass(Object.class);
-		}
-		ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
-		if (classInfo == null) {
-			classInfo = parseClass(inputStreamForClass(clazzName));
-		}
-		return classInfo;
-	}
+  public ClassInfo getClass(Class<?> clazz) {
+    return getClass(clazz.getName());
+  }
 
-	private InputStream inputStreamForClass(String clazzName) {
-		String resource = clazzName.replace(".", "/") + ".class";
-		InputStream classBytes = ClassLoader.getSystemResourceAsStream(resource);
-		if (classBytes == null) {
-			throw new ClassNotFoundException(clazzName);
-		}
-		return classBytes;
-	}
+  public ClassInfo getClass(String clazzName) {
+    if (clazzName.startsWith("[")) {
+      return getClass(Object.class);
+    }
+    ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
+    if (classInfo == null) {
+      classInfo = parseClass(inputStreamForClass(clazzName));
+    }
+    return classInfo;
+  }
 
-	private ClassInfo parseClass(InputStream classBytes) {
-		try {
-			ClassReader classReader = new ClassReader(classBytes);
-			ClassInfoBuilderVisitor visitor = new ClassInfoBuilderVisitor(this);
-			classReader.accept(visitor, 0);
-			return visitor.getClassInfo();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
+  private InputStream inputStreamForClass(String clazzName) {
+    String resource = clazzName.replace(".", "/") + ".class";
+    InputStream classBytes = ClassLoader.getSystemResourceAsStream(resource);
+    if (classBytes == null) {
+      throw new ClassNotFoundException(clazzName);
+    }
+    return classBytes;
+  }
 
-	public void addClass(ClassInfo classInfo) {
-		classes.put(classInfo.getName(), classInfo);
-	}
+  private ClassInfo parseClass(InputStream classBytes) {
+    try {
+      ClassReader classReader = new ClassReader(classBytes);
+      ClassInfoBuilderVisitor visitor = new ClassInfoBuilderVisitor(this);
+      classReader.accept(visitor, 0);
+      return visitor.getClassInfo();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public void addClass(ClassInfo classInfo) {
+    classes.put(classInfo.getName(), classInfo);
+  }
 
 }

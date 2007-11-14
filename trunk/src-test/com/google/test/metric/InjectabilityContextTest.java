@@ -19,14 +19,14 @@ import junit.framework.TestCase;
 
 public class InjectabilityContextTest extends TestCase {
 
-	public void testIsInjectable() throws Exception {
-		InjectabilityContext context = new InjectabilityContext(null);
-		Variable var = new Variable("", Type.fromJava("X"));
-		assertFalse(context.isInjectable(var));
-		context.setInjectable(var);
-		assertTrue(context.isInjectable(var));
-		assertEquals(1, context.getInjectables().size());
-		assertTrue(context.getInjectables().contains(var));
-	}
-	
+  public void testIsInjectable() throws Exception {
+    InjectabilityContext context = new InjectabilityContext(null);
+    Variable var = new Variable("", Type.fromJava("X"));
+    assertFalse(context.isInjectable(var));
+    context.setInjectable(var);
+    assertTrue(context.isInjectable(var));
+    assertEquals(1, context.getInjectables().size());
+    assertTrue(context.getInjectables().contains(var));
+  }
+
 }

@@ -15,41 +15,41 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import com.google.test.metric.Variable;
+import com.google.test.metric.method.op.turing.Operation;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.test.metric.Variable;
-import com.google.test.metric.method.op.turing.Operation;
-
 public abstract class StackOperation {
-	
-	protected final int lineNumber;
-	
-	public StackOperation(int lineNumber) {
-		this.lineNumber = lineNumber;
-	}
 
-	public List<Variable> apply(List<Variable> input){
-		return Collections.emptyList(); 
-	}
+  protected final int lineNumber;
 
-	public int getOperatorCount(){
-		return 0;
-	}
+  public StackOperation(int lineNumber) {
+    this.lineNumber = lineNumber;
+  }
 
-	public Operation toOperation(List<Variable> input) {
-		return null;
-	}
+  public List<Variable> apply(List<Variable> input) {
+    return Collections.emptyList();
+  }
 
-	protected List<Variable> list(Variable...vars) {
-		ArrayList<Variable> list = new ArrayList<Variable>(vars.length);
-		for (Variable variable : vars) {
-			list.add(variable);
-			if (variable.getType().isDouble()) {
-				list.add(variable);
-			}
-		}
-		return list;
-	}
+  public int getOperatorCount() {
+    return 0;
+  }
+
+  public Operation toOperation(List<Variable> input) {
+    return null;
+  }
+
+  protected List<Variable> list(Variable... vars) {
+    ArrayList<Variable> list = new ArrayList<Variable>(vars.length);
+    for (Variable variable : vars) {
+      list.add(variable);
+      if (variable.getType().isDouble()) {
+        list.add(variable);
+      }
+    }
+    return list;
+  }
 }

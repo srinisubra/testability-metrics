@@ -15,199 +15,200 @@
  */
 package com.google.test.metric.collection;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
+import junit.framework.TestCase;
 
 import java.util.Arrays;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 public class KeyedMultiStackTest extends TestCase {
 
-	public static class Push extends PopClosure<String, Integer> {
+  public static class Push extends PopClosure<String, Integer> {
 
-		private List<Integer> items;
-		
-		public Push(Integer...integers) {
-			items = Arrays.asList(integers);
-		}
+    private List<Integer> items;
 
-		@Override
-		public int getSize() {
-			return 0;
-		}
+    public Push(Integer... integers) {
+      items = Arrays.asList(integers);
+    }
 
-		@Override
-		public List<Integer> pop(String key, List<Integer> list) {
-			return items;
-		}
+    @Override
+    public int getSize() {
+      return 0;
+    }
 
-	}
+    @Override
+    public List<Integer> pop(String key, List<Integer> list) {
+      return items;
+    }
 
-	private final class LoggingClosure extends PopClosure<String, Integer> {
-		private int size;
+  }
 
-		public LoggingClosure(int size) {
-			this.size = size;
-		}
+  private final class LoggingClosure extends PopClosure<String, Integer> {
 
-		public List<Integer> pop(String key, List<Integer> value) {
-			log += value;
-			return emptyList();
-		}
+    private int size;
 
-		@Override
-		public int getSize() {
-			return size;
-		}
-	}
+    public LoggingClosure(int size) {
+      this.size = size;
+    }
 
-	KeyedMultiStack<String, Integer> stack = new KeyedMultiStack<String, Integer>(
-			"");
-	String log = "";
+    public List<Integer> pop(String key, List<Integer> value) {
+      log += value;
+      return emptyList();
+    }
 
-	public void testBasicOperationsOnSingleDimension() throws Exception {
-		stack.apply("", new Push(0));
-		stack.apply("", new PopClosure<String, Integer>() {
-			public List<Integer> pop(String key, List<Integer> value) {
-				assertEquals("", key);
-				assertEquals(1, value.size());
-				assertEquals(new Integer(0), value.get(0));
-				log += value.get(0);
-				return emptyList();
-			}
+    @Override
+    public int getSize() {
+      return size;
+    }
+  }
 
-			@Override
-			public int getSize() {
-				return 1;
-			}
-		});
-		assertEquals("0", log);
-	}
+  KeyedMultiStack<String, Integer> stack = new KeyedMultiStack<String, Integer>(
+      "");
 
-	public void testPushPushPopOnSplit() throws Exception {
-		stack.apply("", new Push(0));
-		stack.split("", asList("a", "b"));
-		stack.apply("a", new Push(1));
-		stack.apply("b", new Push(2));
-		stack.apply("a", new LoggingClosure(2));
-		stack.apply("b", new LoggingClosure(2));
-		assertEquals("[0, 1][0, 2]", log);
-	}
+  String log = "";
 
-	public void testPushSplitPushJoinPOP() throws Exception {
-		stack.apply("", new Push(0));
-		stack.split("", asList("a", "b"));
-		stack.apply("a", new Push(1));
-		stack.apply("b", new Push(2));
-		stack.join(asList("a", "b"), "c");
-		stack.apply("c", new Push(3));
-		stack.apply("c", new LoggingClosure(3));
-		assertEquals("[0, 1, 3][0, 2, 3]", log);
-	}
+  public void testBasicOperationsOnSingleDimension() throws Exception {
+    stack.apply("", new Push(0));
+    stack.apply("", new PopClosure<String, Integer>() {
+      public List<Integer> pop(String key, List<Integer> value) {
+        assertEquals("", key);
+        assertEquals(1, value.size());
+        assertEquals(new Integer(0), value.get(0));
+        log += value.get(0);
+        return emptyList();
+      }
 
-	public void testSplitAndJoinShouldCollapsMultipleStacksIfTheyAreOfSameContent()
-			throws Exception {
-		stack.apply("", new Push(0));
-		stack.split("", asList("a", "b"));
-		stack.join(asList("a", "b"), "");
-		stack.apply("", new Push(1));
-		stack.apply("", new LoggingClosure(2));
-		assertEquals("[0, 1]", log);
-	}
+      @Override
+      public int getSize() {
+        return 1;
+      }
+    });
+    assertEquals("0", log);
+  }
 
-	public void testConcurentPushInPopClosure() throws Exception {
-		stack.apply("", new Push(0));
-		stack.apply("", new Push(1));
-		stack.apply("", new PopClosure<String, Integer>() {
-			@Override
-			public List<Integer> pop(String key, List<Integer> value) {
-				stack.apply(key, new Push(value.get(0) + 10));
-				return emptyList();
-			}
+  public void testPushPushPopOnSplit() throws Exception {
+    stack.apply("", new Push(0));
+    stack.split("", asList("a", "b"));
+    stack.apply("a", new Push(1));
+    stack.apply("b", new Push(2));
+    stack.apply("a", new LoggingClosure(2));
+    stack.apply("b", new LoggingClosure(2));
+    assertEquals("[0, 1][0, 2]", log);
+  }
 
-			@Override
-			public int getSize() {
-				return 1;
-			}
-		});
-		stack.apply("", new LoggingClosure(2));
-		assertEquals("[0, 11]", log);
-	}
+  public void testPushSplitPushJoinPOP() throws Exception {
+    stack.apply("", new Push(0));
+    stack.split("", asList("a", "b"));
+    stack.apply("a", new Push(1));
+    stack.apply("b", new Push(2));
+    stack.join(asList("a", "b"), "c");
+    stack.apply("c", new Push(3));
+    stack.apply("c", new LoggingClosure(3));
+    assertEquals("[0, 1, 3][0, 2, 3]", log);
+  }
 
-	public void testPopTooMuch() throws Exception {
-		try {
-			stack.apply("", new LoggingClosure(1));
-			fail();
-		} catch (KeyedMultiStack.StackUnderflowException e) {
-		}
-	}
+  public void testSplitAndJoinShouldCollapsMultipleStacksIfTheyAreOfSameContent()
+      throws Exception {
+    stack.apply("", new Push(0));
+    stack.split("", asList("a", "b"));
+    stack.join(asList("a", "b"), "");
+    stack.apply("", new Push(1));
+    stack.apply("", new LoggingClosure(2));
+    assertEquals("[0, 1]", log);
+  }
 
-	public void testUnknownKey() throws Exception {
-		try {
-			stack.apply("X", new Push());
-			fail();
-		} catch (KeyedMultiStack.KeyNotFoundException e) {
-		}
-	}
+  public void testConcurentPushInPopClosure() throws Exception {
+    stack.apply("", new Push(0));
+    stack.apply("", new Push(1));
+    stack.apply("", new PopClosure<String, Integer>() {
+      @Override
+      public List<Integer> pop(String key, List<Integer> value) {
+        stack.apply(key, new Push(value.get(0) + 10));
+        return emptyList();
+      }
 
-	public void testSplitUnknwonNamespace() throws Exception {
-		try {
-			stack.split("X", asList("A", "B"));
-			fail();
-		} catch (KeyedMultiStack.KeyNotFoundException e) {
-		}
-	}
+      @Override
+      public int getSize() {
+        return 1;
+      }
+    });
+    stack.apply("", new LoggingClosure(2));
+    assertEquals("[0, 11]", log);
+  }
 
-	public void testJoinUnknownNamespace() throws Exception {
-		try {
-			stack.join(asList("B", "C"), "A");
-			fail();
-		} catch (KeyedMultiStack.KeyNotFoundException e) {
-		}
-	}
+  public void testPopTooMuch() throws Exception {
+    try {
+      stack.apply("", new LoggingClosure(1));
+      fail();
+    } catch (KeyedMultiStack.StackUnderflowException e) {
+    }
+  }
 
-	public void testUnevenJoin() throws Exception {
-		stack.split("", asList("a", "b"));
-		stack.apply("a", new Push(0));
-		try {
-			stack.join(asList("a", "b"), "c");
-			fail();
-		} catch (IllegalStateException e) {
-		}
-	}
+  public void testUnknownKey() throws Exception {
+    try {
+      stack.apply("X", new Push());
+      fail();
+    } catch (KeyedMultiStack.KeyNotFoundException e) {
+    }
+  }
 
-	public void testJoinThroughSlipt() throws Exception {
-		stack.apply("", new Push(0));
-		stack.split("", asList("a", "b"));
-		stack.apply("a", new Push(1));
-		stack.apply("b", new Push(2));
-		stack.split("a", asList("join"));
-		stack.split("b", asList("join"));
-		stack.apply("join", new LoggingClosure(2));
-		assertEquals("[0, 2][0, 1]", log);
-	}
+  public void testSplitUnknwonNamespace() throws Exception {
+    try {
+      stack.split("X", asList("A", "B"));
+      fail();
+    } catch (KeyedMultiStack.KeyNotFoundException e) {
+    }
+  }
 
-	public void testParalelPopAndPush() throws Exception {
-		stack.apply("", new Push(0));
-		stack.apply("", new Push(1));
-		stack.split("", asList("a", "b"));
-		stack.apply("a", new Push(2));
-		stack.apply("b", new Push(3));
-		stack.join(asList("a", "b"), "join");
-		stack.apply("join", new PopClosure<String, Integer>() {
-			@Override
-			public List<Integer> pop(String key, List<Integer> list) {
-				return asList(3, 4);
-			}
+  public void testJoinUnknownNamespace() throws Exception {
+    try {
+      stack.join(asList("B", "C"), "A");
+      fail();
+    } catch (KeyedMultiStack.KeyNotFoundException e) {
+    }
+  }
 
-			@Override
-			public int getSize() {
-				return 2;
-			}
-		});
-		stack.apply("join", new LoggingClosure(3));
-		assertEquals("[0, 3, 4][0, 3, 4]", log);
-	}
+  public void testUnevenJoin() throws Exception {
+    stack.split("", asList("a", "b"));
+    stack.apply("a", new Push(0));
+    try {
+      stack.join(asList("a", "b"), "c");
+      fail();
+    } catch (IllegalStateException e) {
+    }
+  }
+
+  public void testJoinThroughSlipt() throws Exception {
+    stack.apply("", new Push(0));
+    stack.split("", asList("a", "b"));
+    stack.apply("a", new Push(1));
+    stack.apply("b", new Push(2));
+    stack.split("a", asList("join"));
+    stack.split("b", asList("join"));
+    stack.apply("join", new LoggingClosure(2));
+    assertEquals("[0, 2][0, 1]", log);
+  }
+
+  public void testParalelPopAndPush() throws Exception {
+    stack.apply("", new Push(0));
+    stack.apply("", new Push(1));
+    stack.split("", asList("a", "b"));
+    stack.apply("a", new Push(2));
+    stack.apply("b", new Push(3));
+    stack.join(asList("a", "b"), "join");
+    stack.apply("join", new PopClosure<String, Integer>() {
+      @Override
+      public List<Integer> pop(String key, List<Integer> list) {
+        return asList(3, 4);
+      }
+
+      @Override
+      public int getSize() {
+        return 2;
+      }
+    });
+    stack.apply("join", new LoggingClosure(3));
+    assertEquals("[0, 3, 4][0, 3, 4]", log);
+  }
 }

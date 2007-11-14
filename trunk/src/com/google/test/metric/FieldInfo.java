@@ -17,28 +17,28 @@ package com.google.test.metric;
 
 public class FieldInfo extends Variable {
 
-	private final ClassInfo classInfo;
-	private final boolean isStatic;
-	private final boolean isPrivate;
+  private final ClassInfo classInfo;
+  private final boolean isStatic;
+  private final boolean isPrivate;
 
-	public FieldInfo(ClassInfo classInfo, String name, Type type, boolean isStatic,
-			boolean isPrivate) {
-		super(name, type);
-		this.classInfo = classInfo;
-		this.isStatic = isStatic;
-		this.isPrivate = isPrivate;
-	}
+  public FieldInfo(ClassInfo classInfo, String name, Type type, boolean isStatic,
+      boolean isPrivate) {
+    super(name, type);
+    this.classInfo = classInfo;
+    this.isStatic = isStatic;
+    this.isPrivate = isPrivate;
+  }
 
-	@Override
-	public String toString() {
-		return classInfo + "." + getName() + "{" + type + "}";
-	}
+  @Override
+  public String toString() {
+    return classInfo + "." + getName() + "{" + type + "}";
+  }
 
-	public boolean isStatic() {
-		return isStatic;
-	}
+  public boolean isStatic() {
+    return isStatic;
+  }
 
-	public boolean isPrivate() {
-		return isPrivate;
-	}
+  public boolean isPrivate() {
+    return isPrivate;
+  }
 }

@@ -19,37 +19,37 @@ import java.util.List;
 
 public class ClassCost {
 
-	private final List<MethodCost> methods;
-	private final ClassInfo classInfo;
+  private final List<MethodCost> methods;
+  private final ClassInfo classInfo;
 
-	public ClassCost(ClassInfo classInfo, List<MethodCost> methods) {
-		this.classInfo = classInfo;
-		this.methods = methods;
-	}
+  public ClassCost(ClassInfo classInfo, List<MethodCost> methods) {
+    this.classInfo = classInfo;
+    this.methods = methods;
+  }
 
-	public MethodCost getMethodCost(String methodName) {
-		for (MethodCost cost : methods) {
-			if (cost.getNameDesc().equals(methodName)) {
-				return cost;
-			}
-		}
-		throw new IllegalArgumentException("Method '" + methodName
-				+ "' does not exist.");
-	}
-	
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		toString(buf);
-		return buf.toString();
-	}
+  public MethodCost getMethodCost(String methodName) {
+    for (MethodCost cost : methods) {
+      if (cost.getNameDesc().equals(methodName)) {
+        return cost;
+      }
+    }
+    throw new IllegalArgumentException("Method '" + methodName
+        + "' does not exist.");
+  }
 
-	public void toString(StringBuilder buf) {
-		buf.append(classInfo.toString());
-		for (MethodCost cost : methods) {
-			buf.append("\n   ");
-			cost.toString(buf);
-		}
-	}
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    toString(buf);
+    return buf.toString();
+  }
+
+  public void toString(StringBuilder buf) {
+    buf.append(classInfo.toString());
+    for (MethodCost cost : methods) {
+      buf.append("\n   ");
+      cost.toString(buf);
+    }
+  }
 
 }

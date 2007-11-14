@@ -15,25 +15,24 @@
  */
 package com.google.test.metric.method;
 
+import com.google.test.metric.Type;
 import static com.google.test.metric.Type.fromClass;
 import static com.google.test.metric.Type.fromJava;
+import com.google.test.metric.method.op.stack.JSR;
+import com.google.test.metric.method.op.stack.Load;
+import com.google.test.metric.method.op.stack.StackOperation;
+import com.google.test.metric.method.op.turing.Operation;
+
+import org.objectweb.asm.Label;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.objectweb.asm.Label;
-
-import com.google.test.metric.Type;
-import com.google.test.metric.method.op.stack.JSR;
-import com.google.test.metric.method.op.stack.Load;
-import com.google.test.metric.method.op.stack.StackOperation;
-import com.google.test.metric.method.op.turing.Operation;
-
 /**
  * This method shows how this class decomposes the bytecodes into the blocks
- * 
+ *
  * <pre>
  * public void methodWithIIf() {
  * 	int b = 1;
@@ -41,9 +40,9 @@ import com.google.test.metric.method.op.turing.Operation;
  * 	b = 2;
  * }
  * </pre>
- * 
+ *
  * is decomposed into these bytecodes:
- * 
+ *
  * <pre>
  *   public void methodWithIIf();
  *   0  iconst_1                      Block0
@@ -66,14 +65,14 @@ import com.google.test.metric.method.op.turing.Operation;
  *  22  istore_1 [b]                  Block3 2-&gt; b
  *  23  return
  * </pre>
- * 
+ *
  * <b>NOTE:</b>
  * <ul>
  * <li> Even thought the " -> a" is common and it is technically in block 3 it
  * needs to be back propagated to block 1 and 2; </li>
  * In other words the assignment belongs to the block from which the L
  * </ul>
- * 
+ *
  * <b>How it works:</b>
  * <ul>
  * <li>Ever time you see a conditional IF then create two blocks (1)
@@ -84,134 +83,134 @@ import com.google.test.metric.method.op.turing.Operation;
  * Even if we have a forward jump.
  * <li>
  * </ul>
- * 
+ *
  * @author misko@google.com <Misko Hevery>
  */
 public class BlockDecomposer implements StackOperations {
 
-	private int nextBlockId = 0;
-	private final List<Block> blocksInOrder = new LinkedList<Block>();
-	private final Block mainBlock = newBlock("");
-	private final Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
-	private Block currentBlock;
+  private int nextBlockId = 0;
+  private final List<Block> blocksInOrder = new LinkedList<Block>();
+  private final Block mainBlock = newBlock("");
+  private final Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
+  private Block currentBlock;
 
-	public BlockDecomposer() {
-		setCurrentBlock(mainBlock);
-	}
+  public BlockDecomposer() {
+    setCurrentBlock(mainBlock);
+  }
 
-	private void setCurrentBlock(Block block) {
-		if (blocksInOrder.contains(block)) {
-			throw new IllegalStateException();
-		}
-		if (block != null) {
-			blocksInOrder.add(block);
-		}
-		currentBlock = block;
-	}
+  private void setCurrentBlock(Block block) {
+    if (blocksInOrder.contains(block)) {
+      throw new IllegalStateException();
+    }
+    if (block != null) {
+      blocksInOrder.add(block);
+    }
+    currentBlock = block;
+  }
 
-	public void unconditionalGoto(Label label) {
-		Block lookaheadBlock = newLookAheadBlock("goto_", label);
-		currentBlock.addNextBlock(lookaheadBlock);
-		setCurrentBlock(null);
-	}
+  public void unconditionalGoto(Label label) {
+    Block lookaheadBlock = newLookAheadBlock("goto_", label);
+    currentBlock.addNextBlock(lookaheadBlock);
+    setCurrentBlock(null);
+  }
 
-	public void conditionalGoto(Label label) {
-		Block falseBlock = newBlock("if_false_");
-		Block trueBlock = newLookAheadBlock("if_true_", label);
-		currentBlock.addNextBlock(falseBlock);
-		currentBlock.addNextBlock(trueBlock);
-		setCurrentBlock(falseBlock);
-	}
+  public void conditionalGoto(Label label) {
+    Block falseBlock = newBlock("if_false_");
+    Block trueBlock = newLookAheadBlock("if_true_", label);
+    currentBlock.addNextBlock(falseBlock);
+    currentBlock.addNextBlock(trueBlock);
+    setCurrentBlock(falseBlock);
+  }
 
-	public void jumpSubroutine(Label sub, int lineNumber) {
-	    Block subBlock = newLookAheadBlock("subroutine", sub);
-	    currentBlock.addOp(new JSR(lineNumber, subBlock));
-	}
+  public void jumpSubroutine(Label sub, int lineNumber) {
+    Block subBlock = newLookAheadBlock("subroutine", sub);
+    currentBlock.addOp(new JSR(lineNumber, subBlock));
+  }
 
-	private Block newBlock(String prefix) {
-		return new Block("" + (prefix + nextBlockId++));
-	}
+  private Block newBlock(String prefix) {
+    return new Block("" + (prefix + nextBlockId++));
+  }
 
-	private Block newLookAheadBlock(String prefix, Label label) {
-		Block lookaheadBlock = lookAheadBlocks.get(label);
-		if (lookaheadBlock == null) {
-			lookaheadBlock = newBlock(prefix);
-			lookAheadBlocks.put(label, lookaheadBlock);
-		}
-		return lookaheadBlock;
-	}
+  private Block newLookAheadBlock(String prefix, Label label) {
+    Block lookaheadBlock = lookAheadBlocks.get(label);
+    if (lookaheadBlock == null) {
+      lookaheadBlock = newBlock(prefix);
+      lookAheadBlocks.put(label, lookaheadBlock);
+    }
+    return lookaheadBlock;
+  }
 
-	public void tryCatchBlock(Label start, Label end, Label handler,
-			String eType) {
-		Block startBlock = newLookAheadBlock("try_", start);
-		newLookAheadBlock("try_end_", end);
-		Block handlerBlock = newLookAheadBlock("handle_" + eType + "_", handler);
-		startBlock.addNextBlock(handlerBlock);
-		if (handlerBlock.getOperations().size() == 0) {
-			Type type = eType == null ? fromClass(Throwable.class)
-					: fromJava(eType);
-			handlerBlock.addOp(new Load(-1, new Constant("?", type)));
-		}
-	}
+  public void tryCatchBlock(Label start, Label end, Label handler,
+      String eType) {
+    Block startBlock = newLookAheadBlock("try_", start);
+    newLookAheadBlock("try_end_", end);
+    Block handlerBlock = newLookAheadBlock("handle_" + eType + "_", handler);
+    startBlock.addNextBlock(handlerBlock);
+    if (handlerBlock.getOperations().size() == 0) {
+      Type type = eType == null ? fromClass(Throwable.class)
+          : fromJava(eType);
+      handlerBlock.addOp(new Load(-1, new Constant("?", type)));
+    }
+  }
 
-	public void tableSwitch(Label dflt, Label[] labels) {
-		for (Label caseLabel : labels) {
-			currentBlock.addNextBlock(newLookAheadBlock("case_", caseLabel));
-		}
-		currentBlock.addNextBlock(newLookAheadBlock("dflt_", dflt));
-		setCurrentBlock(null);
-	}
+  public void tableSwitch(Label dflt, Label[] labels) {
+    for (Label caseLabel : labels) {
+      currentBlock.addNextBlock(newLookAheadBlock("case_", caseLabel));
+    }
+    currentBlock.addNextBlock(newLookAheadBlock("dflt_", dflt));
+    setCurrentBlock(null);
+  }
 
-	public void label(Label label) {
-		if (lookAheadBlocks.containsKey(label)) {
-			Block nextBlock = lookAheadBlocks.get(label);
-			if (currentBlock != null && !currentBlock.isTerminal()) {
-				currentBlock.addNextBlock(nextBlock);
-			}
-			setCurrentBlock(nextBlock);
-		} else {
-			if (currentBlock == null) {
-				setCurrentBlock(newBlock(""));
-				lookAheadBlocks.put(label, currentBlock);
-			} else if (currentBlock.getOperations().size() == 0) {
-				lookAheadBlocks.put(label, currentBlock);
-			} else {
-				Block nextBlock = newBlock("");
-				if (!currentBlock.isTerminal()) {
-					currentBlock.addNextBlock(nextBlock);
-				}
-				setCurrentBlock(nextBlock);
-				lookAheadBlocks.put(label, currentBlock);
-			}
-		}
-	}
+  public void label(Label label) {
+    if (lookAheadBlocks.containsKey(label)) {
+      Block nextBlock = lookAheadBlocks.get(label);
+      if (currentBlock != null && !currentBlock.isTerminal()) {
+        currentBlock.addNextBlock(nextBlock);
+      }
+      setCurrentBlock(nextBlock);
+    } else {
+      if (currentBlock == null) {
+        setCurrentBlock(newBlock(""));
+        lookAheadBlocks.put(label, currentBlock);
+      } else if (currentBlock.getOperations().size() == 0) {
+        lookAheadBlocks.put(label, currentBlock);
+      } else {
+        Block nextBlock = newBlock("");
+        if (!currentBlock.isTerminal()) {
+          currentBlock.addNextBlock(nextBlock);
+        }
+        setCurrentBlock(nextBlock);
+        lookAheadBlocks.put(label, currentBlock);
+      }
+    }
+  }
 
-	public void done() {
-	}
+  public void done() {
+  }
 
-	public List<Operation> getOperations() {
-		return new Stack2Turing(mainBlock).translate();
-	}
+  public List<Operation> getOperations() {
+    return new Stack2Turing(mainBlock).translate();
+  }
 
-	public void addOp(StackOperation operation) {
-		currentBlock.addOp(operation);
-	}
+  public void addOp(StackOperation operation) {
+    currentBlock.addOp(operation);
+  }
 
-	@Override
-	public String toString() {
-		StringBuilder buf = new StringBuilder();
-		List<Block> processed = new LinkedList<Block>();
-		for (Block block : blocksInOrder) {
-			processed.add(block);
-			buf.append(block);
-			buf.append("\n");
-		}
-		return buf.toString();
-	}
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    List<Block> processed = new LinkedList<Block>();
+    for (Block block : blocksInOrder) {
+      processed.add(block);
+      buf.append(block);
+      buf.append("\n");
+    }
+    return buf.toString();
+  }
 
-	public Block getMainBlock() {
-		return mainBlock;
-	}
+  public Block getMainBlock() {
+    return mainBlock;
+  }
 
 
 }

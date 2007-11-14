@@ -19,126 +19,127 @@ import junit.framework.TestCase;
 
 public class CyclomaticComplexityTest extends TestCase {
 
-	private ClassRepository repo;
-	private ClassInfo classInfo;
+  private ClassRepository repo;
+  private ClassInfo classInfo;
 
-	@Override
-	protected void setUp() throws Exception {
-		repo = new ClassRepository();
-		classInfo = repo.getClass(CyclomaticMethods.class);
-	}
+  @Override
+  protected void setUp() throws Exception {
+    repo = new ClassRepository();
+    classInfo = repo.getClass(CyclomaticMethods.class);
+  }
 
-	public static class CyclomaticMethods {
-		public void emptyMethod_1() {
-		}
+  public static class CyclomaticMethods {
+    public void emptyMethod_1() {
+    }
 
-		public void simpleMethod_1() {
-			int i = 0;
-			i += 1;
-		}
+    public void simpleMethod_1() {
+      int i = 0;
+      i += 1;
+    }
 
-		public void ifMethod_2() {
-			int a = 0;
-			if (a < 0) {
-				a++;
-			} else {
-				a--;
-			}
-		}
+    public void ifMethod_2() {
+      int a = 0;
+      if (a < 0) {
+        a++;
+      } else {
+        a--;
+      }
+    }
 
-		public void ifMethodNoElse_2() {
-			int a = 0;
-			if (a < 0) {
-				a++;
-			}
-		}
+    public void ifMethodNoElse_2() {
+      int a = 0;
+      if (a < 0) {
+        a++;
+      }
+    }
 
-		public void tryCatch_2() {
-			int a = 0;
-			try {
-				a++;
-			} catch (RuntimeException e) {
-				a++;
-			}
-		}
+    public void tryCatch_2() {
+      int a = 0;
+      try {
+        a++;
+      } catch (RuntimeException e) {
+        a++;
+      }
+    }
 
-		public void tryCatchFinally_2() {
-			int a = 0;
-			try {
-				a++;
-			} catch (RuntimeException e) {
-				a++;
-			} finally {
-				a++;
-			}
-		}
+    public void tryCatchFinally_2() {
+      int a = 0;
+      try {
+        a++;
+      } catch (RuntimeException e) {
+        a++;
+      } finally {
+        a++;
+      }
+    }
 
-		public void emptySwitch_2() {
-			int a = 0;
-			switch (a) {
-			case 0:
-				a = 0;
-			}
-		}
+    public void emptySwitch_2() {
+      int a = 0;
+      switch (a) {
+        case 0:
+          a = 0;
+      }
+    }
 
-		public void emptySwitch_5() {
-			int a = 0;
-			switch (a) {
-			case 0:
-				a = 0;
-				break;
-			case 1:
-				a = 1;
-				break;
-			case 2:
-				a = 2;
-				break;
-			case 4:
-				a = 4;
-				break;
-			default:
-			}
-		}
-		
-		public void switchImplementWithLookUp_3() {
-			int a = 0;
-			switch (a) {
-			case 0:
-				a = 0;
-				break;
-			case 9999:
-				a = 9999;
-				break;
-			default:
-				a = -1;
-			}
-		}
+    public void emptySwitch_5() {
+      int a = 0;
+      switch (a) {
+        case 0:
+          a = 0;
+          break;
+        case 1:
+          a = 1;
+          break;
+        case 2:
+          a = 2;
+          break;
+        case 4:
+          a = 4;
+          break;
+        default:
+      }
+    }
 
-		public void switchWithDefault_2() {
-			int a = 0;
-			switch (a) {
-			case 0:
-				a = 0;
-				break;
-			default:
-			}
-		}
-	}
+    public void switchImplementWithLookUp_3() {
+      int a = 0;
+      switch (a) {
+        case 0:
+          a = 0;
+          break;
+        case 9999:
+          a = 9999;
+          break;
+        default:
+          a = -1;
+      }
+    }
 
-	public void testVerifyAllMethodsCyclomaticComplexity() throws Exception {
-		String errors = "";
-		for (MethodInfo method : classInfo.getMethods()) {
-			String name = method.getName();
-			int _Index = name.lastIndexOf('_');
-			if (_Index > 0) {
-				long expectedCC = Long.parseLong(name.substring(_Index + 1));
-				long actualCC = method.getNonRecursiveCyclomaticComplexity();
-				if (expectedCC != actualCC)
-					errors += "\n" + method.getName()
-							+ " should have Cyclomatic Complexity of "
-							+ expectedCC + " but was " + actualCC;
-			}
-		}
-		assertTrue(errors, errors.length() == 0);
-	}
+    public void switchWithDefault_2() {
+      int a = 0;
+      switch (a) {
+        case 0:
+          a = 0;
+          break;
+        default:
+      }
+    }
+  }
+
+  public void testVerifyAllMethodsCyclomaticComplexity() throws Exception {
+    String errors = "";
+    for (MethodInfo method : classInfo.getMethods()) {
+      String name = method.getName();
+      int _Index = name.lastIndexOf('_');
+      if (_Index > 0) {
+        long expectedCC = Long.parseLong(name.substring(_Index + 1));
+        long actualCC = method.getNonRecursiveCyclomaticComplexity();
+        if (expectedCC != actualCC) {
+          errors += "\n" + method.getName()
+              + " should have Cyclomatic Complexity of "
+              + expectedCC + " but was " + actualCC;
+        }
+      }
+    }
+    assertTrue(errors, errors.length() == 0);
+  }
 }

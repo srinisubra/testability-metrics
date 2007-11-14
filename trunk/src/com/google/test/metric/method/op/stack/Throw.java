@@ -17,13 +17,13 @@ package com.google.test.metric.method.op.stack;
 
 public class Throw extends Pop {
 
-	public Throw(int lineNumber) {
-		super(lineNumber, 1);
-	}
+  public Throw(int lineNumber) {
+    super(lineNumber, 1);
+  }
 
-	@Override
-	public String toString() {
-		return "throw";
-	}
-	
+  @Override
+  public String toString() {
+    return "throw";
+  }
+
 }

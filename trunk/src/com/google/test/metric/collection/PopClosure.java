@@ -19,8 +19,8 @@ import java.util.List;
 
 public abstract class PopClosure<KEY, VALUE> {
 
-	public abstract int getSize();
-	
-	public abstract List<VALUE> pop(KEY key, List<VALUE> list);
-	
+  public abstract int getSize();
+
+  public abstract List<VALUE> pop(KEY key, List<VALUE> list);
+
 }

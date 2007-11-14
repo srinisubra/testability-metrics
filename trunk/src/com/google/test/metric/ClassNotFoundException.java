@@ -17,17 +17,17 @@ package com.google.test.metric;
 
 public class ClassNotFoundException extends RuntimeException {
 
-	private static final long serialVersionUID = -1109952665323197751L;
+  private static final long serialVersionUID = -1109952665323197751L;
 
-	private final String className;
+  private final String className;
 
-	public ClassNotFoundException(String className) {
-		super("Class '" + className + "' not found.");
-		this.className = className;
-	}
+  public ClassNotFoundException(String className) {
+    super("Class '" + className + "' not found.");
+    this.className = className;
+  }
 
-	public String getClassName() {
-		return className;
-	}
+  public String getClassName() {
+    return className;
+  }
 
 }

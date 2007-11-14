@@ -15,67 +15,67 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import java.util.List;
-
 import com.google.test.metric.InjectabilityContext;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.Variable;
 
+import java.util.List;
+
 public class MethodInvokation extends Operation {
 
-	private final String name;
-	private final String clazzName;
-	private final String signature;
-	private final Variable methodThis;
-	private final List<Variable> parameters;
+  private final String name;
+  private final String clazzName;
+  private final String signature;
+  private final Variable methodThis;
+  private final List<Variable> parameters;
 
-	public MethodInvokation(int lineNumber, String clazz, String name,
-			String signature, Variable methodThis, List<Variable> parameters) {
-		super(lineNumber);
-		this.clazzName = clazz;
-		this.name = name;
-		this.signature = signature;
-		this.methodThis = methodThis;
-		this.parameters = parameters;
-	}
+  public MethodInvokation(int lineNumber, String clazz, String name,
+      String signature, Variable methodThis, List<Variable> parameters) {
+    super(lineNumber);
+    this.clazzName = clazz;
+    this.name = name;
+    this.signature = signature;
+    this.methodThis = methodThis;
+    this.parameters = parameters;
+  }
 
-	public List<Variable> getParameters() {
-		return parameters;
-	}
+  public List<Variable> getParameters() {
+    return parameters;
+  }
 
-	public String getMethodName() {
-		return clazzName + "." + name;
-	}
+  public String getMethodName() {
+    return clazzName + "." + name;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	public String getOwner() {
-		return clazzName;
-	}
+  public String getOwner() {
+    return clazzName;
+  }
 
-	@Override
-	public String toString() {
-		return getMethodName() + signature;
-	}
+  @Override
+  public String toString() {
+    return getMethodName() + signature;
+  }
 
-	@Override
-	public void computeMetric(InjectabilityContext context) {
-		MethodInfo method = context.getMethod(clazzName, name + signature);
-		if (context.methodAlreadyVisited(method)) {
-			// Method already counted, skip (to prevent recursion)
-		} else if (method.canOverride() && context.isInjectable(methodThis)) {
-			// Method can be overridden
-		} else {
-			// Method can not be intercepted we have to add the cost
-			// recursively
-			method.computeMetric(context);
-		}
-	}
+  @Override
+  public void computeMetric(InjectabilityContext context) {
+    MethodInfo method = context.getMethod(clazzName, name + signature);
+    if (context.methodAlreadyVisited(method)) {
+      // Method already counted, skip (to prevent recursion)
+    } else if (method.canOverride() && context.isInjectable(methodThis)) {
+      // Method can be overridden
+    } else {
+      // Method can not be intercepted we have to add the cost
+      // recursively
+      method.computeMetric(context);
+    }
+  }
 
-	public Variable getMethodThis() {
-		return methodThis;
-	}
+  public Variable getMethodThis() {
+    return methodThis;
+  }
 
 }
