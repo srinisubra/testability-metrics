@@ -17,17 +17,17 @@ package com.google.test.metric.method.op.stack;
 
 public class MonitorExit extends StackOperation {
 
-	public MonitorExit(int lineNumber) {
-		super(lineNumber);
-	}
+  public MonitorExit(int lineNumber) {
+    super(lineNumber);
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 1;
-	}
-	
-	@Override
-	public String toString() {
-		return "monitor exit";
-	}
+  @Override
+  public int getOperatorCount() {
+    return 1;
+  }
+
+  @Override
+  public String toString() {
+    return "monitor exit";
+  }
 }

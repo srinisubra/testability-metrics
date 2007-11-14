@@ -16,24 +16,24 @@
 package com.google.test.metric;
 
 public class MethodNotFoundException extends RuntimeException {
-	private static final long serialVersionUID = -259965052038451086L;
+  private static final long serialVersionUID = -259965052038451086L;
 
-	private final String methodName;
-	private final ClassInfo classInfo;
+  private final String methodName;
+  private final ClassInfo classInfo;
 
-	public MethodNotFoundException(ClassInfo classInfo, String methodName) {
-		super("Method '" + methodName + "' not found in class '"
-				+ classInfo.getName() + "'");
-		this.methodName = methodName;
-		this.classInfo = classInfo;
-	}
+  public MethodNotFoundException(ClassInfo classInfo, String methodName) {
+    super("Method '" + methodName + "' not found in class '"
+        + classInfo.getName() + "'");
+    this.methodName = methodName;
+    this.classInfo = classInfo;
+  }
 
-	public String getMethodName() {
-		return methodName;
-	}
+  public String getMethodName() {
+    return methodName;
+  }
 
-	public ClassInfo getClassInfo() {
-		return classInfo;
-	}
+  public ClassInfo getClassInfo() {
+    return classInfo;
+  }
 
 }

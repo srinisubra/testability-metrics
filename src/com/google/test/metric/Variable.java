@@ -17,25 +17,25 @@ package com.google.test.metric;
 
 public class Variable {
 
-	private final String name;
-	protected Type type;
+  private final String name;
+  protected Type type;
 
-	public Variable(String name, Type type) {
-		this.name = name;
-		this.type = type;
-	}
+  public Variable(String name, Type type) {
+    this.name = name;
+    this.type = type;
+  }
 
-	public String getName() {
-		return name;
-	}
+  public String getName() {
+    return name;
+  }
 
-	@Override
-	public String toString() {
-		return name + "{" + type + "}";
-	}
+  @Override
+  public String toString() {
+    return name + "{" + type + "}";
+  }
 
-	public Type getType() {
-		return type;
-	}
+  public Type getType() {
+    return type;
+  }
 
 }

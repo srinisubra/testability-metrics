@@ -15,40 +15,39 @@
  */
 package com.google.test.metric.asm;
 
-import static com.google.test.metric.asm.SignatureParser.parse;
-
-import java.util.List;
-
 import com.google.test.metric.Type;
+import static com.google.test.metric.asm.SignatureParser.parse;
 
 import junit.framework.TestCase;
 
+import java.util.List;
+
 public class SignatureParserTest extends TestCase {
 
-	public void testParsePrimitive() throws Exception {
-		assertSame(Type.LONG, parse("()J").getReturnType());
-	}
+  public void testParsePrimitive() throws Exception {
+    assertSame(Type.LONG, parse("()J").getReturnType());
+  }
 
-	public void testParseObject() throws Exception {
-		assertEquals(Type.fromClass(String.class),
-				parse("()Ljava/lang/String;").getReturnType());
-	}
+  public void testParseObject() throws Exception {
+    assertEquals(Type.fromClass(String.class),
+        parse("()Ljava/lang/String;").getReturnType());
+  }
 
-	public void testParseArray() throws Exception {
-		assertEquals(Type.fromClass(String[].class), parse(
-				"()[Ljava/lang/String;").getReturnType());
-	}
+  public void testParseArray() throws Exception {
+    assertEquals(Type.fromClass(String[].class), parse(
+        "()[Ljava/lang/String;").getReturnType());
+  }
 
-	public void testParseDoubleArray() throws Exception {
-		assertEquals(Type.fromClass(String[][].class), parse(
-				"()[[Ljava/lang/String;").getReturnType());
-	}
+  public void testParseDoubleArray() throws Exception {
+    assertEquals(Type.fromClass(String[][].class), parse(
+        "()[[Ljava/lang/String;").getReturnType());
+  }
 
-	public void testParseArgsDoubleArray() throws Exception {
-		List<Type> parameters = parse("([[Ljava/lang/String;J)V")
-				.getParameters();
-		assertEquals(Type.fromClass(String[][].class), parameters.get(0));
-		assertEquals(Type.LONG, parameters.get(1));
-	}
+  public void testParseArgsDoubleArray() throws Exception {
+    List<Type> parameters = parse("([[Ljava/lang/String;J)V")
+        .getParameters();
+    assertEquals(Type.fromClass(String[][].class), parameters.get(0));
+    assertEquals(Type.LONG, parameters.get(1));
+  }
 
 }

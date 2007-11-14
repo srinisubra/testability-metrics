@@ -19,8 +19,8 @@ import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 
 public class Constant extends Variable {
-	public Constant(Object value, Type type) {
-		super(String.valueOf(value), type);
-	}
+  public Constant(Object value, Type type) {
+    super(String.valueOf(value), type);
+  }
 
 }

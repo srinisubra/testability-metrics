@@ -20,31 +20,31 @@ import com.google.test.metric.Variable;
 
 public class Assignment extends Operation {
 
-	private final Variable value;
-	private final Variable variable;
+  private final Variable value;
+  private final Variable variable;
 
-	public Assignment(int lineNumber, Variable dst, Variable value) {
-		super(lineNumber);
-		this.value = value;
-		this.variable = dst;
-	}
+  public Assignment(int lineNumber, Variable dst, Variable value) {
+    super(lineNumber);
+    this.value = value;
+    this.variable = dst;
+  }
 
-	public Variable getVariable() {
-		return variable;
-	}
+  public Variable getVariable() {
+    return variable;
+  }
 
-	public Variable getValue() {
-		return value;
-	}
+  public Variable getValue() {
+    return value;
+  }
 
-	@Override
-	public String toString() {
-		return variable + " <- " + value;
-	}
+  @Override
+  public String toString() {
+    return variable + " <- " + value;
+  }
 
-	public void computeMetric(InjectabilityContext context) {
-		if (context.isInjectable(value)) {
-			context.setInjectable(variable);
-		}
-	}
+  public void computeMetric(InjectabilityContext context) {
+    if (context.isInjectable(value)) {
+      context.setInjectable(variable);
+    }
+  }
 }

@@ -18,20 +18,20 @@ package com.google.test.metric.method.op.stack;
 
 public class Pop extends StackOperation {
 
-	private final int count;
+  private final int count;
 
-	public Pop(int lineNumber, int count) {
-		super(lineNumber);
-		this.count = count;
-	}
+  public Pop(int lineNumber, int count) {
+    super(lineNumber);
+    this.count = count;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return count;
-	}
-	
-	@Override
-	public String toString() {
-		return "pop" + (count > 1 ? "" + count : "");
-	}
+  @Override
+  public int getOperatorCount() {
+    return count;
+  }
+
+  @Override
+  public String toString() {
+    return "pop" + (count > 1 ? "" + count : "");
+  }
 }

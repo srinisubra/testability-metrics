@@ -15,38 +15,38 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.FieldInfo;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.op.turing.Assignment;
 import com.google.test.metric.method.op.turing.Operation;
 
+import java.util.List;
+
 public class PutField extends StackOperation {
 
-	private final FieldInfo fieldInfo;
+  private final FieldInfo fieldInfo;
 
-	public PutField(int lineNumber, FieldInfo fieldInfo) {
-		super(lineNumber);
-		this.fieldInfo = fieldInfo;
-	}
+  public PutField(int lineNumber, FieldInfo fieldInfo) {
+    super(lineNumber);
+    this.fieldInfo = fieldInfo;
+  }
 
-	@Override
-	public String toString() {
-		return "put " + (fieldInfo.isStatic() ? "static " : "") + fieldInfo;
-	}
+  @Override
+  public String toString() {
+    return "put " + (fieldInfo.isStatic() ? "static " : "") + fieldInfo;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		int valueCount = fieldInfo.getType().isDouble() ? 2 : 1;
-		int fieldThis = fieldInfo.isStatic() ? 0 : 1;
-		return valueCount + fieldThis;
-	}
+  @Override
+  public int getOperatorCount() {
+    int valueCount = fieldInfo.getType().isDouble() ? 2 : 1;
+    int fieldThis = fieldInfo.isStatic() ? 0 : 1;
+    return valueCount + fieldThis;
+  }
 
-	@Override
-	public Operation toOperation(List<Variable> input) {
-		Variable variable = input.get(fieldInfo.isStatic() ? 0 : 1);
-		return new Assignment(lineNumber, fieldInfo, variable);
-	}
+  @Override
+  public Operation toOperation(List<Variable> input) {
+    Variable variable = input.get(fieldInfo.isStatic() ? 0 : 1);
+    return new Assignment(lineNumber, fieldInfo, variable);
+  }
 
 }

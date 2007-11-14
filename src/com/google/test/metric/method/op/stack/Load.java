@@ -15,32 +15,32 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Variable;
+
+import java.util.List;
 
 public class Load extends StackOperation {
 
-	private final Variable variable;
+  private final Variable variable;
 
-	public Load(int lineNumber, Variable variable) {
-		super(lineNumber);
-		this.variable = variable;
-	}
+  public Load(int lineNumber, Variable variable) {
+    super(lineNumber);
+    this.variable = variable;
+  }
 
-	@Override
-	public String toString() {
-		return "load " + variable;
-	}
+  @Override
+  public String toString() {
+    return "load " + variable;
+  }
 
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		return list(variable);
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    return list(variable);
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 0;
-	}
+  @Override
+  public int getOperatorCount() {
+    return 0;
+  }
 
 }

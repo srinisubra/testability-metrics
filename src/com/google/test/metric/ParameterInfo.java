@@ -17,13 +17,13 @@ package com.google.test.metric;
 
 public class ParameterInfo extends Variable {
 
-	public ParameterInfo(String name, Type type) {
-		super(name, type);
-	}
-	
-	@Override
-	public String toString() {
-		return getName();
-	}
+  public ParameterInfo(String name, Type type) {
+    super(name, type);
+  }
+
+  @Override
+  public String toString() {
+    return getName();
+  }
 
 }

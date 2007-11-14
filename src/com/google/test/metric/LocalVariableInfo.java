@@ -17,8 +17,8 @@ package com.google.test.metric;
 
 public class LocalVariableInfo extends Variable {
 
-	public LocalVariableInfo(String name, Type type) {
-		super(name, type);
-	}
-	
+  public LocalVariableInfo(String name, Type type) {
+    super(name, type);
+  }
+
 }

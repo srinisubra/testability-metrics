@@ -15,28 +15,28 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Variable;
+
+import java.util.List;
 
 public class Swap extends StackOperation {
 
-	public Swap(int lineNumber) {
-		super(lineNumber);
-	}
+  public Swap(int lineNumber) {
+    super(lineNumber);
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 2;
-	}
-	
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		return list(input.get(1), input.get(0));
-	}
+  @Override
+  public int getOperatorCount() {
+    return 2;
+  }
 
-	@Override
-	public String toString() {
-		return "swap";
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    return list(input.get(1), input.get(0));
+  }
+
+  @Override
+  public String toString() {
+    return "swap";
+  }
 }

@@ -15,37 +15,37 @@
  */
 package com.google.test.metric.method.op.stack;
 
-import java.util.List;
-
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Constant;
 
+import java.util.List;
+
 public class Convert extends StackOperation {
 
-	private final Type from;
-	private final Type to;
+  private final Type from;
+  private final Type to;
 
-	public Convert(int lineNumber, Type from, Type to) {
-		super(lineNumber);
-		this.from = from;
-		this.to = to;
-	}
+  public Convert(int lineNumber, Type from, Type to) {
+    super(lineNumber);
+    this.from = from;
+    this.to = to;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return from.isDouble() ? 2 : 1;
-	}
+  @Override
+  public int getOperatorCount() {
+    return from.isDouble() ? 2 : 1;
+  }
 
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		Variable variable = input.get(0);
-		return list(new Constant(variable.getName(), to));
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    Variable variable = input.get(0);
+    return list(new Constant(variable.getName(), to));
+  }
 
-	@Override
-	public String toString() {
-		return "convert " + from + " -> " + to;
-	}
+  @Override
+  public String toString() {
+    return "convert " + from + " -> " + to;
+  }
 
 }

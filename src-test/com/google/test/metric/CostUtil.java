@@ -32,65 +32,65 @@
 package com.google.test.metric;
 
 public class CostUtil {
-	private static boolean x = false;
+  private static boolean x = false;
 
-	public static boolean staticCost0() {
-		return x;
-	}
+  public static boolean staticCost0() {
+    return x;
+  }
 
-	public boolean instanceCost0() {
-		return x;
-	}
+  public boolean instanceCost0() {
+    return x;
+  }
 
-	public static boolean staticCost1() {
-		boolean a = x ? false : true;
-		return a;
-	}
+  public static boolean staticCost1() {
+    boolean a = x ? false : true;
+    return a;
+  }
 
-	public boolean instanceCost1() {
-		boolean a = x ? false : true;
-		return a;
-	}
+  public boolean instanceCost1() {
+    boolean a = x ? false : true;
+    return a;
+  }
 
-	public static boolean staticCost2() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		return b;
-	}
+  public static boolean staticCost2() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    return b;
+  }
 
-	public boolean instanceCost2() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		return b;
-	}
+  public boolean instanceCost2() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    return b;
+  }
 
-	public static boolean staticCost3() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		boolean c = b ? false : true;
-		return c;
-	}
+  public static boolean staticCost3() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    boolean c = b ? false : true;
+    return c;
+  }
 
-	public boolean instanceCost3() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		boolean c = b ? false : true;
-		return c;
-	}
+  public boolean instanceCost3() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    boolean c = b ? false : true;
+    return c;
+  }
 
-	public static boolean staticCost4() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		boolean c = b ? false : true;
-		boolean d = c ? false : true;
-		return d;
-	}
+  public static boolean staticCost4() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    boolean c = b ? false : true;
+    boolean d = c ? false : true;
+    return d;
+  }
 
-	public boolean instanceCost4() {
-		boolean a = x ? false : true;
-		boolean b = a ? false : true;
-		boolean c = b ? false : true;
-		boolean d = c ? false : true;
-		return d;
-	}
+  public boolean instanceCost4() {
+    boolean a = x ? false : true;
+    boolean b = a ? false : true;
+    boolean c = b ? false : true;
+    boolean d = c ? false : true;
+    return d;
+  }
 }

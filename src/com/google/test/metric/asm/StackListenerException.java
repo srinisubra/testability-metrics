@@ -18,9 +18,9 @@ package com.google.test.metric.asm;
 import com.google.test.metric.MethodInfo;
 
 public class StackListenerException extends RuntimeException {
-	private static final long serialVersionUID = 5956698548327057875L;
-	public StackListenerException(MethodInfo methodInfo, Exception e) {
-		super("Error in " + methodInfo + " caused by " + e.toString());
-	}
+  private static final long serialVersionUID = 5956698548327057875L;
+  public StackListenerException(MethodInfo methodInfo, Exception e) {
+    super("Error in " + methodInfo + " caused by " + e.toString());
+  }
 
 }

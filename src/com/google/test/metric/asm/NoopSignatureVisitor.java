@@ -19,61 +19,61 @@ import org.objectweb.asm.signature.SignatureVisitor;
 
 public class NoopSignatureVisitor implements SignatureVisitor {
 
-	public SignatureVisitor visitArrayType() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitArrayType() {
+    return new NoopSignatureVisitor();
+  }
 
-	public void visitBaseType(char descriptor) {
-	}
+  public void visitBaseType(char descriptor) {
+  }
 
-	public SignatureVisitor visitClassBound() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitClassBound() {
+    return new NoopSignatureVisitor();
+  }
 
-	public void visitClassType(String name) {
-	}
+  public void visitClassType(String name) {
+  }
 
-	public void visitEnd() {
-	}
+  public void visitEnd() {
+  }
 
-	public SignatureVisitor visitExceptionType() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitExceptionType() {
+    return new NoopSignatureVisitor();
+  }
 
-	public void visitFormalTypeParameter(String name) {
-	}
+  public void visitFormalTypeParameter(String name) {
+  }
 
-	public void visitInnerClassType(String name) {
-	}
+  public void visitInnerClassType(String name) {
+  }
 
-	public SignatureVisitor visitInterface() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitInterface() {
+    return new NoopSignatureVisitor();
+  }
 
-	public SignatureVisitor visitInterfaceBound() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitInterfaceBound() {
+    return new NoopSignatureVisitor();
+  }
 
-	public SignatureVisitor visitParameterType() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitParameterType() {
+    return new NoopSignatureVisitor();
+  }
 
-	public SignatureVisitor visitReturnType() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitReturnType() {
+    return new NoopSignatureVisitor();
+  }
 
-	public SignatureVisitor visitSuperclass() {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitSuperclass() {
+    return new NoopSignatureVisitor();
+  }
 
-	public void visitTypeArgument() {
-	}
+  public void visitTypeArgument() {
+  }
 
-	public SignatureVisitor visitTypeArgument(char wildcard) {
-		return new NoopSignatureVisitor();
-	}
+  public SignatureVisitor visitTypeArgument(char wildcard) {
+    return new NoopSignatureVisitor();
+  }
 
-	public void visitTypeVariable(String name) {
-	}
+  public void visitTypeVariable(String name) {
+  }
 
 }

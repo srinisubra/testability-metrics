@@ -15,95 +15,95 @@
  */
 package com.google.test.metric.asm;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.google.test.metric.Type;
 
 import org.objectweb.asm.signature.SignatureReader;
 import org.objectweb.asm.signature.SignatureVisitor;
 
-import com.google.test.metric.Type;
+import java.util.LinkedList;
+import java.util.List;
 
 public class SignatureParser extends NoopSignatureVisitor {
 
-	interface Setter {
-		void set(Type type);
-	}
+  interface Setter {
+    void set(Type type);
+  }
 
-	public static class TypeVisitor extends NoopSignatureVisitor {
-		private final Setter setter;
+  public static class TypeVisitor extends NoopSignatureVisitor {
+    private final Setter setter;
 
-		public TypeVisitor(Setter setter) {
-			this.setter = setter;
-		}
+    public TypeVisitor(Setter setter) {
+      this.setter = setter;
+    }
 
-		public SignatureVisitor visitArrayType() {
-			return new TypeVisitor(new Setter() {
-				public void set(Type type) {
-					setter.set(type.toArray());
-				}
-			});
-		}
+    public SignatureVisitor visitArrayType() {
+      return new TypeVisitor(new Setter() {
+        public void set(Type type) {
+          setter.set(type.toArray());
+        }
+      });
+    }
 
-		@Override
-		public void visitBaseType(char descriptor) {
-			setter.set(Type.fromDesc(""+descriptor));
-		}
+    @Override
+    public void visitBaseType(char descriptor) {
+      setter.set(Type.fromDesc("" + descriptor));
+    }
 
-		@Override
-		public void visitClassType(String name) {
-			setter.set(Type.fromJava(name));
-		}
+    @Override
+    public void visitClassType(String name) {
+      setter.set(Type.fromJava(name));
+    }
 
-	}
+  }
 
-	private List<Type> parameters = new LinkedList<Type>();
-	private Type returnType;
+  private List<Type> parameters = new LinkedList<Type>();
+  private Type returnType;
 
-	@Override
-	public SignatureVisitor visitArrayType() {
-		return new TypeVisitor(new Setter() {
-			public void set(Type type) {
-				parameters.add(type.toArray());
-			}
-		});
-	}
+  @Override
+  public SignatureVisitor visitArrayType() {
+    return new TypeVisitor(new Setter() {
+      public void set(Type type) {
+        parameters.add(type.toArray());
+      }
+    });
+  }
 
-	@Override
-	public void visitBaseType(char descriptor) {
-		parameters.add(Type.fromDesc(""+descriptor));
-	}
+  @Override
+  public void visitBaseType(char descriptor) {
+    parameters.add(Type.fromDesc("" + descriptor));
+  }
 
-	@Override
-	public void visitClassType(String name) {
-		parameters.add(Type.fromJava(name));
-	}
+  @Override
+  public void visitClassType(String name) {
+    parameters.add(Type.fromJava(name));
+  }
 
-	@Override
-	public SignatureVisitor visitParameterType() {
-		return this;
-	}
+  @Override
+  public SignatureVisitor visitParameterType() {
+    return this;
+  }
 
-	@Override
-	public SignatureVisitor visitReturnType() {
-		return new TypeVisitor(new Setter() {
-			public void set(Type type) {
-				returnType = type;
-			}
-		});
-	}
+  @Override
+  public SignatureVisitor visitReturnType() {
+    return new TypeVisitor(new Setter() {
+      public void set(Type type) {
+        returnType = type;
+      }
+    });
+  }
 
-	public List<Type> getParameters() {
-		return parameters;
-	}
+  public List<Type> getParameters() {
+    return parameters;
+  }
 
-	public Type getReturnType() {
-		return returnType;
-	}
+  public Type getReturnType() {
+    return returnType;
+  }
 
-	public static SignatureParser parse(String signature) {
-		SignatureParser parser = new SignatureParser();
-		new SignatureReader(signature).accept(parser);
-		return parser;
-	}
+  public static SignatureParser parse(String signature) {
+    SignatureParser parser = new SignatureParser();
+    new SignatureReader(signature).accept(parser);
+    return parser;
+  }
 
 }

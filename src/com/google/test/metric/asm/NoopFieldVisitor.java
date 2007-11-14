@@ -20,18 +20,18 @@ import org.objectweb.asm.Attribute;
 
 public class NoopFieldVisitor {
 
-	public NoopFieldVisitor() {
-		super();
-	}
+  public NoopFieldVisitor() {
+    super();
+  }
 
-	public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-		return null;
-	}
+  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+    return null;
+  }
 
-	public void visitAttribute(Attribute attr) {
-	}
+  public void visitAttribute(Attribute attr) {
+  }
 
-	public void visitEnd() {
-	}
+  public void visitEnd() {
+  }
 
 }

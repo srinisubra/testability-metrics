@@ -15,39 +15,39 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import com.google.test.metric.Variable;
+
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.test.metric.Variable;
-
 public class Duplicate2 extends StackOperation {
 
-	private final int offset;
+  private final int offset;
 
-	public Duplicate2(int lineNumber, int offset) {
-		super(lineNumber);
-		this.offset = offset;
-	}
+  public Duplicate2(int lineNumber, int offset) {
+    super(lineNumber);
+    this.offset = offset;
+  }
 
-	@Override
-	public int getOperatorCount() {
-		return 2 + offset;
-	}
+  @Override
+  public int getOperatorCount() {
+    return 2 + offset;
+  }
 
-	@Override
-	public List<Variable> apply(List<Variable> input) {
-		LinkedList<Variable> list = new LinkedList<Variable>();
-		list.add(input.get(input.size() - 2));
-		list.add(input.get(input.size() - 1));
-		for (Variable in : input) {
-			list.add(in);
-		}
-		return list;
-	}
+  @Override
+  public List<Variable> apply(List<Variable> input) {
+    LinkedList<Variable> list = new LinkedList<Variable>();
+    list.add(input.get(input.size() - 2));
+    list.add(input.get(input.size() - 1));
+    for (Variable in : input) {
+      list.add(in);
+    }
+    return list;
+  }
 
-	@Override
-	public String toString() {
-		return "duplicate2" + (offset > 0 ? "_X" + offset : "");
-	}
+  @Override
+  public String toString() {
+    return "duplicate2" + (offset > 0 ? "_X" + offset : "");
+  }
 
 }

@@ -22,71 +22,71 @@ import java.util.Set;
 
 public class InjectabilityContext {
 
-	private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
-	private Set<Variable> injectables = new HashSet<Variable>();
-	private long totalCost = 0;
-	private final ClassRepository classRepository;
-	
-	public InjectabilityContext(ClassRepository classRepository) {
-		this.classRepository = classRepository;
-	}
-	
-	public boolean isInjectable(Variable var) {
-		return injectables.contains(var);
-	}
+  private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
+  private Set<Variable> injectables = new HashSet<Variable>();
+  private long totalCost = 0;
+  private final ClassRepository classRepository;
 
-	public void setInjectable(Variable var) {
-		injectables.add(var);
-	}
+  public InjectabilityContext(ClassRepository classRepository) {
+    this.classRepository = classRepository;
+  }
 
-	public Collection<Variable> getInjectables() {
-		return injectables;
-	}
+  public boolean isInjectable(Variable var) {
+    return injectables.contains(var);
+  }
 
-	public void addMethodCost(long cost) {
-		totalCost += cost;
-	}
-	
-	public long getTotalCost() {
-		return totalCost;
-	}
+  public void setInjectable(Variable var) {
+    injectables.add(var);
+  }
 
-	public long getGlobalState() {
-		return 0;
-	}
+  public Collection<Variable> getInjectables() {
+    return injectables;
+  }
 
-	public long getGlobalMutableState() {
-		return 0;
-	}
+  public void addMethodCost(long cost) {
+    totalCost += cost;
+  }
 
-	public MethodInfo getMethod(String clazzName, String methodName) {
-		return classRepository.getClass(clazzName).getMethod(methodName);
-	}
+  public long getTotalCost() {
+    return totalCost;
+  }
 
-	public void visitMethod(MethodInfo method) {
-		visitedMethods.add(method);
-	}
+  public long getGlobalState() {
+    return 0;
+  }
 
-	public boolean methodAlreadyVisited(MethodInfo method) {
-		return visitedMethods.contains(method);
-	}
-	
-	@Override
-	public String toString() {
-		return injectables.toString();
-	}
+  public long getGlobalMutableState() {
+    return 0;
+  }
 
-	public void setInjectable(List<? extends Variable> parameters) {
-		for (Variable variable : parameters) {
-			setInjectable(variable);
-		}
-	}
+  public MethodInfo getMethod(String clazzName, String methodName) {
+    return classRepository.getClass(clazzName).getMethod(methodName);
+  }
 
-	public void setInjectable(MethodInfo method) {
-		if (method.getMethodThis()!=null) {
-			setInjectable(method.getMethodThis());
-		}
-		setInjectable(method.getParameters());
-	}
+  public void visitMethod(MethodInfo method) {
+    visitedMethods.add(method);
+  }
+
+  public boolean methodAlreadyVisited(MethodInfo method) {
+    return visitedMethods.contains(method);
+  }
+
+  @Override
+  public String toString() {
+    return injectables.toString();
+  }
+
+  public void setInjectable(List<? extends Variable> parameters) {
+    for (Variable variable : parameters) {
+      setInjectable(variable);
+    }
+  }
+
+  public void setInjectable(MethodInfo method) {
+    if (method.getMethodThis() != null) {
+      setInjectable(method.getMethodThis());
+    }
+    setInjectable(method.getParameters());
+  }
 
 }
