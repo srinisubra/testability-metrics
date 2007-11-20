@@ -9,14 +9,14 @@
     <target name="compile" depends="clean">
         <mkdir dir="target/classes"/>
         <javac srcdir="src" destdir="target/classes"
-        	classpath="lib/asm-3.0.jar" debug="true" debuglevel="source" />
+        	classpath="lib/asm-3.0.jar;lib/args4j-2.0.8.jar" debug="true" debuglevel="source" />
     </target>
 
 
     <target name="compile-tests" depends="compile">
         <mkdir dir="target/test-classes"/>
         <javac srcdir="src-test" destdir="target/test-classes"
-               classpath="target/classes;lib/asm-3.0.jar;lib/junit.jar" debug="true"
+               classpath="target/classes;lib/asm-3.0.jar;lib/junit.jar;lib/args4j-2.0.8.jar" debug="true"
       debuglevel="lines,vars,source"/>
     </target>
 
@@ -29,6 +29,7 @@
                 <pathelement location="target/test-classes"/>
                 <pathelement location="lib/asm-3.0.jar"/>
                 <pathelement location="lib/junit.jar"/>
+            	<pathelement location="lib/args4j-2.0.8.jar"/>
             </classpath>
 
             <formatter type="plain"/>
