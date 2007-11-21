@@ -15,11 +15,12 @@
  */
 package com.google.test.metric;
 
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
+
 import com.google.test.metric.asm.Visibility;
 import com.google.test.metric.method.op.turing.Operation;
-
-import static java.util.Collections.unmodifiableList;
-import java.util.List;
 
 public class MethodInfo {
 
@@ -32,16 +33,14 @@ public class MethodInfo {
   private final long cyclomaticComplexity;
   private final Visibility visibility;
   private final List<Operation> operations;
-  private final boolean isStatic;
 
   public MethodInfo(ClassInfo classInfo, String methodName, String desc,
-      boolean isStatic, Variable methodThis, List<ParameterInfo> parameters,
+      Variable methodThis, List<ParameterInfo> parameters,
       List<LocalVariableInfo> localVariables, Visibility visibility,
       long cylomaticComplexity, List<Operation> operations) {
     this.classInfo = classInfo;
     this.name = methodName;
     this.desc = desc;
-    this.isStatic = isStatic;
     this.methodThis = methodThis;
     this.parameters = parameters;
     this.localVariables = localVariables;
@@ -103,7 +102,11 @@ public class MethodInfo {
   }
 
   public boolean isStatic() {
-    return isStatic;
+    return methodThis == null;
+  }
+
+  public boolean isInstance() {
+    return methodThis != null;
   }
 
   public boolean canOverride() {

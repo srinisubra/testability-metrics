@@ -15,6 +15,7 @@
  */
 package com.google.test.metric;
 
+import static com.google.test.metric.SignatureUtil.L;
 import junit.framework.TestCase;
 
 public class MetricComputerTest extends TestCase {
@@ -37,8 +38,8 @@ public class MetricComputerTest extends TestCase {
     }
 
     /**
-     * I cost 2, but I am instance method so I can be overridden. so my cost may be avoided in most
-     * cases.
+     * I cost 2, but I am instance method so I can be overridden. so my cost may
+     * be avoided in most cases.
      */
     public int cost2() {
       int i = 0;
@@ -46,8 +47,8 @@ public class MetricComputerTest extends TestCase {
     }
 
     /**
-     * I am instance method hence you will have to add the cost of constructor to me. (by myself I
-     * cost 4)
+     * I am instance method hence you will have to add the cost of constructor
+     * to me. (by myself I cost 4)
      */
     public Object testMethod4() {
       int i = 0;
@@ -60,16 +61,15 @@ public class MetricComputerTest extends TestCase {
   }
 
   public void testMediumCost1() throws Exception {
-    MethodInfo method = repo.getClass(Medium.class).getMethod(
-        "statiCost1()I");
+    MethodInfo method = repo.getClass(Medium.class).getMethod("statiCost1()I");
     assertFalse(method.canOverride());
     MethodCost cost = computer.compute(Medium.class, "statiCost1()I");
     assertEquals(1l, cost.getComplexity());
   }
 
   /**
-   * Since cost2 is called twice, once by our test and once by constructor we don't want to add it
-   * twice. But the constructor adds 1 so total cost is 3.
+   * Since cost2 is called twice, once by our test and once by constructor we
+   * don't want to add it twice. But the constructor adds 1 so total cost is 3.
    */
   public void testMediumCost2() throws Exception {
     MethodInfo method = repo.getClass(Medium.class).getMethod("cost2()I");
@@ -79,8 +79,8 @@ public class MetricComputerTest extends TestCase {
   }
 
   /**
-   * Cost of the constructor needs to add the cost of the static method it calls as it can not be
-   * overridden but not the cost of the instance method.
+   * Cost of the constructor needs to add the cost of the static method it calls
+   * as it can not be overridden but not the cost of the instance method.
    */
   public void testMediumInit() throws Exception {
     MethodInfo method = repo.getClass(Medium.class).getMethod("<init>()V");
@@ -90,10 +90,11 @@ public class MetricComputerTest extends TestCase {
   }
 
   /**
-   * Method4 is cost of 4 by itself, but one has the add the cost of constructor since it is an
-   * instance method. The constructor is 0 but calls to methods: cost1 method is static and can not
-   * be intercepted hence it has to be added. cost2 method is instance and can be overridden hence
-   * we don't add that cost.
+   * Method4 is cost of 4 by itself, but one has the add the cost of constructor
+   * since it is an instance method. The constructor is 0 but calls to methods:
+   * cost1 method is static and can not be intercepted hence it has to be added.
+   * cost2 method is instance and can be overridden hence we don't add that
+   * cost.
    */
   public void testMediumMethod4() throws Exception {
     MethodCost cost = computer.compute(Medium.class,
@@ -168,8 +169,8 @@ public class MetricComputerTest extends TestCase {
   public void testChooseConstructorWithMostParameters() throws Exception {
     ClassInfo classInfo = repo.getClass(ChoseConstructor.class);
     MethodInfo constructor = computer.getPrefferedConstructor(classInfo);
-    assertEquals("<init>(Ljava/lang/Object;Ljava/lang/Object;)V",
-        constructor.getNameDesc());
+    assertEquals("<init>(Ljava/lang/Object;Ljava/lang/Object;)V", constructor
+        .getNameDesc());
   }
 
   static class Singleton {
@@ -247,6 +248,106 @@ public class MetricComputerTest extends TestCase {
   public void testArray() throws Exception {
     repo.getClass(String[].class);
     computer.compute(repo.getClass(Array.class).getMethod("method()V"));
+  }
+
+  static class InjectableClass {
+    public void cost4() {
+      CostUtil.staticCost4();
+    }
+
+    public static void callCost0(InjectableClass ref) {
+      indirection(ref);
+    }
+
+    private static void indirection(InjectableClass ref) {
+      ref.cost4();
+    }
+    public static void callCost4() {
+      InjectableClass x = new InjectableClass();
+      indirection(x);
+    }
+  }
+
+  public void testInjectabilityIsTransitive() throws Exception {
+    ClassCost cost = computer.compute(InjectableClass.class);
+    MethodCost callCost0 = cost.getMethodCost("callCost0("
+        + L(InjectableClass.class) + ")V");
+    MethodCost callCost4 = cost.getMethodCost("callCost4()V");
+    assertEquals(0L, callCost0.getComplexity());
+    assertEquals(4L, callCost4.getComplexity());
+  }
+
+  static class GlobalState {
+    int i;
+    static final String X = "X";
+
+    public int inc() {
+      return i++;
+    }
+
+    public void noop() {
+    }
+
+    @Override
+    public String toString() {
+      return X;
+    }
+  }
+
+  static final GlobalState ref = new GlobalState();
+  static int count;
+  static class GlobalStateUser {
+
+    // StateLoad: 0
+    public void noLoad() {
+    }
+
+    // StateLoad: 1
+    public void accessCount() {
+      count++;
+    }
+
+    // StateLoad: 0
+    public void accessFinalState() {
+      ref.noop();
+    }
+
+    // StateLoad: 0
+    public void accessFinalState2() {
+      ref.toString();
+    }
+
+    // StateLoad: 1
+    public void accessMutableState() {
+      ref.inc();
+    }
+  }
+
+  public void testGlobalLoadWhichAccessesFinalShouldBeZero() {
+    ClassCost cost = computer.compute(GlobalState.class);
+    MethodCost method = cost.getMethodCost("toString()Ljava/lang/String;");
+    assertEquals(0L, method.getGlobal());
+  }
+
+  public void testGlobalLoadMethodDispatchNoStateAccessShouldBeZero() {
+    ClassCost cost = computer.compute(GlobalStateUser.class);
+    assertEquals(0L, cost.getMethodCost("noLoad()V").getGlobal());
+    assertEquals(0L, cost.getMethodCost("accessFinalState()V").getGlobal());
+    assertEquals(0L, cost.getMethodCost("accessFinalState2()V").getGlobal());
+  }
+
+  public void testGlobalLoadAccessStateShouldBeOne() {
+    MethodCost cost = computer.compute(GlobalStateUser.class, "accessCount()V");
+    assertEquals(1L, cost.getGlobal());
+  }
+
+  public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
+    MethodCost cost = computer.compute(GlobalStateUser.class, "accessMutableState()V");
+    assertEquals(1L, cost.getGlobal());
+  }
+
+  public void testJavaLangObjectParsesCorrectly() throws Exception {
+    repo.getClass(Object.class);
   }
 
 }

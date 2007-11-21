@@ -43,7 +43,7 @@ public class Transform extends StackOperation {
   }
 
   private int size(Type op) {
-    return op == null ? 0 : op.isDouble() ? 2 : 1;
+    return op == null ? 0 : op.isDoubleSlot() ? 2 : 1;
   }
 
   @Override

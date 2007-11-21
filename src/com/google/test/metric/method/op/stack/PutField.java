@@ -15,12 +15,12 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import java.util.List;
+
 import com.google.test.metric.FieldInfo;
 import com.google.test.metric.Variable;
-import com.google.test.metric.method.op.turing.Assignment;
+import com.google.test.metric.method.op.turing.FieldAssignment;
 import com.google.test.metric.method.op.turing.Operation;
-
-import java.util.List;
 
 public class PutField extends StackOperation {
 
@@ -38,15 +38,21 @@ public class PutField extends StackOperation {
 
   @Override
   public int getOperatorCount() {
-    int valueCount = fieldInfo.getType().isDouble() ? 2 : 1;
+    int valueCount = fieldInfo.getType().isDoubleSlot() ? 2 : 1;
     int fieldThis = fieldInfo.isStatic() ? 0 : 1;
     return valueCount + fieldThis;
   }
 
   @Override
   public Operation toOperation(List<Variable> input) {
-    Variable variable = input.get(fieldInfo.isStatic() ? 0 : 1);
-    return new Assignment(lineNumber, fieldInfo, variable);
+    if (fieldInfo.isStatic()) {
+      Variable value = input.get(0);
+      return new FieldAssignment(lineNumber, null, fieldInfo, value);
+    } else {
+      Variable instance = input.get(0);
+      Variable value = input.get(1);
+      return new FieldAssignment(lineNumber, instance, fieldInfo, value);
+    }
   }
 
 }

@@ -15,12 +15,12 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import java.util.List;
+
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
-import com.google.test.metric.method.op.turing.Assignment;
+import com.google.test.metric.method.op.turing.ArrayAssignment;
 import com.google.test.metric.method.op.turing.Operation;
-
-import java.util.List;
 
 public class ArrayStore extends StackOperation {
 
@@ -33,7 +33,7 @@ public class ArrayStore extends StackOperation {
 
   @Override
   public int getOperatorCount() {
-    return 2 + (type.isDouble() ? 2 : 1);
+    return 2 + (type.isDoubleSlot() ? 2 : 1);
   }
 
   @Override
@@ -41,7 +41,10 @@ public class ArrayStore extends StackOperation {
     if (!input.get(0).getType().isObject()) {
       throw new IllegalStateException();
     }
-    return new Assignment(lineNumber, input.get(0), input.get(2));
+    Variable array = input.get(0);
+    Variable index = input.get(1);
+    Variable value = input.get(2);
+    return new ArrayAssignment(lineNumber, array, index, value);
   }
 
   @Override

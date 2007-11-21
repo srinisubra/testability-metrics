@@ -70,6 +70,17 @@ public class MethodInvokation extends Operation {
     } else {
       // Method can not be intercepted we have to add the cost
       // recursively
+      if (method.isInstance()) {
+        context.localAssginment(method.getMethodThis(), methodThis);
+      }
+      int i = 0;
+      if (parameters.size() != method.getParameters().size()) {
+        throw new IllegalStateException(
+            "Argument count does not match method parameter count.");
+      }
+      for (Variable var : parameters) {
+        context.localAssginment(method.getParameters().get(i++), var);
+      }
       method.computeMetric(context);
     }
   }

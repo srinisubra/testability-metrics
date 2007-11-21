@@ -16,7 +16,7 @@
 package com.google.test.metric.method.op.stack;
 
 import com.google.test.metric.Variable;
-import com.google.test.metric.method.op.turing.Assignment;
+import com.google.test.metric.method.op.turing.LocalAssignment;
 import com.google.test.metric.method.op.turing.Operation;
 
 import java.util.List;
@@ -37,12 +37,12 @@ public class Store extends StackOperation {
 
   @Override
   public int getOperatorCount() {
-    return variable.getType().isDouble() ? 2 : 1;
+    return variable.getType().isDoubleSlot() ? 2 : 1;
   }
 
   @Override
   public Operation toOperation(List<Variable> input) {
-    return new Assignment(lineNumber, variable, input.get(0));
+    return new LocalAssignment(lineNumber, variable, input.get(0));
   }
 
 }

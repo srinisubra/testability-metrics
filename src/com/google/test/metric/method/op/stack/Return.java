@@ -22,7 +22,7 @@ public class Return extends Pop {
   private final Type type;
 
   public Return(int lineNumber, Type type) {
-    super(lineNumber, type == Type.VOID ? 0 : (type.isDouble() ? 2 : 1));
+    super(lineNumber, type == Type.VOID ? 0 : (type.isDoubleSlot() ? 2 : 1));
     this.type = type;
   }
 
