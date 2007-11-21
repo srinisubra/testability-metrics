@@ -24,19 +24,13 @@ public class InjectabilityContext {
 
   private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
   private Set<Variable> injectables = new HashSet<Variable>();
+  private Set<Variable> globals = new HashSet<Variable>();
+  private Set<Variable> globalState = new HashSet<Variable>();
   private long totalCost = 0;
   private final ClassRepository classRepository;
 
   public InjectabilityContext(ClassRepository classRepository) {
     this.classRepository = classRepository;
-  }
-
-  public boolean isInjectable(Variable var) {
-    return injectables.contains(var);
-  }
-
-  public void setInjectable(Variable var) {
-    injectables.add(var);
   }
 
   public Collection<Variable> getInjectables() {
@@ -73,7 +67,8 @@ public class InjectabilityContext {
 
   @Override
   public String toString() {
-    return injectables.toString();
+    return "TotalCost: " + totalCost + " " + injectables + "\nGlobalCost: "
+        + globalState.size() + " " + globals;
   }
 
   public void setInjectable(List<? extends Variable> parameters) {
@@ -88,5 +83,49 @@ public class InjectabilityContext {
     }
     setInjectable(method.getParameters());
   }
+
+  public long getGlobalLoad() {
+    return globalState.size();
+  }
+
+  public void localAssginment(Variable destination, Variable source) {
+    if (isInjectable(source)) {
+      setInjectable(destination);
+    }
+    if (destination.isStatic() || isGlobal(source)) {
+      setGlobal(destination);
+    }
+  }
+  
+  public void fieldAssignment(Variable fieldInstance, Variable field, Variable value) {
+    localAssginment(field, value);
+    if (fieldInstance == null || globals.contains(fieldInstance)) {
+      globalState.add(field);
+      globals.add(field);
+    }
+  }
+  
+  public void arrayAssignment(Variable array, Variable index, Variable value) {
+    localAssginment(array, value);
+    if (globals.contains(array)) {
+      globalState.add(array);
+    }
+  }
+  public boolean isGlobal(Variable var) {
+    return var.isStatic() || globals.contains(var);
+  }
+
+  public void setGlobal(Variable var) {
+    globals.add(var);
+  }
+  
+  public boolean isInjectable(Variable var) {
+    return injectables.contains(var);
+  }
+
+  public void setInjectable(Variable var) {
+    injectables.add(var);
+  }
+
 
 }

@@ -18,12 +18,12 @@ package com.google.test.metric.method.op.turing;
 import com.google.test.metric.InjectabilityContext;
 import com.google.test.metric.Variable;
 
-public class Assignment extends Operation {
+public class LocalAssignment extends Operation {
 
   private final Variable value;
   private final Variable variable;
 
-  public Assignment(int lineNumber, Variable dst, Variable value) {
+  public LocalAssignment(int lineNumber, Variable dst, Variable value) {
     super(lineNumber);
     this.value = value;
     this.variable = dst;
@@ -43,8 +43,6 @@ public class Assignment extends Operation {
   }
 
   public void computeMetric(InjectabilityContext context) {
-    if (context.isInjectable(value)) {
-      context.setInjectable(variable);
-    }
+    context.localAssginment(variable, value);
   }
 }

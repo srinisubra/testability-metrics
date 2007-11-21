@@ -57,7 +57,7 @@ public class Type {
     return code;
   }
 
-  public boolean isDouble() {
+  public boolean isDoubleSlot() {
     return this == DOUBLE || this == LONG;
   }
 

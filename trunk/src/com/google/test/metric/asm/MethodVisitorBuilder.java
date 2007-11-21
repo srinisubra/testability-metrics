@@ -15,6 +15,19 @@
  */
 package com.google.test.metric.asm;
 
+import static com.google.test.metric.asm.SignatureParser.parse;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.FieldInfo;
@@ -23,7 +36,6 @@ import com.google.test.metric.MethodInfo;
 import com.google.test.metric.ParameterInfo;
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
-import static com.google.test.metric.asm.SignatureParser.parse;
 import com.google.test.metric.method.BlockDecomposer;
 import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.stack.ArrayLoad;
@@ -46,46 +58,46 @@ import com.google.test.metric.method.op.stack.Swap;
 import com.google.test.metric.method.op.stack.Throw;
 import com.google.test.metric.method.op.stack.Transform;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 public class MethodVisitorBuilder implements MethodVisitor {
 
   private final ClassInfo classInfo;
   private final String name;
   private final String desc;
-  private final int parameterCount;
   private final Visibility visibility;
-  private final Map<Integer, Variable> variables = new HashMap<Integer, Variable>();
+  private final Map<Integer, Variable> slots = new HashMap<Integer, Variable>();
   private final BlockDecomposer block = new BlockDecomposer();
   private final List<Runnable> recorder = new LinkedList<Runnable>();
-  private final boolean isStatic;
   private final ClassRepository repository;
 
   private long cyclomaticComplexity = 1;
   private Variable methodThis;
   private int lineNumber;
+  private final List<ParameterInfo> parameters = new LinkedList<ParameterInfo>();
+  private final List<LocalVariableInfo> localVariables = new LinkedList<LocalVariableInfo>();
 
-  public MethodVisitorBuilder(ClassRepository repository,
-      ClassInfo classInfo, String name, String desc, String signature,
-      String[] exceptions, boolean isStatic, Visibility visibility) {
+  public MethodVisitorBuilder(ClassRepository repository, ClassInfo classInfo,
+      String name, String desc, String signature, String[] exceptions,
+      boolean isStatic, Visibility visibility) {
     this.repository = repository;
     this.classInfo = classInfo;
     this.name = name;
     this.desc = desc;
-    this.isStatic = isStatic;
     this.visibility = visibility;
-    parameterCount = parse(desc).getParameters().size();
+    int slot = 0;
+    if (!isStatic) {
+      Type thisType = Type.fromJava(classInfo.getName());
+      methodThis = new LocalVariableInfo("this", thisType);
+      slots.put(slot++, methodThis);
+      localVariables.add((LocalVariableInfo) methodThis);
+    }
+    for (Type type : parse(desc).getParameters()) {
+      ParameterInfo parameterInfo = new ParameterInfo("param_" + slot, type);
+      parameters.add(parameterInfo);
+      slots.put(slot++, parameterInfo);
+      if (type.isDoubleSlot()) {
+        slot++;
+      }
+    }
   }
 
   public void visitJumpInsn(final int opcode, final Label label) {
@@ -100,72 +112,71 @@ public class MethodVisitorBuilder implements MethodVisitor {
       recorder.add(new Runnable() {
         public void run() {
           switch (opcode) {
-            case Opcodes.IFEQ:
+            case Opcodes.IFEQ :
               if1("IFEQ");
               break;
-            case Opcodes.IFNE:
+            case Opcodes.IFNE :
               if1("IFNE");
               break;
-            case Opcodes.IFLT:
+            case Opcodes.IFLT :
               if1("IFLT");
               break;
-            case Opcodes.IFGE:
+            case Opcodes.IFGE :
               if1("IFGE");
               break;
-            case Opcodes.IFGT:
+            case Opcodes.IFGT :
               if1("IFGT");
               break;
-            case Opcodes.IFLE:
+            case Opcodes.IFLE :
               if1("IFLE");
               break;
-            case Opcodes.IFNONNULL:
+            case Opcodes.IFNONNULL :
               if1("IFNONNULL");
               break;
-            case Opcodes.IFNULL:
+            case Opcodes.IFNULL :
               if1("IFNULL");
               break;
-            case Opcodes.IF_ACMPEQ:
+            case Opcodes.IF_ACMPEQ :
               if2("IF_ACMPEQ");
               break;
-            case Opcodes.IF_ACMPNE:
+            case Opcodes.IF_ACMPNE :
               if2("IF_ACMPNE");
               break;
-            case Opcodes.IF_ICMPEQ:
+            case Opcodes.IF_ICMPEQ :
               if2("IF_ICMPEQ");
               break;
-            case Opcodes.IF_ICMPGE:
+            case Opcodes.IF_ICMPGE :
               if2("IF_ICMPGE");
               break;
-            case Opcodes.IF_ICMPGT:
+            case Opcodes.IF_ICMPGT :
               if2("IF_ICMPGT");
               break;
-            case Opcodes.IF_ICMPLE:
+            case Opcodes.IF_ICMPLE :
               if2("IF_ICMPLE");
               break;
-            case Opcodes.IF_ICMPLT:
+            case Opcodes.IF_ICMPLT :
               if2("IF_ICMPLT");
               break;
-            case Opcodes.IF_ICMPNE:
+            case Opcodes.IF_ICMPNE :
               if2("IF_ICMPNE");
               break;
-            case Opcodes.JSR:
+            case Opcodes.JSR :
               // TODO: This is not quite right.
               block.jumpSubroutine(label, lineNumber);
               break;
-            default:
+            default :
               throw new UnsupportedOperationException("" + opcode);
           }
           block.conditionalGoto(label);
         }
 
         private void if1(String name) {
-          block.addOp(new Transform(lineNumber, name, Type.INT, null,
-              null));
+          block.addOp(new Transform(lineNumber, name, Type.INT, null, null));
         }
 
         private void if2(String name) {
-          block.addOp(new Transform(lineNumber, name, Type.INT,
-              Type.INT, null));
+          block
+              .addOp(new Transform(lineNumber, name, Type.INT, Type.INT, null));
         }
       });
     }
@@ -216,16 +227,14 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public void visitLocalVariable(String name, String desc, String signature,
       Label start, Label end, int slotNum) {
     Type type = Type.fromDesc(desc);
-    Variable variable;
-    int actualMethodParameterCount = parameterCount + (isStatic ? 0 : 1);
-    if (slotNum == 0 && !isStatic) {
-      variable = methodThis = new LocalVariableInfo(name, type);
-    } else if (slotNum < actualMethodParameterCount) {
-      variable = new ParameterInfo(name, type);
+    Variable variable = slots.get(slotNum);
+    if (variable == null) {
+      LocalVariableInfo localVar = new LocalVariableInfo(name, type);
+      slots.put(slotNum, localVar);
+      localVariables.add(localVar);
     } else {
-      variable = new LocalVariableInfo(name, type);
+      variable.setName(name);
     }
-    variables.put(slotNum, variable);
   }
 
   public void visitLineNumber(final int line, final Label start) {
@@ -237,31 +246,18 @@ public class MethodVisitorBuilder implements MethodVisitor {
   }
 
   public void visitEnd() {
-    List<ParameterInfo> parameters = new ArrayList<ParameterInfo>();
-    List<LocalVariableInfo> localVariables = new ArrayList<LocalVariableInfo>();
-    for (Integer slot : new TreeSet<Integer>(variables.keySet())) {
-      Variable variable = variables.get(slot);
-      if (variable == null) {
-      } else if (variable.getName().equals("this")) {
-        localVariables.add((LocalVariableInfo) variable);
-      } else if (variable instanceof ParameterInfo) {
-        parameters.add((ParameterInfo) variable);
-      } else {
-        localVariables.add((LocalVariableInfo) variable);
-      }
-    }
     for (Runnable runnable : recorder) {
       runnable.run();
     }
     block.done();
     try {
       MethodInfo methodInfo = new MethodInfo(classInfo, name, desc,
-          isStatic, methodThis, parameters, localVariables,
-          visibility, cyclomaticComplexity, block.getOperations());
+          methodThis, parameters, localVariables, visibility,
+          cyclomaticComplexity, block.getOperations());
       classInfo.addMethod(methodInfo);
     } catch (IllegalStateException e) {
-      throw new IllegalStateException("Error in " + classInfo + "."
-          + name + desc, e);
+      throw new IllegalStateException("Error in " + classInfo + "." + name
+          + desc, e);
     }
   }
 
@@ -275,24 +271,24 @@ public class MethodVisitorBuilder implements MethodVisitor {
     recorder.add(new Runnable() {
       public void run() {
         switch (opcode) {
-          case Opcodes.NEW:
+          case Opcodes.NEW :
             Constant constant = new Constant("new", type);
             block.addOp(new Load(lineNumber, constant));
             break;
-          case Opcodes.NEWARRAY:
-          case Opcodes.ANEWARRAY:
-            block.addOp(new Transform(lineNumber, "newarray", Type.INT,
-                null, type.toArray()));
+          case Opcodes.NEWARRAY :
+          case Opcodes.ANEWARRAY :
+            block.addOp(new Transform(lineNumber, "newarray", Type.INT, null,
+                type.toArray()));
             break;
-          case Opcodes.INSTANCEOF:
-            block.addOp(new Transform(lineNumber, "instanceof",
-                Type.OBJECT, null, Type.INT));
+          case Opcodes.INSTANCEOF :
+            block.addOp(new Transform(lineNumber, "instanceof", Type.OBJECT,
+                null, Type.INT));
             break;
-          case Opcodes.CHECKCAST:
-            block.addOp(new Transform(lineNumber, "checkcast", type,
-                null, type));
+          case Opcodes.CHECKCAST :
+            block
+                .addOp(new Transform(lineNumber, "checkcast", type, null, type));
             break;
-          default:
+          default :
             throw new UnsupportedOperationException("" + opcode);
         }
       }
@@ -301,47 +297,46 @@ public class MethodVisitorBuilder implements MethodVisitor {
 
   public void visitVarInsn(final int opcode, final int var) {
     switch (opcode) {
-      case Opcodes.ILOAD:
+      case Opcodes.ILOAD :
         load(var, Type.INT);
         break;
-      case Opcodes.LLOAD:
+      case Opcodes.LLOAD :
         load(var, Type.LONG);
         break;
-      case Opcodes.FLOAD:
+      case Opcodes.FLOAD :
         load(var, Type.FLOAT);
         break;
-      case Opcodes.DLOAD:
+      case Opcodes.DLOAD :
         load(var, Type.DOUBLE);
         break;
-      case Opcodes.ALOAD:
+      case Opcodes.ALOAD :
         load(var, Type.OBJECT);
         break;
 
-      case Opcodes.ISTORE:
+      case Opcodes.ISTORE :
         store(var, Type.INT);
         break;
-      case Opcodes.LSTORE:
+      case Opcodes.LSTORE :
         store(var, Type.LONG);
         break;
-      case Opcodes.FSTORE:
+      case Opcodes.FSTORE :
         store(var, Type.FLOAT);
         break;
-      case Opcodes.DSTORE:
+      case Opcodes.DSTORE :
         store(var, Type.DOUBLE);
         break;
-      case Opcodes.ASTORE:
+      case Opcodes.ASTORE :
         store(var, Type.OBJECT);
         break;
 
-      case Opcodes.RET:
+      case Opcodes.RET :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new RetSub(lineNumber));
           }
         });
         break;
-
-      default:
+      default :
         throw new UnsupportedOperationException("opcode: " + opcode);
     }
   }
@@ -363,23 +358,19 @@ public class MethodVisitorBuilder implements MethodVisitor {
   }
 
   private Variable variable(int varIndex, Type type) {
-    Variable variable = variables.get(varIndex);
+    Variable variable = slots.get(varIndex);
     if (variable == null) {
-      if (varIndex == 0 && !isStatic) {
-        variable = new LocalVariableInfo("this", type);
-        variables.put(varIndex, variable);
-      } else {
-        variable = new LocalVariableInfo("local_" + varIndex, type);
-        variables.put(varIndex, variable);
-      }
+      LocalVariableInfo localVar = new LocalVariableInfo("local_" + varIndex, type);
+      slots.put(varIndex, localVar);
+      localVariables.add(localVar);
+      variable = localVar;
     }
     Type varType = variable.getType();
-    if (!varType.equals(type)
-        && (type.isPrimitive() || varType.isPrimitive())) {
+    if (!varType.equals(type) && (type.isPrimitive() || varType.isPrimitive())) {
       // Apparently the compiler reuses local variables and it is possible
       // that the types change. So if types change we have to drop
       // the variable and try again.
-      variables.put(varIndex, null);
+      slots.put(varIndex, null);
       return variable(varIndex, type);
     }
     return variable;
@@ -396,104 +387,103 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public void visitLdcInsn(final Object cst) {
     recorder.add(new Runnable() {
       public void run() {
-        block.addOp(new Load(lineNumber, new Constant(cst, Type
-            .fromClass(cst.getClass()))));
+        block.addOp(new Load(lineNumber, new Constant(cst, Type.fromClass(cst
+            .getClass()))));
       }
     });
   }
 
   public void visitInsn(final int opcode) {
     switch (opcode) {
-      case Opcodes.ACONST_NULL:
+      case Opcodes.ACONST_NULL :
         recorder.add(new Runnable() {
           public void run() {
-            block.addOp(new Load(lineNumber, new Constant(null,
-                Type.OBJECT)));
+            block.addOp(new Load(lineNumber, new Constant(null, Type.OBJECT)));
           }
         });
         break;
-      case Opcodes.ICONST_M1:
-      case Opcodes.ICONST_0:
-      case Opcodes.ICONST_1:
-      case Opcodes.ICONST_2:
-      case Opcodes.ICONST_3:
-      case Opcodes.ICONST_4:
-      case Opcodes.ICONST_5:
+      case Opcodes.ICONST_M1 :
+      case Opcodes.ICONST_0 :
+      case Opcodes.ICONST_1 :
+      case Opcodes.ICONST_2 :
+      case Opcodes.ICONST_3 :
+      case Opcodes.ICONST_4 :
+      case Opcodes.ICONST_5 :
         loadConstant(opcode - Opcodes.ICONST_M1 - 1, Type.INT);
         break;
-      case Opcodes.LCONST_0:
-      case Opcodes.LCONST_1:
+      case Opcodes.LCONST_0 :
+      case Opcodes.LCONST_1 :
         loadConstant(opcode - Opcodes.LCONST_0, Type.LONG);
         break;
-      case Opcodes.FCONST_0:
-      case Opcodes.FCONST_1:
-      case Opcodes.FCONST_2:
+      case Opcodes.FCONST_0 :
+      case Opcodes.FCONST_1 :
+      case Opcodes.FCONST_2 :
         loadConstant(opcode - Opcodes.FCONST_0, Type.FLOAT);
         break;
-      case Opcodes.DCONST_0:
-      case Opcodes.DCONST_1:
+      case Opcodes.DCONST_0 :
+      case Opcodes.DCONST_1 :
         loadConstant(opcode - Opcodes.DCONST_0, Type.DOUBLE);
         break;
-      case Opcodes.IALOAD:
+      case Opcodes.IALOAD :
         recordArrayLoad(Type.INT);
         break;
-      case Opcodes.LALOAD:
+      case Opcodes.LALOAD :
         recordArrayLoad(Type.LONG);
         break;
-      case Opcodes.FALOAD:
+      case Opcodes.FALOAD :
         recordArrayLoad(Type.FLOAT);
         break;
-      case Opcodes.DALOAD:
+      case Opcodes.DALOAD :
         recordArrayLoad(Type.DOUBLE);
         break;
-      case Opcodes.AALOAD:
+      case Opcodes.AALOAD :
         recordArrayLoad(Type.OBJECT);
         break;
-      case Opcodes.BALOAD:
+      case Opcodes.BALOAD :
         recordArrayLoad(Type.BYTE);
         break;
-      case Opcodes.CALOAD:
+      case Opcodes.CALOAD :
         recordArrayLoad(Type.CHAR);
         break;
-      case Opcodes.SALOAD:
+      case Opcodes.SALOAD :
         recordArrayLoad(Type.SHORT);
         break;
 
-      case Opcodes.IASTORE:
+      case Opcodes.IASTORE :
         recordArrayStore(Type.INT);
         break;
-      case Opcodes.LASTORE:
+      case Opcodes.LASTORE :
         recordArrayStore(Type.LONG);
         break;
-      case Opcodes.FASTORE:
+      case Opcodes.FASTORE :
         recordArrayStore(Type.FLOAT);
         break;
-      case Opcodes.DASTORE:
+      case Opcodes.DASTORE :
         recordArrayStore(Type.DOUBLE);
         break;
-      case Opcodes.AASTORE:
+      case Opcodes.AASTORE :
         recordArrayStore(Type.OBJECT);
         break;
-      case Opcodes.BASTORE:
+      case Opcodes.BASTORE :
         recordArrayStore(Type.BYTE);
         break;
-      case Opcodes.CASTORE:
+      case Opcodes.CASTORE :
         recordArrayStore(Type.CHAR);
         break;
-      case Opcodes.SASTORE:
+      case Opcodes.SASTORE :
         recordArrayStore(Type.SHORT);
         break;
-      case Opcodes.POP:
-      case Opcodes.POP2:
+      case Opcodes.POP :
+      case Opcodes.POP2 :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new Pop(lineNumber, opcode - Opcodes.POP + 1));
           }
         });
         break;
-      case Opcodes.DUP:
-      case Opcodes.DUP_X1:
-      case Opcodes.DUP_X2:
+      case Opcodes.DUP :
+      case Opcodes.DUP_X1 :
+      case Opcodes.DUP_X2 :
         recorder.add(new Runnable() {
           public void run() {
             int offset = opcode - Opcodes.DUP;
@@ -501,227 +491,226 @@ public class MethodVisitorBuilder implements MethodVisitor {
           }
         });
         break;
-      case Opcodes.DUP2:
-      case Opcodes.DUP2_X1:
-      case Opcodes.DUP2_X2:
+      case Opcodes.DUP2 :
+      case Opcodes.DUP2_X1 :
+      case Opcodes.DUP2_X2 :
         recorder.add(new Runnable() {
           public void run() {
-            block.addOp(new Duplicate2(lineNumber, opcode
-                - Opcodes.DUP2));
+            block.addOp(new Duplicate2(lineNumber, opcode - Opcodes.DUP2));
           }
         });
         break;
-      case Opcodes.SWAP:
+      case Opcodes.SWAP :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new Swap(lineNumber));
           }
         });
         break;
-      case Opcodes.IRETURN:
+      case Opcodes.IRETURN :
         _return(Type.INT);
         break;
-      case Opcodes.FRETURN:
+      case Opcodes.FRETURN :
         _return(Type.FLOAT);
         break;
-      case Opcodes.ARETURN:
+      case Opcodes.ARETURN :
         _return(Type.OBJECT);
         break;
-      case Opcodes.LRETURN:
+      case Opcodes.LRETURN :
         _return(Type.LONG);
         break;
-      case Opcodes.DRETURN:
+      case Opcodes.DRETURN :
         _return(Type.DOUBLE);
         break;
-      case Opcodes.ATHROW:
+      case Opcodes.ATHROW :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new Throw(lineNumber));
           }
         });
         break;
-      case Opcodes.RETURN:
+      case Opcodes.RETURN :
         _return(Type.VOID);
         break;
-      case Opcodes.LCMP:
+      case Opcodes.LCMP :
         operation("cmp", Type.LONG, Type.LONG, Type.INT);
         break;
-      case Opcodes.FCMPL:
+      case Opcodes.FCMPL :
         operation("cmpl", Type.FLOAT, Type.FLOAT, Type.INT);
         break;
-      case Opcodes.FCMPG:
+      case Opcodes.FCMPG :
         operation("cmpg", Type.FLOAT, Type.FLOAT, Type.INT);
         break;
-      case Opcodes.DCMPL:
+      case Opcodes.DCMPL :
         operation("cmpl", Type.DOUBLE, Type.DOUBLE, Type.INT);
         break;
-      case Opcodes.DCMPG:
+      case Opcodes.DCMPG :
         operation("cmpg", Type.DOUBLE, Type.DOUBLE, Type.INT);
         break;
-      case Opcodes.LSHL:
+      case Opcodes.LSHL :
         operation("shl", Type.LONG, Type.INT, Type.LONG);
         break;
-      case Opcodes.LSHR:
+      case Opcodes.LSHR :
         operation("shr", Type.LONG, Type.INT, Type.LONG);
         break;
-      case Opcodes.LUSHR:
+      case Opcodes.LUSHR :
         operation("ushr", Type.LONG, Type.INT, Type.LONG);
         break;
-      case Opcodes.LADD:
+      case Opcodes.LADD :
         operation("add", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LSUB:
+      case Opcodes.LSUB :
         operation("sub", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LDIV:
+      case Opcodes.LDIV :
         operation("div", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LREM:
+      case Opcodes.LREM :
         operation("rem", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LAND:
+      case Opcodes.LAND :
         operation("and", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LOR:
+      case Opcodes.LOR :
         operation("or", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LXOR:
+      case Opcodes.LXOR :
         operation("xor", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.LMUL:
+      case Opcodes.LMUL :
         operation("mul", Type.LONG, Type.LONG, Type.LONG);
         break;
-      case Opcodes.FADD:
+      case Opcodes.FADD :
         operation("add", Type.FLOAT, Type.FLOAT, Type.FLOAT);
         break;
-      case Opcodes.FSUB:
+      case Opcodes.FSUB :
         operation("sub", Type.FLOAT, Type.FLOAT, Type.FLOAT);
         break;
-      case Opcodes.FMUL:
+      case Opcodes.FMUL :
         operation("mul", Type.FLOAT, Type.FLOAT, Type.FLOAT);
         break;
-      case Opcodes.FREM:
+      case Opcodes.FREM :
         operation("rem", Type.FLOAT, Type.FLOAT, Type.FLOAT);
         break;
-      case Opcodes.FDIV:
+      case Opcodes.FDIV :
         operation("div", Type.FLOAT, Type.FLOAT, Type.FLOAT);
         break;
-      case Opcodes.ISHL:
+      case Opcodes.ISHL :
         operation("shl", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.ISHR:
+      case Opcodes.ISHR :
         operation("shr", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IUSHR:
+      case Opcodes.IUSHR :
         operation("ushr", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IADD:
+      case Opcodes.IADD :
         operation("add", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.ISUB:
+      case Opcodes.ISUB :
         operation("sub", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IMUL:
+      case Opcodes.IMUL :
         operation("mul", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IDIV:
+      case Opcodes.IDIV :
         operation("div", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IREM:
+      case Opcodes.IREM :
         operation("rem", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IAND:
+      case Opcodes.IAND :
         operation("and", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IOR:
+      case Opcodes.IOR :
         operation("or", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.IXOR:
+      case Opcodes.IXOR :
         operation("xor", Type.INT, Type.INT, Type.INT);
         break;
-      case Opcodes.DSUB:
+      case Opcodes.DSUB :
         operation("sub", Type.DOUBLE, Type.DOUBLE, Type.DOUBLE);
         break;
-      case Opcodes.DADD:
+      case Opcodes.DADD :
         operation("add", Type.DOUBLE, Type.DOUBLE, Type.DOUBLE);
         break;
-      case Opcodes.DMUL:
+      case Opcodes.DMUL :
         operation("mul", Type.DOUBLE, Type.DOUBLE, Type.DOUBLE);
         break;
-      case Opcodes.DDIV:
+      case Opcodes.DDIV :
         operation("div", Type.DOUBLE, Type.DOUBLE, Type.DOUBLE);
         break;
-      case Opcodes.DREM:
+      case Opcodes.DREM :
         operation("rem", Type.DOUBLE, Type.DOUBLE, Type.DOUBLE);
         break;
-      case Opcodes.L2I:
+      case Opcodes.L2I :
         convert(Type.LONG, Type.INT);
         break;
-      case Opcodes.L2F:
+      case Opcodes.L2F :
         convert(Type.LONG, Type.FLOAT);
         break;
-      case Opcodes.L2D:
+      case Opcodes.L2D :
         convert(Type.LONG, Type.DOUBLE);
         break;
-      case Opcodes.LNEG:
+      case Opcodes.LNEG :
         operation("neg", Type.LONG, null, Type.LONG);
         break;
-      case Opcodes.F2I:
+      case Opcodes.F2I :
         convert(Type.FLOAT, Type.INT);
         break;
-      case Opcodes.F2L:
+      case Opcodes.F2L :
         convert(Type.FLOAT, Type.LONG);
         break;
-      case Opcodes.FNEG:
+      case Opcodes.FNEG :
         operation("neg", Type.FLOAT, null, Type.FLOAT);
         break;
-      case Opcodes.F2D:
+      case Opcodes.F2D :
         convert(Type.FLOAT, Type.DOUBLE);
         break;
-      case Opcodes.D2I:
+      case Opcodes.D2I :
         convert(Type.DOUBLE, Type.INT);
         break;
-      case Opcodes.D2L:
+      case Opcodes.D2L :
         convert(Type.DOUBLE, Type.LONG);
         break;
-      case Opcodes.D2F:
+      case Opcodes.D2F :
         convert(Type.DOUBLE, Type.FLOAT);
         break;
-      case Opcodes.DNEG:
+      case Opcodes.DNEG :
         operation("neg", Type.DOUBLE, null, Type.DOUBLE);
         break;
-      case Opcodes.I2L:
+      case Opcodes.I2L :
         convert(Type.INT, Type.LONG);
         break;
-      case Opcodes.I2F:
+      case Opcodes.I2F :
         convert(Type.INT, Type.FLOAT);
         break;
-      case Opcodes.I2D:
+      case Opcodes.I2D :
         convert(Type.INT, Type.DOUBLE);
         break;
-      case Opcodes.I2B:
+      case Opcodes.I2B :
         convert(Type.INT, Type.BYTE);
         break;
-      case Opcodes.I2C:
+      case Opcodes.I2C :
         convert(Type.INT, Type.CHAR);
         break;
-      case Opcodes.I2S:
+      case Opcodes.I2S :
         convert(Type.INT, Type.SHORT);
         break;
-      case Opcodes.INEG:
+      case Opcodes.INEG :
         operation("neg", Type.INT, null, Type.INT);
         break;
-      case Opcodes.ARRAYLENGTH:
+      case Opcodes.ARRAYLENGTH :
         operation("arraylength", Type.OBJECT.toArray(), null, Type.INT);
         break;
-      case Opcodes.MONITORENTER:
+      case Opcodes.MONITORENTER :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new MonitorEnter(lineNumber));
           }
         });
         break;
-      case Opcodes.MONITOREXIT:
+      case Opcodes.MONITOREXIT :
         recorder.add(new Runnable() {
           public void run() {
             block.addOp(new MonitorExit(lineNumber));
@@ -735,8 +724,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
       final Type op2, final Type result) {
     recorder.add(new Runnable() {
       public void run() {
-        block.addOp(new Transform(lineNumber, operation, op1, op2,
-            result));
+        block.addOp(new Transform(lineNumber, operation, op1, op2, result));
       }
     });
   }
@@ -784,8 +772,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public void visitFieldInsn(final int opcode, final String owner,
       final String name, final String desc) {
     switch (opcode) {
-      case Opcodes.PUTSTATIC:
-      case Opcodes.PUTFIELD:
+      case Opcodes.PUTSTATIC :
+      case Opcodes.PUTFIELD :
         recorder.add(new Runnable() {
           public void run() {
             FieldInfo field = repository.getClass(owner).getField(name);
@@ -793,8 +781,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
           }
         });
         break;
-      case Opcodes.GETSTATIC:
-      case Opcodes.GETFIELD:
+      case Opcodes.GETSTATIC :
+      case Opcodes.GETFIELD :
         recorder.add(new Runnable() {
           public void run() {
             FieldInfo field = repository.getClass(owner).getField(name);
@@ -813,9 +801,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
     final Type returnType = signature.getReturnType();
     recorder.add(new Runnable() {
       public void run() {
-        block.addOp(new Invoke(lineNumber, clazz.replace('/', '.'),
-            name, desc, params, opcode == Opcodes.INVOKESTATIC,
-            returnType));
+        block.addOp(new Invoke(lineNumber, clazz.replace('/', '.'), name, desc,
+            params, opcode == Opcodes.INVOKESTATIC, returnType));
       }
     });
   }
@@ -843,40 +830,39 @@ public class MethodVisitorBuilder implements MethodVisitor {
 
   public void visitIntInsn(int opcode, int operand) {
     switch (opcode) {
-      case Opcodes.NEWARRAY:
+      case Opcodes.NEWARRAY :
         newArray(operand, toType(operand));
         break;
-      case Opcodes.BIPUSH:
+      case Opcodes.BIPUSH :
         loadConstant(operand, Type.INT);
         break;
-      case Opcodes.SIPUSH:
+      case Opcodes.SIPUSH :
         loadConstant(operand, Type.INT);
         break;
-      default:
-        throw new UnsupportedOperationException("Unexpected opcode: "
-            + opcode);
+      default :
+        throw new UnsupportedOperationException("Unexpected opcode: " + opcode);
     }
   }
 
   private Type toType(int operand) {
     switch (operand) {
-      case Opcodes.T_BOOLEAN:
+      case Opcodes.T_BOOLEAN :
         return Type.BOOLEAN;
-      case Opcodes.T_BYTE:
+      case Opcodes.T_BYTE :
         return Type.BYTE;
-      case Opcodes.T_CHAR:
+      case Opcodes.T_CHAR :
         return Type.CHAR;
-      case Opcodes.T_DOUBLE:
+      case Opcodes.T_DOUBLE :
         return Type.DOUBLE;
-      case Opcodes.T_FLOAT:
+      case Opcodes.T_FLOAT :
         return Type.FLOAT;
-      case Opcodes.T_INT:
+      case Opcodes.T_INT :
         return Type.INT;
-      case Opcodes.T_LONG:
+      case Opcodes.T_LONG :
         return Type.LONG;
-      case Opcodes.T_SHORT:
+      case Opcodes.T_SHORT :
         return Type.SHORT;
-      default:
+      default :
         throw new IllegalArgumentException();
     }
   }
@@ -884,8 +870,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
   private void newArray(final int operand, final Type type) {
     recorder.add(new Runnable() {
       public void run() {
-        block.addOp(new Transform(lineNumber, "newarray", Type.INT,
-            null, type.toArray()));
+        block.addOp(new Transform(lineNumber, "newarray", Type.INT, null, type
+            .toArray()));
       }
     });
   }
@@ -896,8 +882,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public void visitMultiANewArrayInsn(final String clazz, final int dims) {
     recorder.add(new Runnable() {
       public void run() {
-        block.addOp(new MultiANewArrayIns(lineNumber, Type
-            .fromDesc(clazz), dims));
+        block.addOp(new MultiANewArrayIns(lineNumber, Type.fromDesc(clazz),
+            dims));
       }
     });
   }

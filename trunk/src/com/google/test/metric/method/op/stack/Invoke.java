@@ -15,14 +15,15 @@
  */
 package com.google.test.metric.method.op.stack;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.google.test.metric.Type;
 import com.google.test.metric.Variable;
 import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.turing.MethodInvokation;
 import com.google.test.metric.method.op.turing.Operation;
-
-import java.util.Collections;
-import java.util.List;
 
 public class Invoke extends StackOperation {
 
@@ -48,7 +49,7 @@ public class Invoke extends StackOperation {
   public int getOperatorCount() {
     int count = isStatic ? 0 : 1;
     for (Type type : params) {
-      count += type.isDouble() ? 2 : 1;
+      count += type.isDoubleSlot() ? 2 : 1;
     }
     return count;
   }
@@ -64,10 +65,26 @@ public class Invoke extends StackOperation {
 
   @Override
   public Operation toOperation(List<Variable> input) {
-    Variable methodThis = isStatic ? null : input.remove(0);
-    // TODO: inputs are dupped due to longs, etc... Fix it.
+    List<Variable> parameters = removeDuplicateSlots(input);
+    Variable methodThis = isStatic ? null : parameters.remove(0);
     return new MethodInvokation(lineNumber, clazz, name, signature,
-        methodThis, input);
+        methodThis, parameters);
+  }
+
+  private List<Variable> removeDuplicateSlots(List<Variable> input) {
+    List<Variable> parameters = new ArrayList<Variable>();
+    boolean skip = false;
+    for (Variable variable : input) {
+      if (skip) {
+        skip = false;
+        continue;
+      }
+      if (variable.getType().isDoubleSlot()) {
+        skip = true;
+      }
+      parameters.add(variable);
+    }
+    return parameters;
   }
 
   @Override

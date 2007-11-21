@@ -34,6 +34,7 @@ public class FieldInfo extends Variable {
     return classInfo + "." + getName() + "{" + type + "}";
   }
 
+  @Override
   public boolean isStatic() {
     return isStatic;
   }

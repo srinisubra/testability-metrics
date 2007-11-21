@@ -103,7 +103,7 @@ public class Stack2Turing {
     Iterator<Variable> iter = variables.iterator();
     while (iter.hasNext()) {
       final Variable variable = iter.next();
-      if (variable.getType().isDouble()) {
+      if (variable.getType().isDoubleSlot()) {
         Variable varNext = iter.hasNext() ? iter.next() : null;
         if (variable != varNext) {
           throw new IllegalStateException("Variable list '"

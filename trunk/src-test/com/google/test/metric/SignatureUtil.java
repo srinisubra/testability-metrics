@@ -15,35 +15,19 @@
  */
 package com.google.test.metric;
 
-public class Variable {
+public class SignatureUtil {
 
-  private String name;
-  protected final Type type;
-
-  public Variable(String name, Type type) {
-    this.name = name;
-    this.type = type;
-  }
-
-  public String getName() {
+  public static String L(Class<?> clazz) {
+    String name = "L";
+    Class<?> declaringClass = clazz.getDeclaringClass();
+    if (declaringClass != null) {
+      name += declaringClass.getName().replace('.', '/');
+      name += "$" + clazz.getSimpleName();
+    } else {
+      name = clazz.getName().replace('.', '/');
+    }
+    name += ";";
     return name;
-  }
-
-  @Override
-  public String toString() {
-    return name + "{" + type + "}";
-  }
-
-  public Type getType() {
-    return type;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public boolean isStatic() {
-    return false;
   }
 
 }

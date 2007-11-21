@@ -13,39 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method.op.stack;
+package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.Type;
+import com.google.test.metric.InjectabilityContext;
 import com.google.test.metric.Variable;
-import com.google.test.metric.method.Constant;
 
-import java.util.List;
+public class FieldAssignment extends Operation {
 
-public class Convert extends StackOperation {
+  private final Variable fieldInstance;
+  private final Variable field;
+  private final Variable value;
 
-  private final Type from;
-  private final Type to;
-
-  public Convert(int lineNumber, Type from, Type to) {
+  public FieldAssignment(int lineNumber, Variable fieldInstance, Variable field,
+      Variable value) {
     super(lineNumber);
-    this.from = from;
-    this.to = to;
+    this.fieldInstance = fieldInstance;
+    this.field = field;
+    this.value = value;
   }
 
   @Override
-  public int getOperatorCount() {
-    return from.isDoubleSlot() ? 2 : 1;
-  }
-
-  @Override
-  public List<Variable> apply(List<Variable> input) {
-    Variable variable = input.get(0);
-    return list(new Constant(variable.getName(), to));
+  public void computeMetric(InjectabilityContext context) {
+    context.fieldAssignment(fieldInstance, field, value);
   }
 
   @Override
   public String toString() {
-    return "convert " + from + " -> " + to;
+    return field + " <- " + value;
   }
-
 }

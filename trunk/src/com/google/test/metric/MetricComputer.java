@@ -44,7 +44,7 @@ public class MetricComputer {
     addFieldCost(classInfo, context);
     context.setInjectable(method);
     method.computeMetric(context);
-    return new MethodCost(method, context.getTotalCost());
+    return new MethodCost(method, context.getTotalCost(), context.getGlobalLoad());
   }
 
   private void addSetterInjection(ClassInfo classInfo, InjectabilityContext context) {
@@ -58,7 +58,7 @@ public class MetricComputer {
 
   private void addConstructorCost(ClassInfo classInfo,
       MethodInfo method, InjectabilityContext context) {
-    if (method.canOverride()) {
+    if (!method.isStatic()) {
       MethodInfo constructor = getPrefferedConstructor(classInfo);
       if (constructor != null) {
         context.setInjectable(constructor);

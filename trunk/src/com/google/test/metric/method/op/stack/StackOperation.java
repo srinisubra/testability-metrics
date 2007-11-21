@@ -46,7 +46,7 @@ public abstract class StackOperation {
     ArrayList<Variable> list = new ArrayList<Variable>(vars.length);
     for (Variable variable : vars) {
       list.add(variable);
-      if (variable.getType().isDouble()) {
+      if (variable.getType().isDoubleSlot()) {
         list.add(variable);
       }
     }

@@ -19,10 +19,12 @@ public class MethodCost {
 
   private final long complexity;
   private final MethodInfo method;
+  private final long globalLoad;
 
-  public MethodCost(MethodInfo method, long totalCost) {
+  public MethodCost(MethodInfo method, long totalCost, long globalLoad) {
     this.method = method;
     this.complexity = totalCost;
+    this.globalLoad = globalLoad;
   }
 
   public long getComplexity() {
@@ -44,6 +46,10 @@ public class MethodCost {
     buf.append(method.getNameDesc());
     buf.append(" cost: ");
     buf.append(complexity);
+  }
+
+  public long getGlobal() {
+    return globalLoad;
   }
 
 }
