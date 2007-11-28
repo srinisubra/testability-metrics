@@ -16,25 +16,20 @@
 package com.google.classpath;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ArrayList;
 
-public class DirectoryClasspathRoot implements ClasspathRoot {
+public class DirectoryClasspathRoot extends ClasspathRoot {
 
-  private URLClassLoader classloader;
-  private URL url;
-
-  public DirectoryClasspathRoot(URL url) {
-    this.url = url;
-    classloader = new URLClassLoader(new URL[] {url}, null);
-  }
-
-  public InputStream getResourceAsStream(String resourceName) {
-    return classloader.getResourceAsStream(resourceName);
+  public DirectoryClasspathRoot(URL root, String classpath) {
+    this.url = root;
+    List<URL> completeClasspath = new ArrayList<URL>();
+    parseAndAddToClasspathList(completeClasspath, classpath);
+    classloader = new URLClassLoader(completeClasspath.toArray(new URL[]{}), null);
   }
 
   public Collection<String> getResources(String packageName) {
@@ -48,16 +43,5 @@ public class DirectoryClasspathRoot implements ClasspathRoot {
       resources.add(file.getName());
     }
     return resources;
-  }
-
-  @Override
-  public String toString() {
-    String url = this.url.toString();
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
-    int index = Math.max(0, url.lastIndexOf('/') + 1);
-    return url.substring(index);
-  }
-
+  } 
 }

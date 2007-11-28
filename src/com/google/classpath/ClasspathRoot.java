@@ -15,19 +15,90 @@
  */
 package com.google.classpath;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
- * An entry on the classpath, which may be a directory or jar. Implementers are
+ * An entry on the classpath, which may be a directory or jar. Concrete classes are
  * provided for each type.
  * 
- * @author misko, pepstein
+ * @author misko, pepstein, jwolter
  */
-public interface ClasspathRoot {
+public abstract class ClasspathRoot {
+  protected URLClassLoader classloader;
+  protected URL url;
 
-  InputStream getResourceAsStream(String resourceName);
+  public InputStream getResourceAsStream(String resourceName) {
+    return classloader.getResourceAsStream(resourceName);
+  }
 
-  Collection<String> getResources(String packageName);
+  abstract Collection<String> getResources(String packageName);
 
+  public Collection<String> getAllContainedClassNames()  {
+    List<String> classNames = new ArrayList<String>();
+    try {
+      buildClassNamesList(url, this, "", "", classNames, false);
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    }
+    return classNames;
+  }
+
+  @Override
+  public String toString() {
+    String url = this.url.toString();
+    if (url.endsWith("/")) {
+      url = url.substring(0, url.length() - 1);
+    }
+    int index = Math.max(0, url.lastIndexOf('/') + 1);
+    return url.substring(index);
+  }
+
+  protected static void buildClassNamesList(URL root, ClasspathRoot classpathRoot,
+      String requiredPrefix, String packageName, List<String> classNamesList,
+      boolean verbose) throws MalformedURLException {
+    for (String resource : classpathRoot.getResources(packageName)) {
+      if (resource.endsWith(".class")) {
+        String className = packageName + resource;
+        className = className.replace(".class", "").replace('/', '.');
+        if (!className.contains("$")) {
+          if (validClassNameByPrefixFilter(className, requiredPrefix)) {
+            if (verbose) {
+              System.out.println("Found: " + className.replace("/", "."));
+            }
+            classNamesList.add(className);
+          }
+        }
+      } else if (resource.endsWith(".jar")) {
+        String temp = root.getPath() + packageName + resource;
+        URL jarRoot = new File(temp).toURI().toURL();
+        ClasspathRoot jarPath = new JarClasspathRoot(jarRoot, null);
+        buildClassNamesList(jarRoot, jarPath, requiredPrefix, "", classNamesList, verbose);
+      } else {
+        buildClassNamesList(root, classpathRoot, requiredPrefix, packageName + resource + "/",
+            classNamesList, verbose);
+      }
+    }
+  }
+
+  private static boolean validClassNameByPrefixFilter(String className, String requiredPrefix) {
+     return className.startsWith(requiredPrefix);
+   }
+
+  protected static void parseAndAddToClasspathList(List<URL> completeClasspath, String classpath) {
+    for (String path : classpath.split("(:|;)")) {
+      try {
+        URL url = new File(path).toURI().toURL();
+        completeClasspath.add(url);
+      } catch (MalformedURLException e) {
+        throw new RuntimeException("Error parsing classpath. " + e.getMessage());
+      }
+    }
+  }
 }
