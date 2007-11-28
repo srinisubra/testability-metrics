@@ -16,6 +16,7 @@
 package com.google.test.metric;
 
 import com.google.test.metric.asm.ClassInfoBuilderVisitor;
+import com.google.classpath.ClasspathRoot;
 
 import org.objectweb.asm.ClassReader;
 
@@ -27,6 +28,14 @@ import java.util.Map;
 public class ClassRepository {
 
   private final Map<String, ClassInfo> classes = new HashMap<String, ClassInfo>();
+  private ClasspathRoot classpathRoot;
+
+  public ClassRepository() {
+  }
+
+  public ClassRepository(ClasspathRoot classpathRoot) {
+    this.classpathRoot = classpathRoot;
+  }
 
   public ClassInfo getClass(Class<?> clazz) {
     return getClass(clazz.getName());
@@ -44,8 +53,13 @@ public class ClassRepository {
   }
 
   private InputStream inputStreamForClass(String clazzName) {
-    String resource = clazzName.replace(".", "/") + ".class";
-    InputStream classBytes = ClassLoader.getSystemResourceAsStream(resource);
+    String classResource = clazzName.replace(".", "/") + ".class";
+    InputStream classBytes = null;
+    if (classpathRoot != null) {
+      classBytes = classpathRoot.getResourceAsStream(classResource);
+    } else {
+      classBytes = ClassLoader.getSystemResourceAsStream(classResource);
+    }
     if (classBytes == null) {
       throw new ClassNotFoundException(clazzName);
     }

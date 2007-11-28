@@ -16,34 +16,32 @@
 package com.google.classpath;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-public class JarClasspathRoot implements ClasspathRoot {
+public class JarClasspathRoot extends ClasspathRoot {
 
-  private URLClassLoader classloader;
-  private URL url;
   private Map<String, Set<String>> resourceNamesByPackage =
       new HashMap<String, Set<String>>();
 
-  public JarClasspathRoot(URL url) {
+  public JarClasspathRoot(URL url, String classpath) {
     this.url = url;
-    classloader = new URLClassLoader(new URL[] {url}, null);
+    List<URL> completeClasspath = new ArrayList<URL>();
+    parseAndAddToClasspathList(completeClasspath, classpath);
+    classloader = new URLClassLoader(completeClasspath.toArray(new URL[] {url}), null);
     preloadNamesFromJar();
-  }
-
-  public InputStream getResourceAsStream(String resourceName) {
-    return classloader.getResourceAsStream(resourceName);
   }
 
   public Collection<String> getResources(String packageName) {
@@ -52,6 +50,16 @@ public class JarClasspathRoot implements ClasspathRoot {
     }
     Set<String> resources = resourceNamesByPackage.get(packageName);
     return resources == null ? new HashSet<String>() : resources;
+  }
+
+  public Collection<String> getAllContainedClassNames()  {
+    List<String> classNames = new ArrayList<String>();
+    try {
+      buildClassNamesList(url, this, "", "", classNames, false);
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+    }
+    return classNames;
   }
 
   public void preloadNamesFromJar() {
@@ -94,16 +102,6 @@ public class JarClasspathRoot implements ClasspathRoot {
     if (!name.equals("")) {
       names.add(name);
     }
-  }
-
-  @Override
-  public String toString() {
-    String url = this.url.toString();
-    if (url.endsWith("/")) {
-      url = url.substring(0, url.length() - 1);
-    }
-    int index = Math.max(0, url.lastIndexOf('/') + 1);
-    return url.substring(index);
   }
 
 }
