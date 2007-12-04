@@ -57,6 +57,10 @@ public class TestabilityTest extends TestCase {
   public void testMainWithJarFile() throws Exception {
     Testability.main("lib/junit.jar", "-cp", "lib/junit.jar");
   }
+  
+  public void testMainWithJarFileNoClasspath() throws Exception {
+    Testability.main("lib/junit.jar");
+  }
 
   public void testParseNoArgs() throws IOException {
     Testability testability = new Testability();

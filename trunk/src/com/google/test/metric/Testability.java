@@ -35,7 +35,7 @@ public class Testability {
 
   @Option(name = "-cp", metaVar = "lib/one.jar:lib/two.jar",
       usage = "classpath needed for analyzing the jar or directory")
-  private String classpath = ".";
+  private String classpath = "";
 
   @Argument(metaVar = "path/to/directory_or_jar")
   private List<String> arguments = new ArrayList<String>();
@@ -58,15 +58,17 @@ public class Testability {
 
   public void doMain(String... args) throws IOException, CmdLineException {
     parseArgs(new PrintWriter(System.err), args);
-    File jarOrDir = new File(arguments.get(0)); 
+    File jarOrDir = new File(arguments.get(0));
+    if(classpath.length() == 0) {
+    	classpath = System.getProperty("java.class.path", ".");	
+    }
     ClasspathRoot classpathRoot = ClasspathRootFactory.makeClasspathRoot(jarOrDir, classpath);
     ClassRepository classRepository = new ClassRepository(classpathRoot);
     for (String className : classpathRoot.getAllContainedClassNames()) {
       ClassCost classCost = computeCost(className, classRepository);
-      System.out.println("Class cost is " + classCost.toString());
+      System.out.println("Testability cost for " + classCost.toString() + "\n");
     }
   }
-
 
   public void parseArgs(Writer err, String... args) throws IOException, CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
