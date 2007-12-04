@@ -1,41 +1,59 @@
-<project name="testability-metrics" default="zip">
-    <property name="version" value="0.0.1"/>
-    <property name="project-name" value="google-testability-metrics"/>
+<project name="testability-metrics" default="dist">
+    <property name="version" value="0.0.1" />
+    <property name="project-name" value="google-testability-metrics" />
 
+	<property name="src.dir" value="src" />
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="test.src.dir" value="src-test" />
+	<property name="test.classes.dir" value="${build.dir}/test/classes" />
+	<property name="lib.dir" value="lib" />
+	<property name="dist.dir" value="dist" />
+	<property name="reports.dir" value="reports" />
+	
+	<path id="compile.classpath">
+	    <fileset dir="${lib.dir}">
+	        <include name="*.jar" />
+	    	<exclude name="junit.jar" />
+	    </fileset>
+	</path>
+	
+	<path id="test.classpath">
+        <pathelement location="${classes.dir}" />
+        <path refid="compile.classpath" />
+		<pathelement location="${lib.dir}/junit.jar" />
+        <pathelement location="${test.classes.dir}" />
+    </path>
+	
     <target name="clean">
-        <delete dir="target"/>
+    	<delete dir="${build.dir}" />
+        <delete dir="${dist.dir}" />
+    	<delete dir="${reports.dir}" />
     </target>
 
-    <target name="compile" depends="clean">
-        <mkdir dir="target/classes"/>
-        <javac srcdir="src" destdir="target/classes"
-        	classpath="lib/asm-3.0.jar;lib/args4j-2.0.8.jar" debug="true" debuglevel="source" />
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true" debuglevel="source">
+        	<classpath refid="compile.classpath" />
+        </javac>
     </target>
-
 
     <target name="compile-tests" depends="compile">
-        <mkdir dir="target/test-classes"/>
-        <javac srcdir="src-test" destdir="target/test-classes"
-               classpath="target/classes;lib/asm-3.0.jar;lib/junit.jar;lib/args4j-2.0.8.jar" debug="true"
-      debuglevel="lines,vars,source"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" debug="true" debuglevel="lines,vars,source">
+        	<classpath refid="test.classpath" />
+        </javac>
     </target>
 
     <target name="test" depends="compile-tests">
-        <mkdir dir="target/test-reports"/>
+        <mkdir dir="${reports.dir}/junit"/>
         <junit printsummary="yes" haltonfailure="no">
-            <classpath>
-                <pathelement location="src-test"/>
-                <pathelement location="target/classes"/>
-                <pathelement location="target/test-classes"/>
-                <pathelement location="lib/asm-3.0.jar"/>
-                <pathelement location="lib/junit.jar"/>
-            	<pathelement location="lib/args4j-2.0.8.jar"/>
-            </classpath>
+        	<classpath refid="test.classpath" />
 
             <formatter type="plain"/>
 
-            <batchtest fork="yes" todir="target/test-reports">
-                <fileset dir="src-test">
+            <batchtest fork="yes" todir="${reports.dir}/junit">
+                <fileset dir="${test.src.dir}">
                     <include name="**/*Test*.java"/>
                     <exclude name="**/AllTests.java"/>
                 </fileset>
@@ -43,25 +61,28 @@
         </junit>
     </target>
 
-    <target name="jar" depends="test">
+    <target name="jar" depends="compile">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar.jar"/>
-        <jarjar jarfile="target/${project-name}-${version}.jar">
+        <jarjar jarfile="${build.dir}/${project-name}-${version}.jar">
             <!--<manifest>-->
                 <!--<attribute name="Main-Class" value="com.google.test.metric.Main"/>-->
             <!--</manifest>-->
-            <fileset dir="target/classes"/>
-            <zipfileset src="lib/asm-3.0.jar"/>
+            <fileset dir="${classes.dir}"/>
+            <zipfileset src="${lib.dir}/asm-3.0.jar"/>
             <rule pattern="org.objectweb.asm.**" result="com.google.test.metric.asm.@1"/>
+        	<zipfileset src="${lib.dir}/args4j-2.0.8.jar"/>
+        	<rule pattern="org.koshuke.args4j.**" result="com.google.test.metric.args4j.@1"/>
         </jarjar>
     </target>
 
-    <target name="zip" depends="jar">
-        <zip destfile="target/${project-name}-${version}.zip">
+    <target name="dist" depends="clean, test, jar">
+    	<mkdir dir="${dist.dir}"/>
+        <zip destfile="${dist.dir}/${project-name}-${version}.zip">
             <fileset dir=".">
                 <include name="README.txt"/>
                 <include name="LICENSE.txt"/>
             </fileset>
-            <fileset dir="target">
+            <fileset dir="${build.dir}">
                 <include name="${project-name}-${version}.jar"/>
             </fileset>
         </zip>
