@@ -16,16 +16,13 @@
 
 package com.google.test.metric;
 
-import junit.framework.TestCase;
 
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-public class ClassInfoTest extends TestCase {
-
-  ClassRepository repo = new ClassRepository();
+public class ClassInfoTest extends ClassRepositoryTestCase {
 
   public void testNonExistingClass() throws Exception {
     try {

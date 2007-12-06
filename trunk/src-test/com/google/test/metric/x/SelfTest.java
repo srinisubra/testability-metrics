@@ -15,19 +15,29 @@
  */
 package com.google.test.metric.x;
 
+import org.objectweb.asm.ClassReader;
+
 import com.google.test.metric.ClassCost;
 import com.google.test.metric.ClassRepository;
+import com.google.test.metric.ClassRepositoryTestCase;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
 
-import junit.framework.TestCase;
+public class SelfTest extends ClassRepositoryTestCase {
 
-import org.objectweb.asm.ClassReader;
+  private MetricComputer computer;
 
-public class SelfTest extends TestCase {
-
-  ClassRepository repo = new ClassRepository();
-  MetricComputer computer = new MetricComputer(repo);
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    computer = new MetricComputer(repo);
+  }
+  
+  @Override
+  protected void tearDown() throws Exception {
+    super.tearDown();
+    computer = null;
+  }
 
   public void testMethodCost() throws Exception {
     System.out.println(computer.compute(MethodCost.class));

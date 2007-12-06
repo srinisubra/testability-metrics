@@ -13,26 +13,21 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.asm;
+package com.google.test.metric;
 
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.FieldVisitor;
 
-public class NoopFieldVisitor implements FieldVisitor {
+public abstract class ClassRepositoryTestCase extends AutoFieldClearTestCase {
 
-  public NoopFieldVisitor() {
+  protected ClassRepository repo;
+
+  public ClassRepositoryTestCase() {
     super();
   }
 
-  public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
-    return null;
-  }
-
-  public void visitAttribute(Attribute attr) {
-  }
-
-  public void visitEnd() {
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    repo = new ClassRepository();
   }
 
 }
