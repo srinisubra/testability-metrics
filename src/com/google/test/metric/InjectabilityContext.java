@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.LinkedList;
 
 public class InjectabilityContext {
 
@@ -26,8 +27,8 @@ public class InjectabilityContext {
   private Set<Variable> injectables = new HashSet<Variable>();
   private Set<Variable> globals = new HashSet<Variable>();
   private Set<Variable> globalState = new HashSet<Variable>();
-  private long totalCost = 0;
   private final ClassRepository classRepository;
+  private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
 
   public InjectabilityContext(ClassRepository classRepository) {
     this.classRepository = classRepository;
@@ -37,12 +38,16 @@ public class InjectabilityContext {
     return injectables;
   }
 
-  public void addMethodCost(long cost) {
-    totalCost += cost;
-  }
-
-  public long getTotalCost() {
-    return totalCost;
+  public void addMethodCost(MethodInfo methodInfo) {
+    // Why -1? a method with a cyclomatic complexity of 1 can
+    // be split to n smaller methods. The one single method and
+    // N small ones are same cost, but the sum of cyclomatic is not
+    // the same unless we change the offset of the method and say that
+    // a simple method is 0 and hence splitting 0 to N 0 is still zero
+    // and we gain the equivalence.
+    long methodCost = methodInfo.getNonRecursiveCyclomaticComplexity() - 1;
+    LineNumberCost lineNumberCost = new LineNumberCost(methodInfo, methodInfo.getStartingLineNumber(), methodCost);
+    lineNumberCosts.add(lineNumberCost);
   }
 
   public long getGlobalState() {
@@ -59,6 +64,7 @@ public class InjectabilityContext {
 
   public void visitMethod(MethodInfo method) {
     visitedMethods.add(method);
+    addMethodCost(method);
   }
 
   public boolean methodAlreadyVisited(MethodInfo method) {
@@ -67,7 +73,7 @@ public class InjectabilityContext {
 
   @Override
   public String toString() {
-    return "TotalCost: " + totalCost + " " + injectables + "\nGlobalCost: "
+    return "LineNumberCost: " + lineNumberCosts + " " + injectables + "\nGlobalCost: "
         + globalState.size() + " " + globals;
   }
 
@@ -128,4 +134,11 @@ public class InjectabilityContext {
   }
 
 
+  public List<LineNumberCost> getOperationCosts() {
+    return lineNumberCosts;
+  }
+
+  public MethodCost toMethodCost(MethodInfo method) {
+    return new MethodCost(method, getGlobalLoad(), getOperationCosts());
+  }
 }

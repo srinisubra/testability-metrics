@@ -15,20 +15,26 @@
  */
 package com.google.test.metric;
 
+import java.util.List;
+
 public class MethodCost {
 
-  private final long complexity;
   private final MethodInfo method;
   private final long globalLoad;
+  private final List<LineNumberCost> lineNumberCosts;
 
-  public MethodCost(MethodInfo method, long totalCost, long globalLoad) {
+  public MethodCost(MethodInfo method, long globalLoad, List<LineNumberCost> lineNumberCosts) {
     this.method = method;
-    this.complexity = totalCost;
     this.globalLoad = globalLoad;
+    this.lineNumberCosts = lineNumberCosts;
   }
 
   public long getComplexity() {
-    return complexity;
+    long sum = 0;
+    for (LineNumberCost lineNumberCost : lineNumberCosts) {
+      sum += lineNumberCost.getCost();
+    }
+    return sum;
   }
 
   public String getNameDesc() {
@@ -45,11 +51,14 @@ public class MethodCost {
   public void toString(StringBuilder buf) {
     buf.append(method.getNameDesc());
     buf.append(" cost: ");
-    buf.append(complexity);
+    buf.append(getComplexity());
   }
 
   public long getGlobal() {
     return globalLoad;
   }
 
+  public List<LineNumberCost> getOperationCosts() {
+    return lineNumberCosts;
+  }
 }

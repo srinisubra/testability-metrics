@@ -66,7 +66,7 @@ public class MethodInvokation extends Operation {
     if (context.methodAlreadyVisited(method)) {
       // Method already counted, skip (to prevent recursion)
     } else if (method.canOverride() && context.isInjectable(methodThis)) {
-      // Method can be overridden
+      // Method can be overridden / injectable
     } else {
       // Method can not be intercepted we have to add the cost
       // recursively
