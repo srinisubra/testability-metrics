@@ -44,7 +44,7 @@ public class MetricComputer {
     addFieldCost(classInfo, context);
     context.setInjectable(method);
     method.computeMetric(context);
-    return new MethodCost(method, context.getTotalCost(), context.getGlobalLoad());
+    return context.toMethodCost(method);
   }
 
   private void addSetterInjection(ClassInfo classInfo, InjectabilityContext context) {

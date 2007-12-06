@@ -33,13 +33,16 @@ public class MethodInfo {
   private final long cyclomaticComplexity;
   private final Visibility visibility;
   private final List<Operation> operations;
+  private final int startingLineNumber;
 
-  public MethodInfo(ClassInfo classInfo, String methodName, String desc,
-      Variable methodThis, List<ParameterInfo> parameters,
+  public MethodInfo(ClassInfo classInfo, String methodName,
+      int startingLineNumber, String desc, Variable methodThis,
+      List<ParameterInfo> parameters,
       List<LocalVariableInfo> localVariables, Visibility visibility,
       long cylomaticComplexity, List<Operation> operations) {
     this.classInfo = classInfo;
     this.name = methodName;
+    this.startingLineNumber = startingLineNumber;
     this.desc = desc;
     this.methodThis = methodThis;
     this.parameters = parameters;
@@ -88,13 +91,6 @@ public class MethodInfo {
 
   public void computeMetric(InjectabilityContext context) {
     context.visitMethod(this);
-    // Why -1? a method with a cyclomatic complexity of 1 can
-    // be split to n smaller methods. The one single method and
-    // N small ones are same cost, but the sum of cyclomatic is not
-    // the same unless we change the offset of the method and say that
-    // a simple method is 0 and hence splitting 0 to N 0 is still zero
-    // and we gain the equivalence.
-    context.addMethodCost(cyclomaticComplexity - 1);
 
     for (Operation operation : getOperations()) {
       operation.computeMetric(context);
@@ -121,4 +117,11 @@ public class MethodInfo {
     return classInfo;
   }
 
+  /**
+   * Not actually the starting line number of the method, but the first visited
+   * line - see MethodVisitorBuilder for where it comes from.
+   */
+  public int getStartingLineNumber() {
+    return startingLineNumber;
+  }
 }

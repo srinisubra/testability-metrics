@@ -72,6 +72,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
   private long cyclomaticComplexity = 1;
   private Variable methodThis;
   private int lineNumber;
+  private int startingLineNumber;
   private final List<ParameterInfo> parameters = new LinkedList<ParameterInfo>();
   private final List<LocalVariableInfo> localVariables = new LinkedList<LocalVariableInfo>();
 
@@ -240,6 +241,9 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public void visitLineNumber(final int line, final Label start) {
     recorder.add(new Runnable() {
       public void run() {
+        if (lineNumber == 0) {
+          startingLineNumber = line;
+        }
         lineNumber = line;
       }
     });
@@ -251,8 +255,8 @@ public class MethodVisitorBuilder implements MethodVisitor {
     }
     block.done();
     try {
-      MethodInfo methodInfo = new MethodInfo(classInfo, name, desc,
-          methodThis, parameters, localVariables, visibility,
+      MethodInfo methodInfo = new MethodInfo(classInfo, name, startingLineNumber,
+          desc, methodThis, parameters, localVariables, visibility,
           cyclomaticComplexity, block.getOperations());
       classInfo.addMethod(methodInfo);
     } catch (IllegalStateException e) {
