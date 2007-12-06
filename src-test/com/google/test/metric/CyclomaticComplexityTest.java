@@ -15,16 +15,14 @@
  */
 package com.google.test.metric;
 
-import junit.framework.TestCase;
 
-public class CyclomaticComplexityTest extends TestCase {
+public class CyclomaticComplexityTest extends ClassRepositoryTestCase {
 
-  private ClassRepository repo;
   private ClassInfo classInfo;
 
   @Override
   protected void setUp() throws Exception {
-    repo = new ClassRepository();
+    super.setUp();
     classInfo = repo.getClass(CyclomaticMethods.class);
   }
 

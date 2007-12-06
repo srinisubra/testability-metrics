@@ -16,14 +16,18 @@
 package com.google.test.metric;
 
 import static com.google.test.metric.SignatureUtil.L;
-import junit.framework.TestCase;
 
 import java.util.List;
 
-public class MetricComputerTest extends TestCase {
+public class MetricComputerTest extends ClassRepositoryTestCase {
 
-  private ClassRepository repo = new ClassRepository();
-  private MetricComputer computer = new MetricComputer(repo);
+  private MetricComputer computer;
+
+  @Override
+  protected void setUp() throws Exception {
+    super.setUp();
+    computer = new MetricComputer(repo);
+  }
 
   public static class Medium {
     public Medium() {
