@@ -15,7 +15,8 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.InjectabilityContext;
+import com.google.test.metric.MethodInfo;
+import com.google.test.metric.TestabilityContext;
 import com.google.test.metric.Variable;
 
 public class LocalAssignment extends Operation {
@@ -42,7 +43,7 @@ public class LocalAssignment extends Operation {
     return variable + " <- " + value;
   }
 
-  public void computeMetric(InjectabilityContext context) {
+  public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
     context.localAssginment(variable, value);
   }
 }

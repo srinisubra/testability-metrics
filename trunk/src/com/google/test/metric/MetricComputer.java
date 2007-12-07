@@ -36,49 +36,50 @@ public class MetricComputer {
   }
 
   public MethodCost compute(MethodInfo method) {
-    InjectabilityContext context = new InjectabilityContext(classRepository);
-    ClassInfo classInfo = method.getClassInfo();
-    addStaticCost(classInfo, context);
-    addConstructorCost(classInfo, method, context);
-    addSetterInjection(classInfo, context);
-    addFieldCost(classInfo, context);
+    TestabilityContext context = new TestabilityContext(classRepository);
+    addStaticCost(method, context);
+    addConstructorCost(method, context);
+    addSetterInjection(method, context);
+    addFieldCost(method, context);
     context.setInjectable(method);
     method.computeMetric(context);
-    return context.toMethodCost(method);
+    return context.getMethodCost(method);
   }
 
-  private void addSetterInjection(ClassInfo classInfo, InjectabilityContext context) {
-    for (MethodInfo method : classInfo.getMethods()) {
+  private void addSetterInjection(MethodInfo baseMethod, TestabilityContext context) {
+    for (MethodInfo method : baseMethod.getClassInfo().getMethods()) {
       if (method.getName().startsWith("set")) {
+        context.implicitCost(baseMethod, method);
         context.setInjectable(method);
         method.computeMetric(context);
       }
     }
   }
 
-  private void addConstructorCost(ClassInfo classInfo,
-      MethodInfo method, InjectabilityContext context) {
-    if (!method.isStatic()) {
-      MethodInfo constructor = getPrefferedConstructor(classInfo);
+  private void addConstructorCost(MethodInfo method, TestabilityContext context) {
+    if (!method.isStatic() && !method.isConstructor()) {
+      MethodInfo constructor = getPrefferedConstructor(method.getClassInfo());
       if (constructor != null) {
+        context.implicitCost(method, constructor);
         context.setInjectable(constructor);
         constructor.computeMetric(context);
       }
     }
   }
 
-  private void addFieldCost(ClassInfo classInfo,
-      InjectabilityContext context) {
-    for (FieldInfo field : classInfo.getFields()) {
+  private void addFieldCost(MethodInfo method,
+      TestabilityContext context) {
+    for (FieldInfo field : method.getClassInfo().getFields()) {
       if (!field.isPrivate()) {
         context.setInjectable(field);
       }
     }
   }
 
-  private void addStaticCost(ClassInfo classInfo, InjectabilityContext context) {
-    for (MethodInfo method : classInfo.getMethods()) {
+  private void addStaticCost(MethodInfo baseMethod, TestabilityContext context) {
+    for (MethodInfo method : baseMethod.getClassInfo().getMethods()) {
       if (method.getName().startsWith("<clinit>")) {
+        context.implicitCost(baseMethod, method);
         method.computeMetric(context);
       }
     }

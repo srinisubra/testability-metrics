@@ -155,7 +155,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testVeryExpensive() throws Exception {
     MethodCost cost = computer.compute(Tree.class,
         "veryExpensive()Ljava/lang/String;");
-    assertTrue(100l < cost.getComplexity());
+    assertTrue("100<"+cost.getComplexity(), 100l < cost.getComplexity());
   }
 
   static class ChoseConstructor {
@@ -358,9 +358,9 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public static class CostPerLine {
     static void main(){
-      CostUtil.staticCost0();
-      CostUtil.staticCost1();
-      CostUtil.staticCost2();
+      CostUtil.staticCost0(); // line0
+      CostUtil.staticCost1(); // line1
+      CostUtil.staticCost2(); // line2
     }
   }
 
@@ -368,20 +368,22 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodCost cost = computer.compute(CostPerLine.class, "main()V");
     assertEquals(3, cost.getComplexity());
     List<LineNumberCost> lineNumberCosts = cost.getOperationCosts();
-    assertEquals(4, lineNumberCosts.size());
+    assertEquals(3, lineNumberCosts.size());
+    
     LineNumberCost line0 = lineNumberCosts.get(0); // the method - todo: although the cost for this is not as high as I'd expect ! (it is zero, shouldn't it be the sum of the other costs?!)
     LineNumberCost line1 = lineNumberCosts.get(1);
     LineNumberCost line2 = lineNumberCosts.get(2);
-    LineNumberCost line3 = lineNumberCosts.get(3);
 
-    assertEquals(0, line0.getCost());          // todo - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
-    assertEquals(line0.getMethod().getStartingLineNumber() + 0, line0.getLineNumber());
+    int methodStartingLine = cost.getMethod().getStartingLineNumber();
+    
+    assertEquals(0, line0.getMethodCost().getComplexity());          // todo - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
+    assertEquals(methodStartingLine + 0, line0.getLineNumber());
 
-    assertEquals(1, line1.getCost());
-    assertEquals(line1.getMethod().getStartingLineNumber() + 1, line1.getLineNumber());
+    assertEquals(1, line1.getMethodCost().getComplexity());
+    assertEquals(methodStartingLine + 1, line1.getLineNumber());
 
-    assertEquals(2, line2.getCost());
-    assertEquals(line2.getMethod().getStartingLineNumber() + 2, line2.getLineNumber());
+    assertEquals(2, line2.getMethodCost().getComplexity());
+    assertEquals(methodStartingLine + 2, line2.getLineNumber());
   }
 
 }

@@ -15,7 +15,7 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.InjectabilityContext;
+import com.google.test.metric.TestabilityContext;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.Variable;
 
@@ -61,27 +61,27 @@ public class MethodInvokation extends Operation {
   }
 
   @Override
-  public void computeMetric(InjectabilityContext context) {
-    MethodInfo method = context.getMethod(clazzName, name + signature);
-    if (context.methodAlreadyVisited(method)) {
+  public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
+    MethodInfo toMethod = context.getMethod(clazzName, name + signature);
+    if (context.methodAlreadyVisited(toMethod)) {
       // Method already counted, skip (to prevent recursion)
-    } else if (method.canOverride() && context.isInjectable(methodThis)) {
+    } else if (toMethod.canOverride() && context.isInjectable(methodThis)) {
       // Method can be overridden / injectable
     } else {
       // Method can not be intercepted we have to add the cost
       // recursively
-      if (method.isInstance()) {
-        context.localAssginment(method.getMethodThis(), methodThis);
+      if (toMethod.isInstance()) {
+        context.localAssginment(toMethod.getMethodThis(), methodThis);
       }
       int i = 0;
-      if (parameters.size() != method.getParameters().size()) {
+      if (parameters.size() != toMethod.getParameters().size()) {
         throw new IllegalStateException(
             "Argument count does not match method parameter count.");
       }
       for (Variable var : parameters) {
-        context.localAssginment(method.getParameters().get(i++), var);
+        context.localAssginment(toMethod.getParameters().get(i++), var);
       }
-      method.computeMetric(context);
+      context.recordMethodCall(currentMethod, getLineNumber(), toMethod);
     }
   }
 

@@ -15,7 +15,8 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.InjectabilityContext;
+import com.google.test.metric.MethodInfo;
+import com.google.test.metric.TestabilityContext;
 import com.google.test.metric.Variable;
 
 public class ArrayAssignment extends Operation {
@@ -33,7 +34,7 @@ public class ArrayAssignment extends Operation {
   }
 
   @Override
-  public void computeMetric(InjectabilityContext context) {
+  public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
     context.arrayAssignment(array, index, value);
   }
 
