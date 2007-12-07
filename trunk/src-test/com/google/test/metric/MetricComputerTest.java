@@ -370,13 +370,13 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     List<LineNumberCost> lineNumberCosts = cost.getOperationCosts();
     assertEquals(3, lineNumberCosts.size());
     
-    LineNumberCost line0 = lineNumberCosts.get(0); // the method - todo: although the cost for this is not as high as I'd expect ! (it is zero, shouldn't it be the sum of the other costs?!)
+    LineNumberCost line0 = lineNumberCosts.get(0);
     LineNumberCost line1 = lineNumberCosts.get(1);
     LineNumberCost line2 = lineNumberCosts.get(2);
 
     int methodStartingLine = cost.getMethod().getStartingLineNumber();
     
-    assertEquals(0, line0.getMethodCost().getTotalComplexityCost());          // todo - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
+    assertEquals(0, line0.getMethodCost().getTotalComplexityCost()); // todo(jaw) - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
     assertEquals(methodStartingLine + 0, line0.getLineNumber());
 
     assertEquals(1, line1.getMethodCost().getTotalComplexityCost());
