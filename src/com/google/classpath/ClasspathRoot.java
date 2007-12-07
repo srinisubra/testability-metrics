@@ -25,10 +25,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * An entry on the classpath, which may be a directory or jar. Concrete classes are
- * provided for each type.
+ * An entry on the classpath, which may be a directory or jar. Concrete classes
+ * are provided for each type.
  * 
- * @author misko, pepstein, jwolter
+ * @author misko@google.com, pepstein@google.com, jwolter@google.com
  */
 public abstract class ClasspathRoot {
   protected URLClassLoader classloader;
@@ -40,12 +40,12 @@ public abstract class ClasspathRoot {
 
   abstract Collection<String> getResources(String packageName);
 
-  public Collection<String> getAllContainedClassNames()  {
+  public Collection<String> getAllContainedClassNames() {
     List<String> classNames = new ArrayList<String>();
     try {
       buildClassNamesList(url, this, "", "", classNames, false);
     } catch (MalformedURLException e) {
-      e.printStackTrace();
+      throw new RuntimeException(e);
     }
     return classNames;
   }
@@ -60,9 +60,10 @@ public abstract class ClasspathRoot {
     return url.substring(index);
   }
 
-  protected static void buildClassNamesList(URL root, ClasspathRoot classpathRoot,
-      String requiredPrefix, String packageName, List<String> classNamesList,
-      boolean verbose) throws MalformedURLException {
+  protected static void buildClassNamesList(URL root,
+      ClasspathRoot classpathRoot, String requiredPrefix, String packageName,
+      List<String> classNamesList, boolean verbose)
+      throws MalformedURLException {
     for (String resource : classpathRoot.getResources(packageName)) {
       if (resource.endsWith(".class")) {
         String className = packageName + resource;
@@ -79,19 +80,22 @@ public abstract class ClasspathRoot {
         String temp = root.getPath() + packageName + resource;
         URL jarRoot = new File(temp).toURI().toURL();
         ClasspathRoot jarPath = new JarClasspathRoot(jarRoot, null);
-        buildClassNamesList(jarRoot, jarPath, requiredPrefix, "", classNamesList, verbose);
-      } else {
-        buildClassNamesList(root, classpathRoot, requiredPrefix, packageName + resource + "/",
+        buildClassNamesList(jarRoot, jarPath, requiredPrefix, "",
             classNamesList, verbose);
+      } else {
+        buildClassNamesList(root, classpathRoot, requiredPrefix, packageName
+            + resource + "/", classNamesList, verbose);
       }
     }
   }
 
-  private static boolean validClassNameByPrefixFilter(String className, String requiredPrefix) {
-     return className.startsWith(requiredPrefix);
-   }
+  private static boolean validClassNameByPrefixFilter(String className,
+      String requiredPrefix) {
+    return className.startsWith(requiredPrefix);
+  }
 
-  protected static void parseAndAddToClasspathList(List<URL> completeClasspath, String classpath) {
+  protected static void parseAndAddToClasspathList(List<URL> completeClasspath,
+      String classpath) {
     for (String path : classpath.split("(:|;)")) {
       try {
         URL url = new File(path).toURI().toURL();

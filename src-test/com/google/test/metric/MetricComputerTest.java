@@ -70,7 +70,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodInfo method = repo.getClass(Medium.class).getMethod("statiCost1()I");
     assertFalse(method.canOverride());
     MethodCost cost = computer.compute(Medium.class, "statiCost1()I");
-    assertEquals(1l, cost.getComplexity());
+    assertEquals(1l, cost.getTotalComplexityCost());
   }
 
   /**
@@ -81,7 +81,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodInfo method = repo.getClass(Medium.class).getMethod("cost2()I");
     assertTrue(method.canOverride());
     MethodCost cost = computer.compute(Medium.class, "cost2()I");
-    assertEquals(3l, cost.getComplexity());
+    assertEquals(3l, cost.getTotalComplexityCost());
   }
 
   /**
@@ -92,7 +92,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodInfo method = repo.getClass(Medium.class).getMethod("<init>()V");
     assertFalse(method.canOverride());
     MethodCost cost = computer.compute(Medium.class, "<init>()V");
-    assertEquals(1l, cost.getComplexity());
+    assertEquals(1l, cost.getTotalComplexityCost());
   }
 
   /**
@@ -105,7 +105,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testMediumMethod4() throws Exception {
     MethodCost cost = computer.compute(Medium.class,
         "testMethod4()Ljava/lang/Object;");
-    assertEquals(5l, cost.getComplexity());
+    assertEquals(5l, cost.getTotalComplexityCost());
   }
 
   public static class Node {
@@ -137,25 +137,25 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testTree() throws Exception {
     MethodCost cost = computer.compute(Tree.class, "<init>()V");
-    assertEquals(0l, cost.getComplexity());
+    assertEquals(0l, cost.getTotalComplexityCost());
   }
 
   public void testTreeTitleLength() throws Exception {
     MethodCost cost = computer.compute(Tree.class,
         "titleLength()Ljava/lang/String;");
-    assertEquals(0l, cost.getComplexity());
+    assertEquals(0l, cost.getTotalComplexityCost());
   }
 
   public void testTreeSubTitleLength() throws Exception {
     MethodCost cost = computer.compute(Tree.class,
         "subTitleLength()Ljava/lang/String;");
-    assertEquals(1l, cost.getComplexity());
+    assertEquals(1l, cost.getTotalComplexityCost());
   }
 
   public void testVeryExpensive() throws Exception {
     MethodCost cost = computer.compute(Tree.class,
         "veryExpensive()Ljava/lang/String;");
-    assertTrue("100<"+cost.getComplexity(), 100l < cost.getComplexity());
+    assertTrue("100<"+cost.getTotalComplexityCost(), 100l < cost.getTotalComplexityCost());
   }
 
   static class ChoseConstructor {
@@ -192,7 +192,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testIgnoreConstructorsIfAllConstructorsArePrivate()
       throws Exception {
     assertEquals(2L, computer.compute(Singleton.class, "doWork()V")
-        .getComplexity());
+        .getTotalComplexityCost());
   }
 
   static class StaticInit {
@@ -207,7 +207,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testAddStaticInitializationCost() throws Exception {
     assertEquals(3L, computer.compute(StaticInit.class, "doWork()V")
-        .getComplexity());
+        .getTotalComplexityCost());
   }
 
   static class Setters {
@@ -224,7 +224,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testSetterInjection() throws Exception {
     assertEquals(0L, computer.compute(Setters.class, "doWork()V")
-        .getComplexity());
+        .getTotalComplexityCost());
   }
 
   static class WholeClassCost {
@@ -239,8 +239,8 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testComputeClassCost() throws Exception {
     ClassCost cost = computer.compute(WholeClassCost.class);
-    assertEquals(1L, cost.getMethodCost("methodA()V").getComplexity());
-    assertEquals(1L, cost.getMethodCost("methodB()V").getComplexity());
+    assertEquals(1L, cost.getMethodCost("methodA()V").getTotalComplexityCost());
+    assertEquals(1L, cost.getMethodCost("methodB()V").getTotalComplexityCost());
   }
 
   static class Array {
@@ -279,8 +279,8 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodCost callCost0 = cost.getMethodCost("callCost0("
         + L(InjectableClass.class) + ")V");
     MethodCost callCost4 = cost.getMethodCost("callCost4()V");
-    assertEquals(0L, callCost0.getComplexity());
-    assertEquals(4L, callCost4.getComplexity());
+    assertEquals(0L, callCost0.getTotalComplexityCost());
+    assertEquals(4L, callCost4.getTotalComplexityCost());
   }
 
   static class GlobalState {
@@ -332,24 +332,24 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testGlobalLoadWhichAccessesFinalShouldBeZero() {
     ClassCost cost = computer.compute(GlobalState.class);
     MethodCost method = cost.getMethodCost("toString()Ljava/lang/String;");
-    assertEquals(0L, method.getGlobal());
+    assertEquals(0L, method.getTotalGlobalCost());
   }
 
   public void testGlobalLoadMethodDispatchNoStateAccessShouldBeZero() {
     ClassCost cost = computer.compute(GlobalStateUser.class);
-    assertEquals(0L, cost.getMethodCost("noLoad()V").getGlobal());
-    assertEquals(0L, cost.getMethodCost("accessFinalState()V").getGlobal());
-    assertEquals(0L, cost.getMethodCost("accessFinalState2()V").getGlobal());
+    assertEquals(0L, cost.getMethodCost("noLoad()V").getTotalGlobalCost());
+    assertEquals(0L, cost.getMethodCost("accessFinalState()V").getTotalGlobalCost());
+    assertEquals(0L, cost.getMethodCost("accessFinalState2()V").getTotalGlobalCost());
   }
 
   public void testGlobalLoadAccessStateShouldBeOne() {
     MethodCost cost = computer.compute(GlobalStateUser.class, "accessCount()V");
-    assertEquals(1L, cost.getGlobal());
+    assertEquals(1L, cost.getTotalGlobalCost());
   }
 
   public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
     MethodCost cost = computer.compute(GlobalStateUser.class, "accessMutableState()V");
-    assertEquals(1L, cost.getGlobal());
+    assertEquals(1L, cost.getTotalGlobalCost());
   }
 
   public void testJavaLangObjectParsesCorrectly() throws Exception {
@@ -366,7 +366,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testCostPerLine() throws Exception {
     MethodCost cost = computer.compute(CostPerLine.class, "main()V");
-    assertEquals(3, cost.getComplexity());
+    assertEquals(3, cost.getTotalComplexityCost());
     List<LineNumberCost> lineNumberCosts = cost.getOperationCosts();
     assertEquals(3, lineNumberCosts.size());
     
@@ -376,13 +376,13 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
     int methodStartingLine = cost.getMethod().getStartingLineNumber();
     
-    assertEquals(0, line0.getMethodCost().getComplexity());          // todo - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
+    assertEquals(0, line0.getMethodCost().getTotalComplexityCost());          // todo - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
     assertEquals(methodStartingLine + 0, line0.getLineNumber());
 
-    assertEquals(1, line1.getMethodCost().getComplexity());
+    assertEquals(1, line1.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 1, line1.getLineNumber());
 
-    assertEquals(2, line2.getMethodCost().getComplexity());
+    assertEquals(2, line2.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 2, line2.getLineNumber());
   }
 

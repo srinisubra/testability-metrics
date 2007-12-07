@@ -85,6 +85,11 @@ public class KeyedMultiStackTest extends TestCase {
       }
     });
     assertEquals("0", log);
+    stack.assertEmpty();
+  }
+  
+  public void testToString() throws Exception {
+    assertNotNull(stack.toString());
   }
 
   public void testPushPushPopOnSplit() throws Exception {

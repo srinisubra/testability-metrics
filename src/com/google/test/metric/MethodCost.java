@@ -25,48 +25,66 @@ public class MethodCost {
   private final MethodInfo method;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
+  private long totalGlobalCost = -1;
+  private long totalComplexityCost = -1;
 
   public MethodCost(MethodInfo method) {
     this.method = method;
   }
 
-  public long getComplexity() {
-    return getComplexity(new HashSet<MethodCost>());
+  public long getTotalComplexityCost() {
+    assertLinked();
+    return totalComplexityCost;
   }
 
-  public long getComplexity(Set<MethodCost> alreadySeen) {
-    if (alreadySeen.contains(this)) {
-      return 0;
+  public long getTotalGlobalCost() {
+    assertLinked();
+    return totalGlobalCost;
+  }
+
+  private void assertLinked() {
+    if (!isLinked()) {
+      throw new IllegalStateException("Need to link first.");
     }
-    alreadySeen.add(this);
-    long sum = method.getTestCost();
-    for (LineNumberCost lineNumberCost : lineNumberCosts) {
-      sum += lineNumberCost.getMethodCost().getComplexity(alreadySeen);
+  }
+
+  private boolean isLinked() {
+    return totalComplexityCost >= 0 && totalGlobalCost >= 0;
+  }
+
+  public void link() {
+    if (!isLinked()) {
+      totalGlobalCost = 0;
+      totalComplexityCost = 0;
+      for (LineNumberCost lineNumberCost : lineNumberCosts) {
+        MethodCost childCost = lineNumberCost.getMethodCost();
+        childCost.link();
+        totalGlobalCost += childCost.getTotalGlobalCost();
+        totalComplexityCost += childCost.getTotalComplexityCost();
+      }
+      totalComplexityCost += getComplexityCost();
+      totalGlobalCost += getGlobalCost();
     }
-    return sum;
   }
 
-  public String getNameDesc() {
-    return method.getNameDesc();
+  private long getComplexityCost() {
+    return method.getTestCost();
   }
 
-  @Override
-  public String toString() {
-    StringBuilder buf = new StringBuilder();
-    toString("", buf, new HashSet<MethodCost>());
-    return buf.toString();
+  private int getGlobalCost() {
+    return globalStateCosts.size();
   }
 
   public void toString(String prefix, StringBuilder buf,
       Set<MethodCost> alreadySeen) {
     buf.append(method.getNameDesc());
-    long cost = getComplexity(new HashSet<MethodCost>(alreadySeen));
-    buf.append("[" + method.getTestCost() + "/" + cost + "]");
+    buf.append("[" + getComplexityCost() + ", " + getGlobalCost()
+        + "/" + totalComplexityCost + ", " + totalGlobalCost + "]");
     if (alreadySeen.contains(this)) {
       return;
     }
     alreadySeen.add(this);
-    if (cost > 0) {
+    if (totalGlobalCost > 0 || totalComplexityCost > 0) {
       for (LineNumberCost line : lineNumberCosts) {
         buf.append("\n");
         buf.append(prefix + "  line ");
@@ -76,23 +94,6 @@ public class MethodCost {
       }
     }
   }
-  
-  public long getGlobal() {
-    return getGlobal(new HashSet<MethodCost>());
-  }
-
-  public long getGlobal(Set<MethodCost> alreadySeen) {
-    if (alreadySeen.contains(this)) {
-      return 0;
-    }
-    alreadySeen.add(this);
-    long sum = globalStateCosts.size();
-    for (LineNumberCost lineNumberCost : lineNumberCosts) {
-      sum += lineNumberCost.getMethodCost().getGlobal(alreadySeen);
-    }
-    return sum;
-  }
-
 
   public List<LineNumberCost> getOperationCosts() {
     return lineNumberCosts;
@@ -108,6 +109,13 @@ public class MethodCost {
 
   public void addGlobalCost(int lineNumber, Variable variable) {
     globalStateCosts.add(new GlobalStateCost(lineNumber, variable));
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    toString("", buf, new HashSet<MethodCost>());
+    return buf.toString();
   }
 
 }
