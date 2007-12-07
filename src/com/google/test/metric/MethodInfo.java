@@ -89,14 +89,6 @@ public class MethodInfo {
     return unmodifiableList(operations);
   }
 
-  public void computeMetric(InjectabilityContext context) {
-    context.visitMethod(this);
-
-    for (Operation operation : getOperations()) {
-      operation.computeMetric(context);
-    }
-  }
-
   public boolean isStatic() {
     return methodThis == null;
   }
@@ -124,4 +116,22 @@ public class MethodInfo {
   public int getStartingLineNumber() {
     return startingLineNumber;
   }
+
+  public long getTestCost() {
+    // Why -1? a method with a cyclomatic complexity of 1 can
+    // be split to n smaller methods. The one single method and
+    // N small ones are same cost, but the sum of cyclomatic is not
+    // the same unless we change the offset of the method and say that
+    // a simple method is 0 and hence splitting 0 to N 0 is still zero
+    // and we gain the equivalence.
+    long implicitCost = getNonRecursiveCyclomaticComplexity() - 1;
+    return implicitCost;
+  }
+
+  public void computeMetric(TestabilityContext context) {
+    for (Operation operation : getOperations()) {
+      operation.computeMetric(context, this);
+    }
+  }
+
 }

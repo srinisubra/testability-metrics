@@ -17,16 +17,18 @@ package com.google.test.metric;
 
 import junit.framework.TestCase;
 
-public class InjectabilityContextTest extends TestCase {
+public class TestabilityContextTest extends TestCase {
 
   public void testIsInjectable() throws Exception {
-    InjectabilityContext context = new InjectabilityContext(null);
+    TestabilityContext context = new TestabilityContext(null);
     Variable var = new Variable("", Type.fromJava("X"));
     assertFalse(context.isInjectable(var));
     context.setInjectable(var);
     assertTrue(context.isInjectable(var));
-    assertEquals(1, context.getInjectables().size());
-    assertTrue(context.getInjectables().contains(var));
+  }
+  
+  public void testToMethodCost() throws Exception {
+    TestabilityContext context = new TestabilityContext(new ClassRepository());
   }
 
 }

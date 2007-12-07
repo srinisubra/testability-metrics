@@ -15,24 +15,35 @@
  */
 package com.google.test.metric;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class MethodCost {
 
   private final MethodInfo method;
-  private final long globalLoad;
-  private final List<LineNumberCost> lineNumberCosts;
+  private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
+  private final long implicitCost;
+  private long globalLoad;
 
-  public MethodCost(MethodInfo method, long globalLoad, List<LineNumberCost> lineNumberCosts) {
+  public MethodCost(MethodInfo method, long implicitCost) {
     this.method = method;
-    this.globalLoad = globalLoad;
-    this.lineNumberCosts = lineNumberCosts;
+    this.implicitCost = implicitCost;
   }
 
   public long getComplexity() {
-    long sum = 0;
+    return getComplexity(new HashSet<MethodCost>());
+  }
+
+  public long getComplexity(Set<MethodCost> alreadySeen) {
+    if (alreadySeen.contains(this)) {
+      return 0;
+    }
+    alreadySeen.add(this);
+    long sum = implicitCost;
     for (LineNumberCost lineNumberCost : lineNumberCosts) {
-      sum += lineNumberCost.getCost();
+      sum += lineNumberCost.getMethodCost().getComplexity(alreadySeen);
     }
     return sum;
   }
@@ -44,16 +55,29 @@ public class MethodCost {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    toString(buf);
+    toString("", buf, new HashSet<MethodCost>());
     return buf.toString();
   }
 
-  public void toString(StringBuilder buf) {
+  public void toString(String prefix, StringBuilder buf,
+      Set<MethodCost> alreadySeen) {
     buf.append(method.getNameDesc());
-    buf.append(" cost: ");
-    buf.append(getComplexity());
+    long cost = getComplexity(new HashSet<MethodCost>(alreadySeen));
+    buf.append("[" + implicitCost + "/" + cost + "]");
+    if (alreadySeen.contains(this)) {
+      return;
+    }
+    alreadySeen.add(this);
+    if (cost > 0) {
+      for (LineNumberCost line : lineNumberCosts) {
+        buf.append("\n");
+        buf.append(prefix + "  line ");
+        buf.append(line.getLineNumber());
+        buf.append(": ");
+        line.getMethodCost().toString(prefix + "  ", buf, alreadySeen);
+      }
+    }
   }
-
   public long getGlobal() {
     return globalLoad;
   }
@@ -61,4 +85,13 @@ public class MethodCost {
   public List<LineNumberCost> getOperationCosts() {
     return lineNumberCosts;
   }
+
+  public MethodInfo getMethod() {
+    return method;
+  }
+
+  public void addMethodCost(int fromLineNumber, MethodCost to) {
+    lineNumberCosts.add(new LineNumberCost(fromLineNumber, to));
+  }
+
 }

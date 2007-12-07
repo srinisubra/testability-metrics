@@ -20,21 +20,39 @@ import junit.framework.TestCase;
 public class CostUtilTest extends TestCase {
 
   public void testVerifyCosts() throws Exception {
-    assertEquals(0, cost("staticCost0()Z"));
-    assertEquals(0, cost("instanceCost0()Z"));
-    assertEquals(1, cost("staticCost1()Z"));
-    assertEquals(1, cost("instanceCost1()Z"));
-    assertEquals(2, cost("staticCost2()Z"));
-    assertEquals(2, cost("instanceCost2()Z"));
     assertEquals(3, cost("staticCost3()Z"));
     assertEquals(3, cost("instanceCost3()Z"));
     assertEquals(4, cost("staticCost4()Z"));
     assertEquals(4, cost("instanceCost4()Z"));
   }
 
+  public void testInstanceCost2() {
+    assertEquals(2, cost("instanceCost2()Z"));
+  }
+
+  public void testStatcCost2() {
+    assertEquals(2, cost("staticCost2()Z"));
+  }
+
+  public void testInstanceCost1() {
+    assertEquals(1, cost("instanceCost1()Z"));
+  }
+
+  public void testStaticCost1() {
+    assertEquals(1, cost("staticCost1()Z"));
+  }
+
+  public void testInstanceCost0() {
+    assertEquals(0, cost("instanceCost0()Z"));
+  }
+
+  public void testStaticCost0() {
+    assertEquals(0, cost("staticCost0()Z"));
+  }
+
   private long cost(String method) {
     MetricComputer computer = new MetricComputer(new ClassRepository());
-    return computer.compute(CostUtil.class, method)
-        .getComplexity();
+    MethodCost cost = computer.compute(CostUtil.class, method);
+    return cost.getComplexity();
   }
 }

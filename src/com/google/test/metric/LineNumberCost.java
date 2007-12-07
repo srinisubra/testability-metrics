@@ -1,28 +1,29 @@
 package com.google.test.metric;
 
+
 /**
  * User: jwolter Date: Nov 30, 2007
  */
 public class LineNumberCost {
-  private final MethodInfo methodInfo;
-  private final long cost;
   private final int lineNumber;
+  private final MethodCost methodCost;
 
-  public LineNumberCost(MethodInfo methodInfo, int lineNumber, long cost) {
-    this.methodInfo = methodInfo;
+  public LineNumberCost(int lineNumber, MethodCost methodCost) {
     this.lineNumber = lineNumber;
-    this.cost = cost;
-  }
-
-  public long getCost() {
-    return cost;
-  }
-
-  public MethodInfo getMethod() {
-    return methodInfo;
+    this.methodCost = methodCost;
   }
 
   public int getLineNumber() {
     return lineNumber;
   }
+
+  public MethodCost getMethodCost() {
+    return methodCost;
+  }
+
+  @Override
+  public String toString() {
+    return methodCost.getMethod() + ":" + lineNumber;
+  }
+
 }

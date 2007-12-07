@@ -15,7 +15,8 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.InjectabilityContext;
+import com.google.test.metric.MethodInfo;
+import com.google.test.metric.TestabilityContext;
 
 public abstract class Operation {
 
@@ -28,6 +29,6 @@ public abstract class Operation {
   public int getLineNumber() {
     return lineNumber;
   }
-
-  public abstract void computeMetric(InjectabilityContext context);
+  
+  public abstract void computeMetric(TestabilityContext context, MethodInfo currentMethod);
 }

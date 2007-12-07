@@ -15,66 +15,73 @@
  */
 package com.google.test.metric;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.LinkedList;
 
-public class InjectabilityContext {
+public class TestabilityContext {
 
-  private Set<MethodInfo> visitedMethods = new HashSet<MethodInfo>();
   private Set<Variable> injectables = new HashSet<Variable>();
   private Set<Variable> globals = new HashSet<Variable>();
   private Set<Variable> globalState = new HashSet<Variable>();
   private final ClassRepository classRepository;
-  private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
+  private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
 
-  public InjectabilityContext(ClassRepository classRepository) {
+  public TestabilityContext(ClassRepository classRepository) {
     this.classRepository = classRepository;
-  }
-
-  public Collection<Variable> getInjectables() {
-    return injectables;
-  }
-
-  public void addMethodCost(MethodInfo methodInfo) {
-    // Why -1? a method with a cyclomatic complexity of 1 can
-    // be split to n smaller methods. The one single method and
-    // N small ones are same cost, but the sum of cyclomatic is not
-    // the same unless we change the offset of the method and say that
-    // a simple method is 0 and hence splitting 0 to N 0 is still zero
-    // and we gain the equivalence.
-    long methodCost = methodInfo.getNonRecursiveCyclomaticComplexity() - 1;
-    LineNumberCost lineNumberCost = new LineNumberCost(methodInfo, methodInfo.getStartingLineNumber(), methodCost);
-    lineNumberCosts.add(lineNumberCost);
-  }
-
-  public long getGlobalState() {
-    return 0;
-  }
-
-  public long getGlobalMutableState() {
-    return 0;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
     return classRepository.getClass(clazzName).getMethod(methodName);
   }
 
-  public void visitMethod(MethodInfo method) {
-    visitedMethods.add(method);
-    addMethodCost(method);
+  public boolean methodAlreadyVisited(MethodInfo method) {
+    return methodCosts.containsKey(method);
   }
 
-  public boolean methodAlreadyVisited(MethodInfo method) {
-    return visitedMethods.contains(method);
+  public void recordMethodCall(MethodInfo fromMethod, int fromLineNumber,
+      MethodInfo toMethod) {
+    MethodCost from = getMethodCost(fromMethod);
+    MethodCost to = getMethodCost(toMethod);
+    from.addMethodCost(fromLineNumber, to);
+    toMethod.computeMetric(this);
+  }
+
+  public MethodCost getMethodCost(MethodInfo method) {
+    MethodCost methodCost = methodCosts.get(method);
+    if (methodCost == null) {
+      methodCost = new MethodCost(method, method.getTestCost());
+      methodCosts.put(method, methodCost);
+    }
+    return methodCost;
+  }
+
+  public void implicitCost(MethodInfo from, MethodInfo to) {
+    int line = to.getStartingLineNumber();
+    getMethodCost(from).addMethodCost(line, getMethodCost(to));
   }
 
   @Override
   public String toString() {
-    return "LineNumberCost: " + lineNumberCosts + " " + injectables + "\nGlobalCost: "
-        + globalState.size() + " " + globals;
+    StringBuilder buf = new StringBuilder();
+    buf.append("MethodCost:");
+    for (MethodCost cost : methodCosts.values()) {
+      buf.append("\n");
+      cost.toString("   ", buf, new HashSet<MethodCost>());
+    }
+    buf.append("\nInjectables:");
+    for (Variable var : injectables) {
+      buf.append("\n   ");
+      buf.append(var);
+    }
+    buf.append("\nGlobals:");
+    for (Variable var : globalState) {
+      buf.append("\n   ");
+      buf.append(var);
+    }
+    return buf.toString();
   }
 
   public void setInjectable(List<? extends Variable> parameters) {
@@ -90,10 +97,6 @@ public class InjectabilityContext {
     setInjectable(method.getParameters());
   }
 
-  public long getGlobalLoad() {
-    return globalState.size();
-  }
-
   public void localAssginment(Variable destination, Variable source) {
     if (isInjectable(source)) {
       setInjectable(destination);
@@ -102,15 +105,16 @@ public class InjectabilityContext {
       setGlobal(destination);
     }
   }
-  
-  public void fieldAssignment(Variable fieldInstance, Variable field, Variable value) {
+
+  public void fieldAssignment(Variable fieldInstance, Variable field,
+      Variable value) {
     localAssginment(field, value);
     if (fieldInstance == null || globals.contains(fieldInstance)) {
       globalState.add(field);
       globals.add(field);
     }
   }
-  
+
   public void arrayAssignment(Variable array, Variable index, Variable value) {
     localAssginment(array, value);
     if (globals.contains(array)) {
@@ -124,7 +128,7 @@ public class InjectabilityContext {
   public void setGlobal(Variable var) {
     globals.add(var);
   }
-  
+
   public boolean isInjectable(Variable var) {
     return injectables.contains(var);
   }
@@ -133,12 +137,4 @@ public class InjectabilityContext {
     injectables.add(var);
   }
 
-
-  public List<LineNumberCost> getOperationCosts() {
-    return lineNumberCosts;
-  }
-
-  public MethodCost toMethodCost(MethodInfo method) {
-    return new MethodCost(method, getGlobalLoad(), getOperationCosts());
-  }
 }

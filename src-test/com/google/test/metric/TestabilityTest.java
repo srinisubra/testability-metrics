@@ -21,15 +21,35 @@ import org.kohsuke.args4j.CmdLineException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.IOException;
 
 public class TestabilityTest extends TestCase {
 
+  public static class IgnoreOutputStream extends OutputStream {
+
+    @Override
+    public void write(int ch) throws IOException {
+    }
+    
+    @Override
+    public void write(byte[] b) throws IOException {
+    }
+    
+    @Override
+    public void write(byte[] b, int off, int len) throws IOException {
+    }
+
+  }
+
   public void testParseClasspathAndSingleClass() throws Exception {
     Testability testability = new Testability();
     StringWriter err = new StringWriter();
-    testability.parseArgs(err, "-cp", "not/default/path", "com.google.TestClass");
+    testability.parseArgs(err, "-cp", "not/default/path",
+        "com.google.TestClass");
 
     assertEquals("", err.toString());
     assertEquals("not/default/path", testability.getClasspath());
@@ -50,16 +70,29 @@ public class TestabilityTest extends TestCase {
   }
 
   public void testMainWithDirectoryOfClasses() throws Exception {
-    Testability.main("classes/production/testability-metrics", "-cp",
-        "lib/asm-3.0.jar:lib/args4j-2.0.8.jar:classes/production/testability-metrics");
+    Testability
+        .main("classes/production/testability-metrics", "-cp",
+            "lib/asm-3.0.jar:lib/args4j-2.0.8.jar:classes/production/testability-metrics");
   }
 
   public void testMainWithJarFile() throws Exception {
-    Testability.main("lib/junit.jar", "-cp", "lib/junit.jar");
+    PrintStream out = System.out;
+    try {
+      System.setOut(new PrintStream(new IgnoreOutputStream()));
+      Testability.main("lib/junit.jar", "-cp", "lib/junit.jar");
+    } finally {
+      System.setOut(out);
+    }
   }
-  
+
   public void testMainWithJarFileNoClasspath() throws Exception {
-    Testability.main("lib/junit.jar");
+    PrintStream out = System.out;
+    try {
+      System.setOut(new PrintStream(new IgnoreOutputStream()));
+      Testability.main("lib/junit.jar");
+    } finally {
+      System.setOut(out);
+    }
   }
 
   public void testParseNoArgs() throws IOException {

@@ -33,8 +33,7 @@ import java.util.List;
 
 public class Testability {
 
-  @Option(name = "-cp", metaVar = "lib/one.jar:lib/two.jar",
-      usage = "classpath needed for analyzing the jar or directory")
+  @Option(name = "-cp", metaVar = "lib/one.jar:lib/two.jar", usage = "classpath needed for analyzing the jar or directory")
   private String classpath = "";
 
   @Argument(metaVar = "path/to/directory_or_jar")
@@ -48,29 +47,27 @@ public class Testability {
     return arguments;
   }
 
-  public static void main(String... args) throws CmdLineException {
-    try {
-      new Testability().doMain(args);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  public static void main(String... args) throws CmdLineException, IOException {
+    new Testability().doMain(args);
   }
 
   public void doMain(String... args) throws IOException, CmdLineException {
     parseArgs(new PrintWriter(System.err), args);
     File jarOrDir = new File(arguments.get(0));
-    if(classpath.length() == 0) {
-    	classpath = System.getProperty("java.class.path", ".");	
+    if (classpath.length() == 0) {
+      classpath = System.getProperty("java.class.path", ".");
     }
-    ClasspathRoot classpathRoot = ClasspathRootFactory.makeClasspathRoot(jarOrDir, classpath);
+    ClasspathRoot classpathRoot = ClasspathRootFactory.makeClasspathRoot(
+        jarOrDir, classpath);
     ClassRepository classRepository = new ClassRepository(classpathRoot);
     for (String className : classpathRoot.getAllContainedClassNames()) {
       ClassCost classCost = computeCost(className, classRepository);
-      System.out.println("Testability cost for " + classCost.toString() + "\n");
+      System.out.println("Testability cost for " + classCost + "\n");
     }
   }
 
-  public void parseArgs(Writer err, String... args) throws IOException, CmdLineException {
+  public void parseArgs(Writer err, String... args) throws IOException,
+      CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     try {
       parser.parseArgument(args);
@@ -80,8 +77,8 @@ public class Testability {
     } catch (CmdLineException e) {
       err.write(e.getMessage());
       err.write("\njava com.google.test.metric.Testability [options...] arguments...");
-      err.write("\nExample: java path/to/dir_or_jar" +
-          parser.printExample(ExampleMode.ALL) + "\n\n");
+      err.write("\nExample: java path/to/dir_or_jar"
+          + parser.printExample(ExampleMode.ALL) + "\n\n");
       err.flush();
       throw new CmdLineException("Exiting...");
     }
