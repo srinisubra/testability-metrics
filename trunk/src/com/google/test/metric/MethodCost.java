@@ -24,12 +24,10 @@ public class MethodCost {
 
   private final MethodInfo method;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
-  private final long implicitCost;
-  private long globalLoad;
+  private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
 
-  public MethodCost(MethodInfo method, long implicitCost) {
+  public MethodCost(MethodInfo method) {
     this.method = method;
-    this.implicitCost = implicitCost;
   }
 
   public long getComplexity() {
@@ -41,7 +39,7 @@ public class MethodCost {
       return 0;
     }
     alreadySeen.add(this);
-    long sum = implicitCost;
+    long sum = method.getTestCost();
     for (LineNumberCost lineNumberCost : lineNumberCosts) {
       sum += lineNumberCost.getMethodCost().getComplexity(alreadySeen);
     }
@@ -63,7 +61,7 @@ public class MethodCost {
       Set<MethodCost> alreadySeen) {
     buf.append(method.getNameDesc());
     long cost = getComplexity(new HashSet<MethodCost>(alreadySeen));
-    buf.append("[" + implicitCost + "/" + cost + "]");
+    buf.append("[" + method.getTestCost() + "/" + cost + "]");
     if (alreadySeen.contains(this)) {
       return;
     }
@@ -78,9 +76,23 @@ public class MethodCost {
       }
     }
   }
+  
   public long getGlobal() {
-    return globalLoad;
+    return getGlobal(new HashSet<MethodCost>());
   }
+
+  public long getGlobal(Set<MethodCost> alreadySeen) {
+    if (alreadySeen.contains(this)) {
+      return 0;
+    }
+    alreadySeen.add(this);
+    long sum = globalStateCosts.size();
+    for (LineNumberCost lineNumberCost : lineNumberCosts) {
+      sum += lineNumberCost.getMethodCost().getGlobal(alreadySeen);
+    }
+    return sum;
+  }
+
 
   public List<LineNumberCost> getOperationCosts() {
     return lineNumberCosts;
@@ -90,8 +102,12 @@ public class MethodCost {
     return method;
   }
 
-  public void addMethodCost(int fromLineNumber, MethodCost to) {
-    lineNumberCosts.add(new LineNumberCost(fromLineNumber, to));
+  public void addMethodCost(int lineNumber, MethodCost to) {
+    lineNumberCosts.add(new LineNumberCost(lineNumber, to));
+  }
+
+  public void addGlobalCost(int lineNumber, Variable variable) {
+    globalStateCosts.add(new GlobalStateCost(lineNumber, variable));
   }
 
 }

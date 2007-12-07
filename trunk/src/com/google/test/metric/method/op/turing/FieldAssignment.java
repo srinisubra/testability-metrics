@@ -35,7 +35,7 @@ public class FieldAssignment extends Operation {
 
   @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
-    context.fieldAssignment(fieldInstance, field, value);
+    context.fieldAssignment(fieldInstance, field, value, currentMethod, getLineNumber());
   }
 
   @Override

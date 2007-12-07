@@ -15,16 +15,10 @@
  */
 package com.google.test.metric;
 
-import junit.framework.TestCase;
+public class GlobalStateCost {
 
-public class TestabilityContextTest extends TestCase {
-
-  public void testIsInjectable() throws Exception {
-    TestabilityContext context = new TestabilityContext(null);
-    Variable var = new Variable("", Type.fromJava("X"));
-    assertFalse(context.isInjectable(var));
-    context.setInjectable(var);
-    assertTrue(context.isInjectable(var));
+  public GlobalStateCost(int lineNumber, Variable variable) {
+    // TODO Auto-generated constructor stub
   }
-  
+
 }
