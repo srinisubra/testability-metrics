@@ -43,7 +43,7 @@ public class MetricComputer {
     addFieldCost(method, context);
     context.setInjectable(method);
     method.computeMetric(context);
-    return context.getMethodCost(method);
+    return context.getLinkedMethodCost(method);
   }
 
   private void addSetterInjection(MethodInfo baseMethod, TestabilityContext context) {

@@ -48,7 +48,13 @@ public class TestabilityContext {
     toMethod.computeMetric(this);
   }
 
-  public MethodCost getMethodCost(MethodInfo method) {
+  public MethodCost getLinkedMethodCost(MethodInfo method) {
+    MethodCost cost = getMethodCost(method);
+    cost.link();
+    return cost;
+  }
+
+  private MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
       methodCost = new MethodCost(method);
