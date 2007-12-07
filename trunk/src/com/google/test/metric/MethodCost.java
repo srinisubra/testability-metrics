@@ -79,7 +79,7 @@ public class MethodCost {
       Set<MethodCost> alreadySeen) {
     buf.append(method.getNameDesc());
     buf.append("[" + getComplexityCost() + ", " + getGlobalCost()
-        + "/" + totalComplexityCost + ", " + totalGlobalCost + "]");
+        + " / " + totalComplexityCost + ", " + totalGlobalCost + "]");
     if (alreadySeen.contains(this)) {
       return;
     }
