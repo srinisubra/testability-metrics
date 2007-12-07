@@ -35,7 +35,7 @@ public class ArrayAssignment extends Operation {
 
   @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
-    context.arrayAssignment(array, index, value);
+    context.arrayAssignment(array, index, value, currentMethod, getLineNumber());
   }
 
   @Override

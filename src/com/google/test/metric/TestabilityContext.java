@@ -24,8 +24,7 @@ import java.util.Set;
 public class TestabilityContext {
 
   private Set<Variable> injectables = new HashSet<Variable>();
-  private Set<Variable> globals = new HashSet<Variable>();
-  private Set<Variable> globalState = new HashSet<Variable>();
+  private Set<Variable> statics = new HashSet<Variable>();
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
 
@@ -52,7 +51,7 @@ public class TestabilityContext {
   public MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
-      methodCost = new MethodCost(method, method.getTestCost());
+      methodCost = new MethodCost(method);
       methodCosts.put(method, methodCost);
     }
     return methodCost;
@@ -77,7 +76,7 @@ public class TestabilityContext {
       buf.append(var);
     }
     buf.append("\nGlobals:");
-    for (Variable var : globalState) {
+    for (Variable var : statics) {
       buf.append("\n   ");
       buf.append(var);
     }
@@ -107,26 +106,26 @@ public class TestabilityContext {
   }
 
   public void fieldAssignment(Variable fieldInstance, Variable field,
-      Variable value) {
+      Variable value, MethodInfo inMethod, int lineNumber) {
     localAssginment(field, value);
-    if (fieldInstance == null || globals.contains(fieldInstance)) {
-      globalState.add(field);
-      globals.add(field);
+    if (fieldInstance == null || statics.contains(fieldInstance)) {
+      getMethodCost(inMethod).addGlobalCost(lineNumber, fieldInstance);
+      statics.add(field);
     }
   }
 
-  public void arrayAssignment(Variable array, Variable index, Variable value) {
+  public void arrayAssignment(Variable array, Variable index, Variable value, MethodInfo inMethod, int lineNumber) {
     localAssginment(array, value);
-    if (globals.contains(array)) {
-      globalState.add(array);
+    if (statics.contains(array)) {
+      getMethodCost(inMethod).addGlobalCost(lineNumber, array);
     }
   }
   public boolean isGlobal(Variable var) {
-    return var.isStatic() || globals.contains(var);
+    return var.isStatic() || statics.contains(var);
   }
 
   public void setGlobal(Variable var) {
-    globals.add(var);
+    statics.add(var);
   }
 
   public boolean isInjectable(Variable var) {
