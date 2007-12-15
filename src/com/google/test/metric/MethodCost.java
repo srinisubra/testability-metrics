@@ -77,6 +77,7 @@ public class MethodCost {
 
   public void toString(String prefix, StringBuilder buf,
       Set<MethodCost> alreadySeen) {
+    buf.append(method.getClassInfo().getName() + " ");
     buf.append(method.getNameDesc());
     buf.append("[" + getComplexityCost() + ", " + getGlobalCost()
         + " / " + totalComplexityCost + ", " + totalGlobalCost + "]");

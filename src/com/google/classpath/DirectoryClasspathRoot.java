@@ -15,21 +15,21 @@
  */
 package com.google.classpath;
 
+import com.google.classpath.ColonDelimitedStringParser;
+
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ArrayList;
 
 public class DirectoryClasspathRoot extends ClasspathRoot {
 
   public DirectoryClasspathRoot(URL root, String classpath) {
     this.url = root;
-    List<URL> completeClasspath = new ArrayList<URL>();
-    parseAndAddToClasspathList(completeClasspath, classpath);
-    classloader = new URLClassLoader(completeClasspath.toArray(new URL[]{}), null);
+    List<URL> cp = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
   }
 
   public Collection<String> getResources(String packageName) {
