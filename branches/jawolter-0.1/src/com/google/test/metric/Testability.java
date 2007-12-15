@@ -15,55 +15,60 @@
  */
 package com.google.test.metric;
 
-import com.google.classpath.ClasspathRoot;
 import com.google.classpath.ClasspathRootFactory;
-
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.ExampleMode;
-import org.kohsuke.args4j.Option;
+import com.google.classpath.ClasspathRootGroup;
+import org.kohsuke.args4j.*;
 
 import java.io.IOException;
-import java.io.Writer;
 import java.io.PrintWriter;
-import java.io.File;
+import java.io.Writer;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Testability {
 
-  @Option(name = "-cp", metaVar = "lib/one.jar:lib/two.jar", usage = "classpath needed for analyzing the jar or directory")
-  private String classpath = "";
+  @Option(name = "-cp", metaVar = "classpath",
+          usage = "colon delimited classpath to analyze (jars or directories)" +
+          "\nEx. lib/one.jar:lib/two.jar")
+  protected String classpath = "";
 
-  @Argument(metaVar = "path/to/directory_or_jar")
-  private List<String> arguments = new ArrayList<String>();
+/* not currently implemented
+  @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
+          usage = "colon delimited whitelisted packages that will not " +
+                  "count against you. Includes matching all subpackages.")
+  private String whitelist = "";*/
 
-  public String getClasspath() {
-    return classpath;
+  @Argument(metaVar = "classes/packages",
+          usage = "Classes or packages to analyze. " +
+          "Matches any class starting with these." +
+          "\nEx. com.example.analyze.these com.google.and.these.packages " +
+          "com.google.or.AClass", required = true)
+  protected List<String> packagesToAnalyzeFilter = new ArrayList<String>();
+
+  public static void main(String... args) throws IOException {
+    try {
+      new Testability().doMain(args, System.err);
+    } catch (CmdLineException ignored) { }
   }
 
-  public List<String> getArguments() {
-    return arguments;
-  }
-
-  public static void main(String... args) throws CmdLineException, IOException {
-    new Testability().doMain(args);
-  }
-
-  public void doMain(String... args) throws IOException, CmdLineException {
-    parseArgs(new PrintWriter(System.err), args);
-    File jarOrDir = new File(arguments.get(0));
+  public void doMain(String[] args, PrintStream err) throws IOException, CmdLineException {
+    parseArgs(new PrintWriter(err), args);
+    System.out.println(packagesToAnalyzeFilter.get(0));
     if (classpath.length() == 0) {
       classpath = System.getProperty("java.class.path", ".");
     }
-    ClasspathRoot classpathRoot = ClasspathRootFactory.makeClasspathRoot(
-        jarOrDir, classpath);
-    ClassRepository classRepository = new ClassRepository(classpathRoot);
-    for (String className : classpathRoot.getAllContainedClassNames()) {
+    ClasspathRootGroup classpathRootGroup =
+      ClasspathRootFactory.makeClasspathRootGroup(classpath);
+    ClassRepository classRepository = new ClassRepository(classpathRootGroup);
+    List<String> allContainedClassNames =
+      classpathRootGroup.getAllContainedClassNames(packagesToAnalyzeFilter);
+    for (String className : allContainedClassNames) {
       ClassCost classCost = computeCost(className, classRepository);
       System.out.println("Testability cost for " + classCost + "\n");
     }
+    System.out.println("Analyzed " + allContainedClassNames.size() +
+      " classes (plus how ever many of their external dependencies)");
   }
 
   public void parseArgs(Writer err, String... args) throws IOException,
@@ -71,14 +76,19 @@ public class Testability {
     CmdLineParser parser = new CmdLineParser(this);
     try {
       parser.parseArgument(args);
-      if (arguments.isEmpty()) {
+      if (packagesToAnalyzeFilter.isEmpty()) {
         throw new CmdLineException("No argument was given");
+      } else {
+        for (int i = 0; i < packagesToAnalyzeFilter.size(); i++) {
+          packagesToAnalyzeFilter.set(i, packagesToAnalyzeFilter.get(i).replaceAll("/", "."));
+        }
       }
     } catch (CmdLineException e) {
       err.write(e.getMessage());
-      err.write("\njava com.google.test.metric.Testability [options...] arguments...");
-      err.write("\nExample: java path/to/dir_or_jar"
-          + parser.printExample(ExampleMode.ALL) + "\n\n");
+      err.write("\njava com.google.test.metric.Testability" +
+        " -cp classpath packages.to.analyze");
+      err.write("\nExample: java -cp lib/foo.jar com.foo.model.Device\n" +
+        "Example: java -cp lib/foo.jar:classes com.foo.model.subpackages foo.AClass\n");
       err.flush();
       throw new CmdLineException("Exiting...");
     }

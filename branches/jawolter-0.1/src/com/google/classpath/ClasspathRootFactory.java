@@ -18,6 +18,8 @@ package com.google.classpath;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Builds a ClasspathRoot instance, depending on if you pass in a jar or directory.
@@ -32,9 +34,23 @@ public class ClasspathRootFactory {
     // do not instantiate
   }
 
+  public static ClasspathRootGroup makeClasspathRootGroup(String classpath) {
+    List<File> classpathElements = new ColonDelimitedStringParser(classpath).getListAsFiles();
+    List<ClasspathRoot> roots = new ArrayList<ClasspathRoot>();
+    for (File fileOrJar: classpathElements) {
+      try {
+        roots.add(makeClasspathRoot(fileOrJar, classpath));
+      } catch (MalformedURLException e) {
+        throw new RuntimeException("Error while creating ClasspathRoot "
+          + e.getMessage());
+      }
+    }
+    return new ClasspathRootGroup(roots);
+  }
+
+
   public static ClasspathRoot makeClasspathRoot(File jarOrDir, String classpath)
       throws MalformedURLException {
-    // todo(jwolter) support multiple jars or directories being passed in for analysis.
     ClasspathRoot classpathRoot;
     if (isJar(jarOrDir)) {
       URL jarRoot = jarOrDir.toURI().toURL();

@@ -18,6 +18,8 @@ package com.google.test.metric.method.op.turing;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.TestabilityContext;
 
+import java.util.List;
+
 public abstract class Operation {
 
   private final int lineNumber;
@@ -29,6 +31,7 @@ public abstract class Operation {
   public int getLineNumber() {
     return lineNumber;
   }
-  
+
   public abstract void computeMetric(TestabilityContext context, MethodInfo currentMethod);
+
 }

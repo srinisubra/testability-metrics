@@ -38,9 +38,8 @@ public class JarClasspathRoot extends ClasspathRoot {
 
   public JarClasspathRoot(URL url, String classpath) {
     this.url = url;
-    List<URL> completeClasspath = new ArrayList<URL>();
-    parseAndAddToClasspathList(completeClasspath, classpath);
-    classloader = new URLClassLoader(completeClasspath.toArray(new URL[] {url}), null);
+    List<URL> cp = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
     preloadNamesFromJar();
   }
 
@@ -50,16 +49,6 @@ public class JarClasspathRoot extends ClasspathRoot {
     }
     Set<String> resources = resourceNamesByPackage.get(packageName);
     return resources == null ? new HashSet<String>() : resources;
-  }
-
-  public Collection<String> getAllContainedClassNames()  {
-    List<String> classNames = new ArrayList<String>();
-    try {
-      buildClassNamesList(url, this, "", "", classNames, false);
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
-    return classNames;
   }
 
   public void preloadNamesFromJar() {

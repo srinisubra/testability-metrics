@@ -29,6 +29,7 @@ public class MetricComputer {
     this.classRepository = classRepository;
   }
 
+  /* used for testing */
   public MethodCost compute(Class<?> clazz, String methodName) {
     ClassInfo classInfo = classRepository.getClass(clazz);
     MethodInfo method = classInfo.getMethod(methodName);
@@ -112,6 +113,7 @@ public class MetricComputer {
     return count;
   }
 
+  /* used for testing   */
   public ClassCost compute(Class<?> clazz) {
     return compute(classRepository.getClass(clazz));
   }
