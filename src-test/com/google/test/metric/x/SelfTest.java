@@ -30,7 +30,7 @@ public class SelfTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo);
+    computer = new MetricComputer(repo, null);
   }
   
   @Override

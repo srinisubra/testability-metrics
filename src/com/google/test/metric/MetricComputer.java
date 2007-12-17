@@ -20,13 +20,17 @@ import com.google.test.metric.asm.Visibility;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class MetricComputer {
 
   private final ClassRepository classRepository;
+  private final PrintStream err;
 
-  public MetricComputer(ClassRepository classRepository) {
+  public MetricComputer(ClassRepository classRepository, PrintStream err) {
     this.classRepository = classRepository;
+    this.err = err;
   }
 
   /* used for testing */
@@ -37,7 +41,7 @@ public class MetricComputer {
   }
 
   public MethodCost compute(MethodInfo method) {
-    TestabilityContext context = new TestabilityContext(classRepository);
+    TestabilityContext context = new TestabilityContext(classRepository, err);
     addStaticCost(method, context);
     addConstructorCost(method, context);
     addSetterInjection(method, context);
