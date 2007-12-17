@@ -10,9 +10,19 @@
       <properties />
     </buildFile>
   </component>
+  <component name="Build editor project-level loader">
+    <settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.ClearOutputChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
+    </settings>
+  </component>
   <component name="BuildJarProjectSettings">
     <option name="BUILD_JARS_ON_MAKE" value="false" />
   </component>
+  <component name="ClearCase" />
   <component name="CodeStyleProjectProfileManger">
     <option name="PROJECT_PROFILE" />
     <option name="USE_PROJECT_LEVEL_SETTINGS" value="false" />
@@ -40,12 +50,11 @@
       <entry name="?*.tld" />
     </wildcardResourcePatterns>
   </component>
+  <component name="DataSourceManagerImpl" />
   <component name="DependenciesAnalyzeManager">
     <option name="myForwardDirection" value="false" />
   </component>
-  <component name="DependencyValidationManager">
-    <option name="SKIP_IMPORT_STATEMENTS" value="false" />
-  </component>
+  <component name="DependencyValidationManager" />
   <component name="EclipseCompilerSettings">
     <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="true" />
@@ -63,6 +72,11 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="ExportToHTMLSettings">
+    <option name="PRINT_LINE_NUMBERS" value="false" />
+    <option name="OPEN_IN_BROWSER" value="false" />
+    <option name="OUTPUT_DIRECTORY" />
+  </component>
   <component name="IdProvider" IDEtalkID="7E6D6DD119759FDC8D41FF7B26CC8091" />
   <component name="InspectionProjectProfileManager">
     <option name="PROJECT_PROFILE" value="Project Default" />
@@ -72,16 +86,33 @@
       <profile version="1.0" is_locked="false">
         <option name="myName" value="Project Default" />
         <option name="myLocal" value="false" />
+        <used_levels>
+          <error>
+            <option name="myName" value="ERROR" />
+            <option name="myVal" value="400" />
+          </error>
+          <warning>
+            <option name="myName" value="WARNING" />
+            <option name="myVal" value="300" />
+          </warning>
+          <information>
+            <option name="myName" value="INFO" />
+            <option name="myVal" value="200" />
+          </information>
+          <server>
+            <option name="myName" value="SERVER PROBLEM" />
+            <option name="myVal" value="100" />
+          </server>
+        </used_levels>
       </profile>
     </profiles>
-    <list size="0" />
   </component>
   <component name="JavacSettings">
     <option name="DEBUGGING_INFO" value="true" />
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="DEPRECATION" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
-    <option name="MAXIMUM_HEAP_SIZE" value="128" />
+    <option name="MAXIMUM_HEAP_SIZE" value="800" />
   </component>
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" />
@@ -107,6 +138,14 @@
     <option name="GENERATE_NO_WARNINGS" value="false" />
     <option name="IS_EMACS_ERRORS_MODE" value="true" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
+  </component>
+  <component name="Mach LOCAL_PREFIX stripper" stripping="true" />
+  <component name="Mach integration configuration">
+    <pre-compile target="" enabled="false" />
+    <use-mach-for-java enabled="false" />
+    <mach-version />
+    <working-set enabled="false" />
+    <previous-paths />
   </component>
   <component name="Palette2">
     <group name="Swing">
@@ -238,6 +277,7 @@
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.6" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
+  <component name="ProjectRunConfigurationManager" />
   <component name="ResourceManagerContainer">
     <option name="myResourceBundles">
       <value>
@@ -252,6 +292,7 @@
     <option name="GENERATE_IIOP_STUBS" value="false" />
     <option name="ADDITIONAL_OPTIONS_STRING" value="" />
   </component>
+  <component name="StarteamVcsAdapter" />
   <component name="SvnBranchConfigurationManager">
     <option name="myConfigurationMap">
       <map>
@@ -259,10 +300,10 @@
           <value>
             <SvnBranchConfiguration>
               <option name="branchUrls">
-                <list>
+                <collection>
                   <option value="https://testability-metrics.googlecode.com/svn/branches" />
                   <option value="https://testability-metrics.googlecode.com/svn/tags" />
-                </list>
+                </collection>
               </option>
               <option name="trunkUrl" value="https://testability-metrics.googlecode.com/svn/trunk" />
             </SvnBranchConfiguration>
@@ -274,6 +315,15 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="svn" />
   </component>
+  <component name="VssVcs" />
   <component name="WebServicesPlugin" addRequiredLibraries="true" />
+  <component name="com.intellij.jsf.UserDefinedFacesConfigs">
+    <option name="USER_DEFINED_CONFIGS">
+      <value>
+        <list size="0" />
+      </value>
+    </option>
+  </component>
+  <component name="libraryTable" />
 </project>
 
