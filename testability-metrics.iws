@@ -13,19 +13,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/ClassRepositoryTestCaseBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/classes-for-test/root2/com/google/test/metric/AutoFieldClearTestCase.class" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/ClassInfoTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/ClassInfoTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testability-metrics.iws" afterPath="$PROJECT_DIR$/testability-metrics.iws" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/ClassRepositoryTestCase.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/ClassRepositoryTestCaseBase.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/AutoFieldClearTestCaseBase.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/AutoFieldClearTestCase.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/AutoFieldClearTestCaseBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/CyclomaticComplexityTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/CyclomaticComplexityTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" />
     </list>
     <ignored path="testability-metrics.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -233,7 +221,7 @@
       <file leaf-file-name="DirectoryClasspathRootTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="53" column="62" selection-start="2271" selection-end="2271" vertical-scroll-proportion="0.6335404">
+            <state line="50" column="74" selection-start="2119" selection-end="2119" vertical-scroll-proportion="0.57763976">
               <folding />
             </state>
           </provider>
@@ -429,10 +417,6 @@
         </PATH_ELEMENT>
         <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src-test/com/google" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src-test/com/google/test/metric" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -912,7 +896,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="25" width="1646" height="1550" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Regex" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
@@ -930,7 +914,7 @@
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12791431" order="1" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" order="8" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38543898" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.38543898" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.14626865" order="2" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5403283" order="3" />
@@ -1120,7 +1104,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="62" selection-start="2271" selection-end="2271" vertical-scroll-proportion="0.6335404">
+        <state line="50" column="74" selection-start="2119" selection-end="2119" vertical-scroll-proportion="0.57763976">
           <folding />
         </state>
       </provider>
