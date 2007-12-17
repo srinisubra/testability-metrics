@@ -15,9 +15,8 @@
  */
 package com.google.test.metric;
 
+import com.google.classpath.ClasspathRootGroup;
 import com.google.test.metric.asm.ClassInfoBuilderVisitor;
-import com.google.classpath.ClasspathRoot;
-
 import org.objectweb.asm.ClassReader;
 
 import java.io.IOException;
@@ -28,13 +27,13 @@ import java.util.Map;
 public class ClassRepository {
 
   private final Map<String, ClassInfo> classes = new HashMap<String, ClassInfo>();
-  private ClasspathRoot classpathRoot;
+  private ClasspathRootGroup classpathRoots;
 
   public ClassRepository() {
   }
 
-  public ClassRepository(ClasspathRoot classpathRoot) {
-    this.classpathRoot = classpathRoot;
+  public ClassRepository(ClasspathRootGroup classpathRoots) {
+    this.classpathRoots = classpathRoots;
   }
 
   public ClassInfo getClass(Class<?> clazz) {
@@ -47,16 +46,16 @@ public class ClassRepository {
     }
     ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
     if (classInfo == null) {
-      classInfo = parseClass(inputStreamForClass(clazzName));
+        classInfo = parseClass(inputStreamForClass(clazzName));
     }
     return classInfo;
   }
 
   private InputStream inputStreamForClass(String clazzName) {
     String classResource = clazzName.replace(".", "/") + ".class";
-    InputStream classBytes = null;
-    if (classpathRoot != null) {
-      classBytes = classpathRoot.getResourceAsStream(classResource);
+    InputStream classBytes;
+    if (classpathRoots != null) {
+      classBytes = classpathRoots.getResourceAsStream(classResource);
     } else {
       classBytes = ClassLoader.getSystemResourceAsStream(classResource);
     }
@@ -82,3 +81,4 @@ public class ClassRepository {
   }
 
 }
+

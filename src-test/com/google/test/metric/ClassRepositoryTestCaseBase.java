@@ -16,11 +16,11 @@
 package com.google.test.metric;
 
 
-public abstract class ClassRepositoryTestCase extends AutoFieldClearTestCase {
+public abstract class ClassRepositoryTestCaseBase extends AutoFieldClearTestCaseBase {
 
   protected ClassRepository repo;
 
-  public ClassRepositoryTestCase() {
+  public ClassRepositoryTestCaseBase() {
     super();
   }
 

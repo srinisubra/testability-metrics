@@ -15,9 +15,8 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.TestabilityContext;
-import com.google.test.metric.MethodInfo;
-import com.google.test.metric.Variable;
+import com.google.test.metric.*;
+import com.google.test.metric.ClassNotFoundException;
 
 import java.util.List;
 
@@ -62,26 +61,30 @@ public class MethodInvokation extends Operation {
 
   @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
-    MethodInfo toMethod = context.getMethod(clazzName, name + signature);
-    if (context.methodAlreadyVisited(toMethod)) {
-      // Method already counted, skip (to prevent recursion)
-    } else if (toMethod.canOverride() && context.isInjectable(methodThis)) {
-      // Method can be overridden / injectable
-    } else {
-      // Method can not be intercepted we have to add the cost
-      // recursively
-      if (toMethod.isInstance()) {
-        context.localAssginment(toMethod.getMethodThis(), methodThis);
+    try {
+      MethodInfo toMethod = context.getMethod(clazzName, name + signature);
+      if (context.methodAlreadyVisited(toMethod)) {
+        // Method already counted, skip (to prevent recursion)
+      } else if (toMethod.canOverride() && context.isInjectable(methodThis)) {
+        // Method can be overridden / injectable
+      } else {
+        // Method can not be intercepted we have to add the cost
+        // recursively
+        if (toMethod.isInstance()) {
+          context.localAssginment(toMethod.getMethodThis(), methodThis);
+        }
+        int i = 0;
+        if (parameters.size() != toMethod.getParameters().size()) {
+          throw new IllegalStateException(
+              "Argument count does not match method parameter count.");
+        }
+        for (Variable var : parameters) {
+          context.localAssginment(toMethod.getParameters().get(i++), var);
+        }
+        context.recordMethodCall(currentMethod, getLineNumber(), toMethod);
       }
-      int i = 0;
-      if (parameters.size() != toMethod.getParameters().size()) {
-        throw new IllegalStateException(
-            "Argument count does not match method parameter count.");
-      }
-      for (Variable var : parameters) {
-        context.localAssginment(toMethod.getParameters().get(i++), var);
-      }
-      context.recordMethodCall(currentMethod, getLineNumber(), toMethod);
+    } catch (ClassNotFoundException e) {
+      context.reportError("WARNING: class not found: " + clazzName);
     }
   }
 

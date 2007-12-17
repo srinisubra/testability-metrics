@@ -28,14 +28,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
-import com.google.test.metric.ClassInfo;
-import com.google.test.metric.ClassRepository;
-import com.google.test.metric.FieldInfo;
-import com.google.test.metric.LocalVariableInfo;
-import com.google.test.metric.MethodInfo;
-import com.google.test.metric.ParameterInfo;
-import com.google.test.metric.Type;
-import com.google.test.metric.Variable;
+import com.google.test.metric.*;
 import com.google.test.metric.method.BlockDecomposer;
 import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.stack.ArrayLoad;
@@ -780,7 +773,12 @@ public class MethodVisitorBuilder implements MethodVisitor {
       case Opcodes.PUTFIELD :
         recorder.add(new Runnable() {
           public void run() {
-            FieldInfo field = repository.getClass(owner).getField(name);
+            FieldInfo field = null;
+            try {
+              field = repository.getClass(owner).getField(name);
+            } catch (FieldNotFoundException e) {
+              System.err.println("WARNING: field not found: " + name);
+            }
             block.addOp(new PutField(lineNumber, field));
           }
         });
@@ -789,7 +787,12 @@ public class MethodVisitorBuilder implements MethodVisitor {
       case Opcodes.GETFIELD :
         recorder.add(new Runnable() {
           public void run() {
-            FieldInfo field = repository.getClass(owner).getField(name);
+            FieldInfo field = null;
+            try {
+              field = repository.getClass(owner).getField(name);
+            } catch (FieldNotFoundException e) {
+              System.err.println("WARNING: field not found: " + name);
+            }
             block.addOp(new GetField(lineNumber, field));
           }
 
