@@ -19,7 +19,7 @@ import static com.google.test.metric.SignatureUtil.L;
 
 import java.util.List;
 
-public class MetricComputerTest extends ClassRepositoryTestCase {
+public class MetricComputerTest extends ClassRepositoryTestCaseBase {
 
   private MetricComputer computer;
 

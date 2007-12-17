@@ -19,7 +19,7 @@ import java.lang.reflect.Field;
 
 import junit.framework.TestCase;
 
-public abstract class AutoFieldClearTestCase extends TestCase {
+public abstract class AutoFieldClearTestCaseBase extends TestCase {
 
   @Override
   protected void tearDown() throws Exception {

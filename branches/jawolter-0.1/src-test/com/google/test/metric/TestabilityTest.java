@@ -25,7 +25,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestabilityTest extends AutoFieldClearTestCase {
+public class TestabilityTest extends AutoFieldClearTestCaseBase {
   private WatchedOutputStream out;
   private WatchedOutputStream err;
   private Testability testability;
