@@ -16,117 +16,140 @@
 package com.google.test.metric;
 
 import com.google.classpath.DirectoryClasspathRootTest;
-import junit.framework.TestCase;
+
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestabilityTest extends TestCase {
+public class TestabilityTest extends AutoFieldClearTestCase {
+  private WatchedOutputStream out;
+  private WatchedOutputStream err;
+  private Testability testability;
+
+  private static final String ANT_OUTPUT_DIR = "build/classes";
+  private static final String IDEA_OUTPUT_DIR = "out/production/testability-metrics";
+  /**
+   * The output directory this project compiles to by default. For compatibility,
+   * this defaults to the ant output directory.
+   */
+  private static String whereToLookForClasses;
+
+  @Override
+  protected void setUp() {
+    whereToLookForClasses = ANT_OUTPUT_DIR;
+    out = new WatchedOutputStream();
+    err = new WatchedOutputStream();
+    testability = new Testability(new PrintStream(out), new PrintStream(err));
+  }
 
   public void testComputeCostSingleClass() throws Exception {
     String classUnderTest = com.google.test.metric.Testability.class.getName();
-    Testability testability = new Testability();
     ClassCost classCost = testability.computeCost(classUnderTest);
     assertNotNull(classCost);
     assertTrue(classCost.toString().length() > 0);
   }
 
   public void testParseNoArgs() throws IOException {
-    Testability testability = new Testability();
-    StringWriter err = new StringWriter();
     try {
-      testability.parseArgs(err);
+      testability.parseArgs();
       fail("Should have thrown a CmdLineException exception");
     } catch (CmdLineException expected) {
       // expecting this
     }
-    assertTrue(err.toString().indexOf("No argument was given") > -1);
+    assertTrue(err.toString().indexOf("Argument \"classes/packages\" is required") > -1);
   }
 
   public void testParseClasspathAndSingleClass() throws Exception {
-    Testability testability = new Testability();
-    StringWriter err = new StringWriter();
-    testability.parseArgs(err, "-cp", "not/default/path", "com.google.TestClass");
+    testability.parseArgs("-cp", "not/default/path", "com.google.TestClass");
 
-    assertEquals("", err.toString());
+    assertEquals("", err.getOutput());
     assertEquals("not/default/path", testability.classpath);
     List<String> expectedArgs = new ArrayList<String>();
     expectedArgs.add("com.google.TestClass");
-    assertNotNull(testability.packagesToAnalyzeFilter);
-    assertEquals(expectedArgs, testability.packagesToAnalyzeFilter);
+    assertNotNull(testability.entryList);
+    assertEquals(expectedArgs, testability.entryList);
   }
 
 
-  public void testMainWithJarFileNoClasspath() throws Exception {
-    PrintStream origOut = System.out;
-    PrintStream origErr = System.err;
-    WatchedOutputStream tempOut = null;
-    WatchedOutputStream tempErr = null;
-    try {
-      tempOut = new WatchedOutputStream();
-      tempErr = new WatchedOutputStream();
-      System.setOut(new PrintStream(tempOut));
-      System.setErr(new PrintStream(tempErr));
-      Testability.main("junit.runner", "-cp");
-    } finally {
-      System.setOut(origOut);
-      System.setErr(origErr);
-      assertNotNull(tempOut);
-      assertNotNull(tempErr);
-      assertEquals("", tempOut.getOutput());
-      /* we expect the error to say something about proper usage of the
-arguments. The -cp needs a value */
-      assertTrue(tempErr.getOutput().length() > 0);
-    }
+  public void testJarFileNoClasspath() throws Exception {
+    testability.run("junit.runner", "-cp");
+    /** we expect the error to say something about proper usage of the arguments.
+     * The -cp needs a value */
+    assertTrue(out.getOutput().length() == 0);
+    assertTrue(err.getOutput().length() > 0);
   }
 
 
-  public void testMainWithJarFile() throws Exception {
-    WatchedOutputStream out = new WatchedOutputStream();
-    Testability testability = new Testability();
-    testability.doMain(new String[] {"", "-cp", "lib/junit.jar"},
-      new PrintStream(out));
-//    System.out.println(out.getOutput());
+  public void testJarFileParseSetupAndComputeGroupMetric() throws Exception {
+    testability.parseSetup("", "-cp", "lib/junit.jar");
+    testability.computeGroupMetric();
     assertTrue("output too short, expected parsing lots of files correctly",
-      out.getOutput().length() > 1000);
-    assertEquals(1, testability.packagesToAnalyzeFilter.size());
-    assertEquals("", testability.packagesToAnalyzeFilter.get(0));
+        out.getOutput().length() > 1000);
+    assertEquals(1, testability.entryList.size());
+    assertEquals("", testability.entryList.get(0));
     assertTrue(testability.classpath.endsWith("lib/junit.jar"));
-   }
-
-  public void testMainWithJarFileAndClassesNotInClasspath() throws Exception {
-   /* root2/ contains some classes from this project, but not all. There are
-    * many references to classes that will not be in this test's -cp classpath.
-    * We are testing that when the ClassRepository encounters a
-    * ClassNotFoundException, it continues nicely and prints the values for
-    * the classes that it _does_ find. */
-    Testability.main("", "-cp",
-      DirectoryClasspathRootTest.ROOT_2_CLASSES_FOR_TEST);
   }
 
-  public void testMainWithJarFileAndFilter() throws Exception {
-    PrintStream out = System.out;
-    try {
-//  System.setOut(new PrintStream(new IgnoreOutputStream()));
-      Testability.main("junit.runner", "-cp", "lib/junit.jar");
-      Testability.main("junit.swingui.ProgressBar", "-cp", "lib/junit.jar");
-    } finally {
-      System.setOut(out);
-    }
+  public void testJarFileAndClassesNotInClasspath() throws Exception {
+    /* root2/ contains some classes from this project, but not all. There are
+     * many references to classes that will not be in this test's -cp classpath.
+     * We are testing that when the ClassRepository encounters a
+     * ClassNotFoundException, it continues nicely and prints the values for
+     * the classes that it _does_ find. */
+    testability.run("", "-cp", DirectoryClasspathRootTest.ROOT_2_CLASSES_FOR_TEST);
+    assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() > 0);
   }
 
-  public void testMainWithJarsAndDirectoryOfClasses() throws Exception {
-    Testability.main("" /* blank will look for everything */, "-cp",
-            "lib/asm-3.0.jar:lib/args4j-2.0.8.jar:out/production/testability-metrics");
+  public void testJarFileAndJunitSwinguiProgressBarEntryPattern() throws Exception {
+    testability.run("junit.swingui.ProgressBar", "-cp", "lib/junit.jar");
+    assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() == 0);
+  }
+
+  public void testJarFileAndJunitRunnerEntryPattern() throws IOException {
+    testability.run("junit.runner", "-cp", "lib/junit.jar");
+    assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() == 0);
+  }
+
+  public void testJarsAndDirectoryWildcardEntryPattern() throws Exception {
+    testability.run("" /* blank will look for everything */, "-cp",
+        "lib/asm-3.0.jar:lib/args4j-2.0.8.jar:" + whereToLookForClasses);
+    assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() == 0);
+  }
+
+  public void testIncompleteClasspath() throws Exception {
+    testability.run("" /* blank will look for everything */, "-cp", whereToLookForClasses);
+    assertTrue("Output was empty, some output expected", out.getOutput().length() > 0);
+    assertTrue("Error output was empty, expected error output from class not found",
+        err.getOutput().length() > 0);
   }
 
   public void testMainWithJarsAndDirectoryOfClassesAndFilter() throws Exception {
+    testability.run("junit.swingui.ProgressBar", "-cp", "lib/junit.jar:" + whereToLookForClasses);
+    assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() == 0);
+  }
 
+  public void testForWarningWhenClassesRecurseToIncludeClassesOutOfClasspath() throws Exception {
+    testability.run("" /* blank will look for everything */, "-cp", whereToLookForClasses);
+    assertTrue("Output was empty, some output expected", out.getOutput().length() > 0);
+    assertTrue("Error output was empty, expected error output from class not found",
+        err.getOutput().length() > 0);
+    assertTrue(err.getOutput().indexOf("WARNING: class not found") > -1);
+  }
+
+  public void testForWarningWhenClassExtendsFromClassOutOfClasspath() throws Exception {
+    testability.computeCost("ThisClassDoesNotExist");
+    assertTrue(out.getOutput().length() == 0);
+    assertTrue(err.getOutput().length() > 0);
+    assertTrue(err.getOutput().startsWith("WARNING: can not analyze class 'ThisClassDoesNotExist"));
   }
 
 
@@ -149,6 +172,10 @@ arguments. The -cp needs a value */
     }
 
     public String getOutput() {
+      return sb.toString();
+    }
+
+    public String toString() {
       return sb.toString();
     }
   }

@@ -13,8 +13,13 @@
   <component name="Build editor project-level loader">
     <settings>
       <class-settings class="com.google.devtools.intellig.configcheck.ClearOutputChecker" />
-      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker" />
-      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker" />
+      <class-settings class="com.google.devtools.intellig.configcheck.JavacHeapChecker">
+        <setting name="getHeapSize" value="800" />
+      </class-settings>
+      <class-settings class="com.google.devtools.intellig.configcheck.ProjectJdkChecker">
+        <setting name="getModuleJdks" value="rO0ABXNyABFqYXZhLnV0aWwuSGFzaFNldLpEhZWWuLc0AwAAeHB3DAAAABA/QAAAAAAAAHg=" />
+        <setting name="getProjectJdk" value="/usr/local/buildtools/java/jdk1.6.0_01_gg1" />
+      </class-settings>
       <class-settings class="com.google.devtools.intellig.configcheck.ProjectPathChecker" />
       <class-settings class="com.google.devtools.intellig.configcheck.PythonSdkChecker" />
     </settings>
@@ -325,5 +330,6 @@
     </option>
   </component>
   <component name="libraryTable" />
+  <component name="uidesigner-configuration" />
 </project>
 

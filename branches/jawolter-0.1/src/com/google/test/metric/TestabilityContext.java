@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.PrintWriter;
+import java.io.PrintStream;
 
 public class TestabilityContext {
 
@@ -27,9 +29,11 @@ public class TestabilityContext {
   private Set<Variable> statics = new HashSet<Variable>();
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
+  private final PrintStream err;
 
-  public TestabilityContext(ClassRepository classRepository) {
+  public TestabilityContext(ClassRepository classRepository, PrintStream err) {
     this.classRepository = classRepository;
+    this.err = err;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
@@ -142,4 +146,7 @@ public class TestabilityContext {
     injectables.add(var);
   }
 
+  public void reportError(String errorMessage) {
+    err.println(errorMessage);
+  }
 }

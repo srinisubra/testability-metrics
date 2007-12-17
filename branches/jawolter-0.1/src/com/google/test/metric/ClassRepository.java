@@ -46,11 +46,7 @@ public class ClassRepository {
     }
     ClassInfo classInfo = classes.get(clazzName.replace('/', '.'));
     if (classInfo == null) {
-      try {
         classInfo = parseClass(inputStreamForClass(clazzName));
-      } catch (ClassNotFoundException e) {
-        System.err.println("WARNING: class not found: " + clazzName);
-      }
     }
     return classInfo;
   }
