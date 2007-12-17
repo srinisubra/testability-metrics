@@ -19,18 +19,18 @@ import org.objectweb.asm.ClassReader;
 
 import com.google.test.metric.ClassCost;
 import com.google.test.metric.ClassRepository;
-import com.google.test.metric.ClassRepositoryTestCase;
+import com.google.test.metric.ClassRepositoryTestCaseBase;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
 
-public class SelfTest extends ClassRepositoryTestCase {
+public class SelfTest extends ClassRepositoryTestCaseBase {
 
   private MetricComputer computer;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo);
+    computer = new MetricComputer(repo, null);
   }
   
   @Override

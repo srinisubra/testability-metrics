@@ -15,78 +15,107 @@
  */
 package com.google.test.metric;
 
-import com.google.classpath.ClasspathRoot;
 import com.google.classpath.ClasspathRootFactory;
-
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.kohsuke.args4j.ExampleMode;
-import org.kohsuke.args4j.Option;
+import com.google.classpath.ClasspathRootGroup;
+import org.kohsuke.args4j.*;
 
 import java.io.IOException;
-import java.io.Writer;
-import java.io.PrintWriter;
-import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Testability {
 
-  @Option(name = "-cp", metaVar = "lib/one.jar:lib/two.jar", usage = "classpath needed for analyzing the jar or directory")
-  private String classpath = "";
+  @Option(name = "-cp", metaVar = "classpath",
+          usage = "colon delimited classpath to analyze (jars or directories)" +
+          "\nEx. lib/one.jar:lib/two.jar")
+  protected String classpath = "";
 
-  @Argument(metaVar = "path/to/directory_or_jar")
-  private List<String> arguments = new ArrayList<String>();
+/* not currently implemented
+  @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
+          usage = "colon delimited whitelisted packages that will not " +
+                  "count against you. Includes matching all subpackages.")
+  private String whitelist = "";*/
 
-  public String getClasspath() {
-    return classpath;
+  @Argument(metaVar = "classes/packages",
+          usage = "Classes or packages to analyze. " +
+          "Matches any class starting with these.\n" +
+          "Ex. com.example.analyze.these com.google.and.these.packages " +
+          "com.google.or.AClass", required = true)
+  protected List<String> entryList = new ArrayList<String>();
+  private final PrintStream out;
+  private final PrintStream err;
+  protected ClasspathRootGroup classpathRootGroup;
+
+  public Testability(PrintStream out, PrintStream err) {
+    this.out = out;
+    this.err = err;
   }
 
-  public List<String> getArguments() {
-    return arguments;
+  public static void main(String... args) throws IOException {
+    Testability testability = new Testability(System.out, System.err);
+    testability.run(args);
   }
 
-  public static void main(String... args) throws CmdLineException, IOException {
-    new Testability().doMain(args);
+  public void run(String... args) throws IOException {
+    try {
+      parseSetup(args);
+      computeGroupMetric();
+    } catch (CmdLineException ignored) { }
   }
 
-  public void doMain(String... args) throws IOException, CmdLineException {
-    parseArgs(new PrintWriter(System.err), args);
-    File jarOrDir = new File(arguments.get(0));
+  public void parseSetup(String... args) throws IOException, CmdLineException {
+    parseArgs(args);
+    out.println(entryList.get(0));
     if (classpath.length() == 0) {
       classpath = System.getProperty("java.class.path", ".");
     }
-    ClasspathRoot classpathRoot = ClasspathRootFactory.makeClasspathRoot(
-        jarOrDir, classpath);
-    ClassRepository classRepository = new ClassRepository(classpathRoot);
-    for (String className : classpathRoot.getAllContainedClassNames()) {
-      ClassCost classCost = computeCost(className, classRepository);
-      System.out.println("Testability cost for " + classCost + "\n");
-    }
+    classpathRootGroup = ClasspathRootFactory.makeClasspathRootGroup(classpath);
   }
 
-  public void parseArgs(Writer err, String... args) throws IOException,
+  public void parseArgs(String... args) throws IOException,
       CmdLineException {
     CmdLineParser parser = new CmdLineParser(this);
     try {
       parser.parseArgument(args);
-      if (arguments.isEmpty()) {
+      if (entryList.isEmpty()) {
         throw new CmdLineException("No argument was given");
+      } else {
+        for (int i = 0; i < entryList.size(); i++) {
+          entryList.set(i, entryList.get(i).replaceAll("/", "."));
+        }
       }
     } catch (CmdLineException e) {
-      err.write(e.getMessage());
-      err.write("\njava com.google.test.metric.Testability [options...] arguments...");
-      err.write("\nExample: java path/to/dir_or_jar"
-          + parser.printExample(ExampleMode.ALL) + "\n\n");
-      err.flush();
+      err.println(e.getMessage());
+      err.println("\njava com.google.test.metric.Testability" +
+        " -cp classpath packages.to.analyze");
+      err.println("\nExample: java -cp lib/foo.jar com.foo.model.Device\n" +
+        "Example: java -cp lib/foo.jar:classes com.foo.model.subpackages foo.AClass\n");
       throw new CmdLineException("Exiting...");
     }
   }
 
+  public void computeGroupMetric() throws IOException, CmdLineException {
+    ClassRepository classRepository = new ClassRepository(classpathRootGroup);
+    List<String> allContainedClassNames =
+        classpathRootGroup.getAllContainedClassNames(entryList);
+    for (String className : allContainedClassNames) {
+      ClassCost classCost = computeCost(className, classRepository);
+      out.println("Testability cost for " + classCost + "\n");
+    }
+    out.println("Analyzed " + allContainedClassNames.size() +
+        " classes (plus how ever many of their external dependencies)");
+  }
+
   public ClassCost computeCost(String className, ClassRepository repo) {
-    MetricComputer metricComputer = new MetricComputer(repo);
-    ClassCost classCost = metricComputer.compute(repo.getClass(className));
+    MetricComputer metricComputer = new MetricComputer(repo, err);
+    ClassCost classCost = null;
+    try {
+      classCost = metricComputer.compute(repo.getClass(className));
+    } catch (ClassNotFoundException e) {
+      err.println("WARNING: can not analyze class '" + className + "' since class '"
+          + e.getClassName() + "' was not found.");
+    }
     return classCost;
   }
 

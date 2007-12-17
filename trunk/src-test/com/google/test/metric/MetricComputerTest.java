@@ -19,14 +19,14 @@ import static com.google.test.metric.SignatureUtil.L;
 
 import java.util.List;
 
-public class MetricComputerTest extends ClassRepositoryTestCase {
+public class MetricComputerTest extends ClassRepositoryTestCaseBase {
 
   private MetricComputer computer;
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo);
+    computer = new MetricComputer(repo, null);
   }
 
   public static class Medium {
@@ -376,7 +376,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
     int methodStartingLine = cost.getMethod().getStartingLineNumber();
     
-    assertEquals(0, line0.getMethodCost().getTotalComplexityCost()); // todo(jaw) - this is failing, why? shouldn't the line0 (method) cost be the sum of the contained costs - the method calls w/in it? (= 0+1+2 = 3)?
+    assertEquals(0, line0.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 0, line0.getLineNumber());
 
     assertEquals(1, line1.getMethodCost().getTotalComplexityCost());

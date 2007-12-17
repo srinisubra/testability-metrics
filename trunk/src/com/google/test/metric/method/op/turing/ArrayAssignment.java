@@ -34,6 +34,7 @@ public class ArrayAssignment extends Operation {
   }
 
   @Override
+  // todo will need to add prevention to enter this if currentMethod.getClassInfo() is in a class we don't want to enter
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
     context.arrayAssignment(array, index, value, currentMethod, getLineNumber());
   }

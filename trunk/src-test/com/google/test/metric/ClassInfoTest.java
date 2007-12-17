@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
-public class ClassInfoTest extends ClassRepositoryTestCase {
+public class ClassInfoTest extends ClassRepositoryTestCaseBase {
 
   public void testNonExistingClass() throws Exception {
     try {
