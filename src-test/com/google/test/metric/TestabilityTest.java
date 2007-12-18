@@ -30,9 +30,9 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream err;
   private Testability testability;
 
-  private static final String ANT_OUTPUT_DIR = "build/classes";
-  private static final String IDEA_OUTPUT_DIR = "out/production/testability-metrics";
-  private static final String ECLIPSE_OUTPUT_DIR = "bin/";
+  static final String ANT_OUTPUT_DIR = "build/classes";
+  static final String IDEA_OUTPUT_DIR = "out/production/testability-metrics";
+  static final String ECLIPSE_OUTPUT_DIR = "bin/";
 
   /**
    * The output directory this project compiles to by default. For compatibility,

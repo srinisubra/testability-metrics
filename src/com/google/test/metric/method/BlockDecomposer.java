@@ -35,9 +35,9 @@ import java.util.Map;
  *
  * <pre>
  * public void methodWithIIf() {
- * 	int b = 1;
- * 	a = b &gt; 0 ? null : new Object();
- * 	b = 2;
+ *   int b = 1;
+ *   a = b &gt; 0 ? null : new Object();
+ *   b = 2;
  * }
  * </pre>
  *

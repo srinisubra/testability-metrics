@@ -79,19 +79,20 @@ public class MethodCost {
       Set<MethodCost> alreadySeen) {
     buf.append(method.getClassInfo().getName() + " ");
     buf.append(method.getNameDesc());
-    buf.append("[" + getComplexityCost() + ", " + getGlobalCost()
-        + " / " + totalComplexityCost + ", " + totalGlobalCost + "]");
+    buf.append("[" + getComplexityCost() + ", " + getGlobalCost() + " / "
+        + totalComplexityCost + ", " + totalGlobalCost + "]");
     if (alreadySeen.contains(this)) {
       return;
     }
     alreadySeen.add(this);
-    if (totalGlobalCost > 0 || totalComplexityCost > 0) {
-      for (LineNumberCost line : lineNumberCosts) {
+    for (LineNumberCost line : lineNumberCosts) {
+      MethodCost childCost = line.getMethodCost();
+      if (childCost.totalGlobalCost > 0 || childCost.totalComplexityCost > 0) {
         buf.append("\n");
         buf.append(prefix + "  line ");
         buf.append(line.getLineNumber());
         buf.append(": ");
-        line.getMethodCost().toString(prefix + "  ", buf, alreadySeen);
+        childCost.toString(prefix + "  ", buf, alreadySeen);
       }
     }
   }

@@ -22,6 +22,9 @@ import com.google.test.metric.ClassRepository;
 import com.google.test.metric.ClassRepositoryTestCase;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
+import com.google.test.metric.example.Primeness;
+import com.google.test.metric.example.SumOfPrimes;
+import com.google.test.metric.example.SumOfPrimes2;
 
 public class SelfTest extends ClassRepositoryTestCase {
 
@@ -54,5 +57,18 @@ public class SelfTest extends ClassRepositoryTestCase {
   public void testClassReader() throws Exception {
     System.out.println(computer.compute(ClassReader.class));
   }
+
+  public void testPrimeness() throws Exception {
+    System.out.println(computer.compute(Primeness.class));
+  }
+
+  public void testSumOfPrimes() throws Exception {
+    System.out.println(computer.compute(SumOfPrimes.class));
+  }
+  
+  public void testSumOfPrimes2() throws Exception {
+    System.out.println(computer.compute(SumOfPrimes2.class));
+  }
+  
 
 }

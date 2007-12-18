@@ -15,13 +15,12 @@
  */
 package com.google.test.metric;
 
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.io.PrintWriter;
-import java.io.PrintStream;
 
 public class TestabilityContext {
 
