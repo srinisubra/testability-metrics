@@ -13,23 +13,17 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method.op.turing;
+package com.google.test.metric.example;
 
-import com.google.test.metric.MethodInfo;
-import com.google.test.metric.TestabilityContext;
+public class Primeness {
 
-public abstract class Operation {
-
-  private final int lineNumber;
-
-  public Operation(int lineNumber) {
-    this.lineNumber = lineNumber;
+  public boolean isPrime(int number) {
+    for (int i = 2; i < number / 2; i++) {
+      if (number % i == 0) {
+        return false;
+      }
+    }
+    return true;
   }
-
-  public int getLineNumber() {
-    return lineNumber;
-  }
-
-  public abstract void computeMetric(TestabilityContext context, MethodInfo currentMethod);
 
 }

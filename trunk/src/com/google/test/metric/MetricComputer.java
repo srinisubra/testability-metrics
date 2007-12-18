@@ -15,13 +15,12 @@
  */
 package com.google.test.metric;
 
-import com.google.test.metric.asm.Visibility;
-
+import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.io.PrintWriter;
-import java.io.PrintStream;
+
+import com.google.test.metric.asm.Visibility;
 
 public class MetricComputer {
 

@@ -30,14 +30,14 @@ import java.util.List;
 public class BlockDecomposerTest extends TestCase {
 
   /**
-	 * load 1
-	 * jsr mySub
-	 * load 2
-	 * return
+   * load 1
+   * jsr mySub
+   * load 2
+   * return
    *
-	 * mySub:
-	 * load 3
-	 * return;
+   * mySub:
+   * load 3
+   * return;
    */
   public void testJSR() throws Exception {
     BlockDecomposer decomposer = new BlockDecomposer();
