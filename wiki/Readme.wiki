@@ -74,10 +74,10 @@ be 0 allows us to split the method to smaller functions which all have the cost
 of 0. Hence the user is not penalized for breaking methods into smaller
 ones, which is a good idea.
 
-==More Complicated Example: Injectibility Scoring==
-This example shows the differences in scores based on how injectible a class is. In SumOfPrimes, it instantiates a new Primeness() directly. The new operator prevents you from being able to inject in a different Primeness for testing. Thus the scores differ.
-  `sum(I)I[2, 0 / 4, 0]` <- total test complexity of 4 for SumOfPrimes
-  `sum(I)I[2, 0 / 2, 0]` <- total test complexity of 2 for SumOfPrimes2
+==Example: Injectibility Scoring==
+This example shows the differences in scores based on how injectible a class is. In `SumOfPrimes`, it instantiates a new Primeness() directly. The new operator prevents you from being able to inject in a different Primeness for testing. Thus the scores differ.
+  * `sum(I)I[2, 0 / 4, 0]` <- total test complexity of 4 for `SumOfPrimes`
+  * `sum(I)I[2, 0 / 2, 0]` <- total test complexity of 2 for `SumOfPrimes2`
 SOURCE:
 {{{
 public class SumOfPrimes {
@@ -133,3 +133,10 @@ com.google.test.metric.example.SumOfPrimes2
   <init>(Lcom/google/test/metric/example/Primeness;)V[0, 0 / 0, 0]
   sum(I)I[2, 0 / 2, 0]
 }}}
+
+==Example: Global State==
+
+==Example: ... ==
+
+==Future Enhancements / Requests==
+Please talk about what you want on the mailing list: http://groups.google.com/group/testability-metrics
