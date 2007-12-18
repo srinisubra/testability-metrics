@@ -25,13 +25,15 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestabilityTest extends AutoFieldClearTestCaseBase {
+public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream out;
   private WatchedOutputStream err;
   private Testability testability;
 
   private static final String ANT_OUTPUT_DIR = "build/classes";
   private static final String IDEA_OUTPUT_DIR = "out/production/testability-metrics";
+  private static final String ECLIPSE_OUTPUT_DIR = "bin/";
+
   /**
    * The output directory this project compiles to by default. For compatibility,
    * this defaults to the ant output directory.

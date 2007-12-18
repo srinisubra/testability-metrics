@@ -16,7 +16,7 @@
 package com.google.test.metric;
 
 
-public class CyclomaticComplexityTest extends ClassRepositoryTestCaseBase {
+public class CyclomaticComplexityTest extends ClassRepositoryTestCase {
 
   private ClassInfo classInfo;
 
