@@ -56,7 +56,7 @@
                 <fileset dir="${test.src.dir}">
                     <include name="**/*Test*.java"/>
                     <exclude name="**/AllTests.java"/>
-                    <exclude name="**/*Base.java"/>
+                    <exclude name="**/*TestCase.java"/>
                 </fileset>
             </batchtest>
         </junit>

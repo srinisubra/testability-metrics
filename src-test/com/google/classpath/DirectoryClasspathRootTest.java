@@ -48,7 +48,7 @@ public class DirectoryClasspathRootTest extends TestCase {
     packageFilter.add("");
     List<String> names = group.getAllContainedClassNames(packageFilter);
     assertTrue(names.contains("com.google.classpath.ColonDelimitedStringParser"));
-    assertTrue(names.contains("com.google.test.metric.AutoFieldClearTestCaseBase"));
+    assertTrue(names.contains("com.google.test.metric.AutoFieldClearTestCase"));
     assertTrue(names.contains("com.google.test.metric.ClassInfoTest"));
     assertTrue(names.contains("com.google.test.metric.x.SelfTest"));
 

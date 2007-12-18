@@ -19,11 +19,11 @@ import org.objectweb.asm.ClassReader;
 
 import com.google.test.metric.ClassCost;
 import com.google.test.metric.ClassRepository;
-import com.google.test.metric.ClassRepositoryTestCaseBase;
+import com.google.test.metric.ClassRepositoryTestCase;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
 
-public class SelfTest extends ClassRepositoryTestCaseBase {
+public class SelfTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
 
