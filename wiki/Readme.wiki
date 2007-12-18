@@ -60,9 +60,9 @@ com.google.test.metric.example.Primeness
 In the above example we got a test complexity of 2. This is because the
 method is Prime has a loop and an if statement. Therefore there are 2
 additional paths of execution for a total of 3.
-# Loop does not execute
-# Loop executes but if does not evaluate to true
-# Loop executes and if evaluates to true.
+ # Loop does not execute
+ # Loop executes but if does not evaluate to true
+ # Loop executes and if evaluates to true.
 
 Note: this is just cyclomatic complexity of the method minus one. The reason
 we are subtracting one is that we don't want to penalize you for breaking the
