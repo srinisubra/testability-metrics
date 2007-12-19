@@ -15,21 +15,23 @@
  */
 package com.google.test.metric;
 
+import com.google.test.metric.asm.Visibility;
+
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.google.test.metric.asm.Visibility;
-
 public class MetricComputer {
 
   private final ClassRepository classRepository;
   private final PrintStream err;
+  private int maxDepthToPrintCosts;
 
-  public MetricComputer(ClassRepository classRepository, PrintStream err) {
+  public MetricComputer(ClassRepository classRepository, PrintStream err, int maxDepthToPrintCosts) {
     this.classRepository = classRepository;
     this.err = err;
+    this.maxDepthToPrintCosts = maxDepthToPrintCosts;
   }
 
   /* used for testing */
@@ -40,7 +42,7 @@ public class MetricComputer {
   }
 
   public MethodCost compute(MethodInfo method) {
-    TestabilityContext context = new TestabilityContext(classRepository, err);
+    TestabilityContext context = new TestabilityContext(classRepository, err, maxDepthToPrintCosts);
     addStaticCost(method, context);
     addConstructorCost(method, context);
     addSetterInjection(method, context);
