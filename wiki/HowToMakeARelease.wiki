@@ -1,4 +1,5 @@
 #summary For project developers, how to release
+#labels Phase-Implementation,Featured
 
  # Make sure all tests pass locally. Run ant test, as well as whatever you use as an IDE.
  # Update the [Readme] in the wiki, and copy/paste any changes there into the Readme.txt in svn.
