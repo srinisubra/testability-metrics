@@ -26,7 +26,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null);
+    computer = new MetricComputer(repo, null, Integer.MAX_VALUE);
   }
 
   public static class Medium {

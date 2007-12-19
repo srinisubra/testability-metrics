@@ -29,10 +29,13 @@ public class TestabilityContext {
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
+  private int maxDepthToPrintCosts;
 
-  public TestabilityContext(ClassRepository classRepository, PrintStream err) {
+  public TestabilityContext(ClassRepository classRepository, PrintStream err,
+      int maxDepthToPrintCosts) {
     this.classRepository = classRepository;
     this.err = err;
+    this.maxDepthToPrintCosts = maxDepthToPrintCosts;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
@@ -60,7 +63,7 @@ public class TestabilityContext {
   private MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
-      methodCost = new MethodCost(method);
+      methodCost = new MethodCost(method, maxDepthToPrintCosts);
       methodCosts.put(method, methodCost);
     }
     return methodCost;
@@ -77,7 +80,7 @@ public class TestabilityContext {
     buf.append("MethodCost:");
     for (MethodCost cost : methodCosts.values()) {
       buf.append("\n");
-      cost.toString("   ", buf, new HashSet<MethodCost>());
+      cost.toString("   ", buf, new HashSet<MethodCost>(), 0);
     }
     buf.append("\nInjectables:");
     for (Variable var : injectables) {

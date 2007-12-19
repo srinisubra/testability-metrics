@@ -49,7 +49,7 @@ public class ClassCost {
     buf.append(classInfo.toString());
     for (MethodCost cost : methods) {
       buf.append("\n  ");
-      cost.toString("  ", buf, new HashSet<MethodCost>());
+      cost.toString("  ", buf, new HashSet<MethodCost>(), 0);
     }
   }
 

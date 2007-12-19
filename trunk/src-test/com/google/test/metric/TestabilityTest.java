@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream out;
@@ -116,6 +117,31 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   public void testJarFileAndJunitRunnerEntryPattern() throws IOException {
     testability.run("junit.runner", "-cp", "lib/junit.jar");
     assertTrue(out.getOutput().length() > 0);
+    assertTrue(err.getOutput().length() == 0);
+    System.out.println(out.getOutput());
+  }
+
+  public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthTwo() throws IOException {
+    testability.run("junit.runner", "-cp", "lib/junit.jar", "-maxPrintingDepth", "2");
+    assertTrue(out.getOutput().length() > 0);
+
+    Pattern sixSpacesThenLinePattern = Pattern.compile("^(\\s){6}line", Pattern.MULTILINE);
+    assertTrue("Expected 6 leading spaces spaces for maxPrintingDepth=2",
+        sixSpacesThenLinePattern.matcher(out.getOutput()).find());
+
+    Pattern over7SpacesThenLinePattern = Pattern.compile("^(\\s){7,}line", Pattern.MULTILINE);
+    assertFalse("Should not have had more than 2 + 2*2 = 6 leading spaces for maxPrintingDepth=2",
+        over7SpacesThenLinePattern.matcher(out.getOutput()).find());
+    assertTrue(err.getOutput().length() == 0);
+  }
+
+  public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() throws IOException {
+    testability.run("junit.runner", "-cp", "lib/junit.jar", "-maxPrintingDepth", "0");
+    assertTrue(out.getOutput().length() > 0);
+
+    Pattern noLinesPattern = Pattern.compile("^(\\s)*line", Pattern.MULTILINE);
+    assertFalse("Should not have any line matchings for printing depth of 0",
+        noLinesPattern.matcher(out.getOutput()).find());
     assertTrue(err.getOutput().length() == 0);
   }
 
