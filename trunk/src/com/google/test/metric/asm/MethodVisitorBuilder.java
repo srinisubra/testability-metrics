@@ -43,7 +43,6 @@ import com.google.test.metric.method.op.stack.MonitorEnter;
 import com.google.test.metric.method.op.stack.MonitorExit;
 import com.google.test.metric.method.op.stack.MultiANewArrayIns;
 import com.google.test.metric.method.op.stack.Pop;
-import com.google.test.metric.method.op.stack.PutField;
 import com.google.test.metric.method.op.stack.RetSub;
 import com.google.test.metric.method.op.stack.Return;
 import com.google.test.metric.method.op.stack.Store;
@@ -770,33 +769,16 @@ public class MethodVisitorBuilder implements MethodVisitor {
       final String name, final String desc) {
     switch (opcode) {
       case Opcodes.PUTSTATIC :
+          recorder.add(new PutFieldRunnable(owner, name, desc, true));
+          break;
       case Opcodes.PUTFIELD :
-        recorder.add(new Runnable() {
-          public void run() {
-            FieldInfo field = null;
-            try {
-              field = repository.getClass(owner).getField(name);
-            } catch (FieldNotFoundException e) {
-              System.err.println("WARNING: field not found: " + name);
-            }
-            block.addOp(new PutField(lineNumber, field));
-          }
-        });
+        recorder.add(new PutFieldRunnable(owner, name, desc, false));
         break;
       case Opcodes.GETSTATIC :
+          recorder.add(new GetFieldRunnable(owner, name, desc, true));
+          break;
       case Opcodes.GETFIELD :
-        recorder.add(new Runnable() {
-          public void run() {
-            FieldInfo field = null;
-            try {
-              field = repository.getClass(owner).getField(name);
-            } catch (FieldNotFoundException e) {
-              System.err.println("WARNING: field not found: " + name);
-            }
-            block.addOp(new GetField(lineNumber, field));
-          }
-
-        });
+        recorder.add(new GetFieldRunnable(owner, name, desc, false));
         break;
     }
   }
@@ -904,4 +886,57 @@ public class MethodVisitorBuilder implements MethodVisitor {
   public String toString() {
     return classInfo + "." + name + desc + "\n" + block;
   }
+
+    private class PutFieldRunnable implements Runnable {
+        private final String owner;
+        private final String name;
+        private String desc;
+        private boolean isStatic;
+
+        public PutFieldRunnable(String owner, String name, String desc, boolean isStatic) {
+            this.owner = owner;
+            this.name = name;
+            this.desc = desc;
+            this.isStatic = isStatic;
+        }
+
+        public void run() {
+            FieldInfo field = null;
+            ClassInfo ownerClass = repository.getClass(owner);
+            try {
+                field = ownerClass.getField(name);
+            } catch (FieldNotFoundException e) {
+                System.err.println("WARNING: field not found: " + name);
+                field = new FieldInfo(ownerClass, "FAKE:" + name, Type.fromDesc(desc), isStatic, false);
+            }
+            block.addOp(new com.google.test.metric.method.op.stack.PutField(lineNumber, field));
+        }
+    }
+
+    private class GetFieldRunnable implements Runnable {
+        private final String owner;
+        private final String name;
+        private String desc;
+        private boolean isStatic;
+
+        public GetFieldRunnable(String owner, String name, String desc, boolean isStatic) {
+            this.owner = owner;
+            this.name = name;
+            this.desc = desc;
+            this.isStatic = isStatic;
+        }
+
+        public void run() {
+            FieldInfo field = null;
+            ClassInfo ownerClass = repository.getClass(owner);
+            try {
+                field = ownerClass.getField(name);
+            } catch (FieldNotFoundException e) {
+                System.err.println("WARNING: field not found: " + name);
+                field = new FieldInfo(ownerClass, "FAKE:" + name, Type.fromDesc(desc), isStatic, false);
+            }
+            block.addOp(new GetField(lineNumber, field));
+        }
+
+    }
 }
