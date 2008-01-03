@@ -17,10 +17,10 @@ package com.google.classpath;
 
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DirectoryClasspathRootTest extends TestCase {
   /**
@@ -28,8 +28,9 @@ public class DirectoryClasspathRootTest extends TestCase {
    * These are included in subversion so that any checkout will have a consistent
    * environment for testing.
    */
-  public static final String ROOT_1_CLASSES_FOR_TEST = "classes-for-test/root1";
-  public static final String ROOT_2_CLASSES_FOR_TEST = "classes-for-test/root2";
+  public static final String CLASSES_FOR_TEST = "classes-for-test";
+  public static final String ROOT_1_CLASSES_FOR_TEST = CLASSES_FOR_TEST + "/root1";
+  public static final String ROOT_2_CLASSES_FOR_TEST = CLASSES_FOR_TEST + "/root2";
 
   public void testCreateNewDirectoryClasspathRoot() throws Exception {
     File dir = new File(ROOT_1_CLASSES_FOR_TEST);

@@ -16,11 +16,7 @@
 package com.google.test.metric;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TestabilityContext {
 
@@ -30,12 +26,14 @@ public class TestabilityContext {
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
   private int maxDepthToPrintCosts;
+  private int minCostThreshold;
 
   public TestabilityContext(ClassRepository classRepository, PrintStream err,
-      int maxDepthToPrintCosts) {
+    int maxDepthToPrintCosts, int minCostThreshold) {
     this.classRepository = classRepository;
     this.err = err;
     this.maxDepthToPrintCosts = maxDepthToPrintCosts;
+    this.minCostThreshold = minCostThreshold;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
@@ -63,7 +61,7 @@ public class TestabilityContext {
   private MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
-      methodCost = new MethodCost(method, maxDepthToPrintCosts);
+      methodCost = new MethodCost(method, maxDepthToPrintCosts, minCostThreshold);
       methodCosts.put(method, methodCost);
     }
     return methodCost;
@@ -80,7 +78,7 @@ public class TestabilityContext {
     buf.append("MethodCost:");
     for (MethodCost cost : methodCosts.values()) {
       buf.append("\n");
-      cost.toString("   ", buf, new HashSet<MethodCost>(), 0);
+      cost.buildCostString("   ", buf, new HashSet<MethodCost>(), 0);
     }
     buf.append("\nInjectables:");
     for (Variable var : injectables) {

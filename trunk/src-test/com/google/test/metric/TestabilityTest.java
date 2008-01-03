@@ -16,7 +16,7 @@
 package com.google.test.metric;
 
 import com.google.classpath.DirectoryClasspathRootTest;
-
+import com.google.classpath.JarClasspathRootTest;
 import org.kohsuke.args4j.CmdLineException;
 
 import java.io.IOException;
@@ -88,16 +88,16 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
 
   public void testJarFileParseSetupAndComputeGroupMetric() throws Exception {
-    testability.parseSetup("", "-cp", "lib/junit.jar");
+    testability.parseSetup("", "-cp", JarClasspathRootTest.JUNIT_JAR);
     testability.computeGroupMetric();
     assertTrue("output too short, expected parsing lots of files correctly",
         out.getOutput().length() > 1000);
     assertEquals(1, testability.entryList.size());
     assertEquals("", testability.entryList.get(0));
-    assertTrue(testability.classpath.endsWith("lib/junit.jar"));
+    assertTrue(testability.classpath.endsWith(JarClasspathRootTest.JUNIT_JAR));
   }
 
-  public void testJarFileAndClassesNotInClasspath() throws Exception {
+  public void testClassesNotInClasspath() throws Exception {
     /* root2/ contains some classes from this project, but not all. There are
      * many references to classes that will not be in this test's -cp classpath.
      * We are testing that when the ClassRepository encounters a
@@ -109,20 +109,20 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   }
 
   public void testJarFileAndJunitSwinguiProgressBarEntryPattern() throws Exception {
-    testability.run("junit.swingui.ProgressBar", "-cp", "lib/junit.jar");
+    testability.run("junit.swingui.ProgressBar", "-cp", JarClasspathRootTest.JUNIT_JAR);
     assertTrue(out.getOutput().length() > 0);
     assertTrue(err.getOutput().length() == 0);
   }
 
   public void testJarFileAndJunitRunnerEntryPattern() throws IOException {
-    testability.run("junit.runner", "-cp", "lib/junit.jar");
+    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR);
     assertTrue(out.getOutput().length() > 0);
     assertTrue(err.getOutput().length() == 0);
     System.out.println(out.getOutput());
   }
 
   public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthTwo() throws IOException {
-    testability.run("junit.runner", "-cp", "lib/junit.jar", "-maxPrintingDepth", "2");
+    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR, "-maxPrintingDepth", "2");
     assertTrue(out.getOutput().length() > 0);
 
     Pattern sixSpacesThenLinePattern = Pattern.compile("^(\\s){6}line", Pattern.MULTILINE);
@@ -136,20 +136,20 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   }
 
   public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() throws IOException {
-    testability.run("junit.runner", "-cp", "lib/junit.jar", "-maxPrintingDepth", "0");
+    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR, "-maxPrintingDepth", "0");
     assertTrue(out.getOutput().length() > 0);
 
     Pattern noLinesPattern = Pattern.compile("^(\\s)*line", Pattern.MULTILINE);
     assertFalse("Should not have any line matchings for printing depth of 0",
         noLinesPattern.matcher(out.getOutput()).find());
-    assertTrue(err.getOutput().length() == 0);
+    assertEquals(0, err.getOutput().length());
   }
 
   public void testJarsAndDirectoryWildcardEntryPattern() throws Exception {
     testability.run("" /* blank will look for everything */, "-cp",
-        "lib/asm-3.0.jar:lib/args4j-2.0.8.jar:" + whereToLookForClasses);
+        JarClasspathRootTest.ASM_JAR + ":" + JarClasspathRootTest.JUNIT_JAR + ":" + whereToLookForClasses);
     assertTrue(out.getOutput().length() > 0);
-    assertTrue(err.getOutput().length() == 0);
+    assertEquals(0, err.getOutput().length());
   }
 
   public void testIncompleteClasspath() throws Exception {
@@ -160,9 +160,10 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   }
 
   public void testMainWithJarsAndDirectoryOfClassesAndFilter() throws Exception {
-    testability.run("junit.swingui.ProgressBar", "-cp", "lib/junit.jar:" + whereToLookForClasses);
+    testability.run("junit.swingui.ProgressBar", "-cp",
+        JarClasspathRootTest.JUNIT_JAR + ":" + whereToLookForClasses);
     assertTrue(out.getOutput().length() > 0);
-    assertTrue(err.getOutput().length() == 0);
+    assertEquals(0, err.getOutput().length());
   }
 
   public void testForWarningWhenClassesRecurseToIncludeClassesOutOfClasspath() throws Exception {
@@ -175,11 +176,18 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
   public void testForWarningWhenClassExtendsFromClassOutOfClasspath() throws Exception {
     testability.computeCost("ThisClassDoesNotExist");
-    assertTrue(out.getOutput().length() == 0);
+    assertEquals(0, out.getOutput().length());
     assertTrue(err.getOutput().length() > 0);
     assertTrue(err.getOutput().startsWith("WARNING: can not analyze class 'ThisClassDoesNotExist"));
   }
 
+  public void testFilterCostOverTotalCostThreshold() throws Exception {
+    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR);
+    int baselineLength = out.getOutput().length();
+    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR, "-costThreshold", "1000");
+    int throttledLength = out.getOutput().length();
+    assertTrue(baselineLength < throttledLength);
+  }
 
   public static class WatchedOutputStream extends OutputStream {
     StringBuffer sb = new StringBuffer();

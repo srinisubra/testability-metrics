@@ -12,8 +12,17 @@ import java.util.List;
  * Date: Dec 13, 2007
  */
 public class JarClasspathRootTest extends TestCase {
+  /**
+   * Directories to be used for testing that contains class files, for testing.
+   * These are included in subversion so that any checkout will have a consistent
+   * environment for testing.
+   */
+  public static final String JUNIT_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/junit.jar";
+  public static final String ASM_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/asm-3.0.jar";
+  public static final String JARJAR_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/jarjar.jar";
+
   public void testCreateNewJarClasspathRootTest() throws Exception {
-    File jar = new File("lib/asm-3.0.jar");
+    File jar = new File(ASM_JAR);
     assertTrue(jar.isFile());
     ClasspathRoot root = ClasspathRootFactory.makeClasspathRoot(jar, "");
     assertNotNull(root);
@@ -21,7 +30,7 @@ public class JarClasspathRootTest extends TestCase {
   }
 
   public void testCreateNewJarsClasspathRootTest() throws Exception {
-    String classpath = "lib/asm-3.0.jar:lib/junit.jar:lib/jarjar.jar";
+    String classpath = ASM_JAR + ":" + JUNIT_JAR + ":" + JARJAR_JAR;
     ClasspathRootGroup group = ClasspathRootFactory.makeClasspathRootGroup(classpath);
     assertNotNull(group);
     assertEquals(3, group.getGroupCount());

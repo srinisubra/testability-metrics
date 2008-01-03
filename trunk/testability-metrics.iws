@@ -16,11 +16,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testability-metrics.ipr" afterPath="$PROJECT_DIR$/testability-metrics.ipr" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testability-metrics.iws" afterPath="$PROJECT_DIR$/testability-metrics.iws" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testability-metrics.iml" afterPath="$PROJECT_DIR$/testability-metrics.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.xml" afterPath="$PROJECT_DIR$/build.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/asm/MethodVisitorBuilder.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/asm/MethodVisitorBuilder.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityContextTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityContextTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/Testability.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/Testability.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/MetricComputer.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/MetricComputer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java" />
     </list>
     <ignored path="testability-metrics.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -153,84 +161,73 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="MethodVisitorBuilder.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/asm/MethodVisitorBuilder.java">
+      <file leaf-file-name="ClassCost.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="906" column="36" selection-start="27040" selection-end="27040" vertical-scroll-proportion="0.35447338">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ClassInfo.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassInfo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="20" selection-start="2234" selection-end="2234" vertical-scroll-proportion="0.35447338">
+            <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.5912162">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="build.xml" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/build.xml">
+      <file leaf-file-name="MethodCost.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="44" selection-start="96" selection-end="96" vertical-scroll-proportion="0.017361112">
+            <state line="85" column="81" selection-start="2855" selection-end="2855" vertical-scroll-proportion="0.68613976">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GetField.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/stack/GetField.java">
+      <file leaf-file-name="TestabilityTest.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="0.3567384">
+            <state line="37" column="29" selection-start="1298" selection-end="1298" vertical-scroll-proportion="0.33333334">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PutField.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/stack/PutField.java">
+      <file leaf-file-name="DirectoryClasspathRootTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="0" selection-start="1239" selection-end="1239" vertical-scroll-proportion="0.3567384">
+            <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.2195946">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="FieldInfo.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/FieldInfo.java">
+      <file leaf-file-name="JarClasspathRootTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="13" selection-start="640" selection-end="640" vertical-scroll-proportion="0.050962627">
+            <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23648648">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ClassReader.class" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar://$PROJECT_DIR$/lib/asm-3.0.jar!/org/objectweb/asm/ClassReader.class">
+      <file leaf-file-name="MetricComputerTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="0" selection-start="1439" selection-end="1439" vertical-scroll-proportion="0.6394009">
+            <state line="28" column="66" selection-start="950" selection-end="950" vertical-scroll-proportion="0.016891891">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TestabilityContext.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java">
+      <file leaf-file-name="SelfTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="41" column="0" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.33295584">
+            <state line="35" column="66" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.2027027">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MethodInvokation.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/MethodInvokation.java">
+      <file leaf-file-name="CostUtilTest.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="64" column="0" selection-start="1748" selection-end="1748" vertical-scroll-proportion="0.79841447">
+            <state line="14" column="39" selection-start="593" selection-end="593" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -629,6 +626,10 @@
           <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/classpath" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
       </PATH>
       <PATH>
         <PATH_ELEMENT>
@@ -679,6 +680,9 @@
     <property name="MemberChooser.copyJavadoc" value="false" />
   </component>
   <component name="RecentsManager">
+    <key name="IntroduceConstantDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.google.test.metric" />
     </key>
@@ -733,34 +737,6 @@
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
     </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
-      <option name="MAIN_CLASS_NAME" />
-      <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="" />
-      <envs />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -812,10 +788,38 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="false" name="Unnamed" type="Application" factoryName="Application" enabled="false" merge="false">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <configuration default="false" name="android.jar" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.google.test.metric.Testability" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="-cp /home/jwolter/projects/android-learn/android_sdk_linux_m3-rc37a/android.jar com.google" />
+      <option name="PROGRAM_PARAMETERS" value="-cp /home/jwolter/projects/android-learn/android_sdk_linux_m3-rc37a/android.jar android -maxPrintingDepth 0" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -866,10 +870,29 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <list size="3">
-      <item index="0" class="java.lang.String" itemvalue="Application.Unnamed" />
+    <configuration default="false" name="junit" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" value="com.google.test.metric.Testability" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="junit.runner -cp lib/junit.jar -maxPrintingDepth 10" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="testability-metrics" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Application.android.jar" />
       <item index="1" class="java.lang.String" itemvalue="Application.Unnamed1" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.All in testability-metrics" />
+      <item index="2" class="java.lang.String" itemvalue="Application.junit" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.All in testability-metrics" />
     </list>
     <configuration default="true" type="RubyRunConfigurationType" factoryName="Ruby test">
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
@@ -936,11 +959,11 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="25" width="1301" height="1550" extended-state="0" />
-    <editor active="false" />
+    <frame x="10" y="25" width="1384" height="1550" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32976446" order="8" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" order="8" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.12791431" order="1" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32619557" order="1" />
@@ -948,18 +971,18 @@
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32619557" order="8" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32619557" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24925373" order="1" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="Maven projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2173913" order="0" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28226414" order="0" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.15879017" order="2" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.08615137" order="2" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
       <window_info id="Duplicates" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.38543898" order="2" x="1467" y="705" width="1044" height="841" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.38543898" order="2" x="1394" y="25" width="1123" height="1209" />
       <window_info id="Mach" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902467" order="8" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="5" />
@@ -1041,13 +1064,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="41" column="0" selection-start="1452" selection-end="1452" vertical-scroll-proportion="0.33295584">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/MethodInvokation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="64" column="0" selection-start="1748" selection-end="1748" vertical-scroll-proportion="0.79841447">
@@ -1055,102 +1071,109 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/asm-3.0.jar!/org/objectweb/asm/ClassReader.class">
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassInfo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="1439" selection-end="1439" vertical-scroll-proportion="0.6394009">
+        <state line="28" column="45" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.06849315">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/FieldInfo.java">
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MethodInfo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="13" selection-start="640" selection-end="640" vertical-scroll-proportion="0.050962627">
+        <state line="24" column="13" selection-start="824" selection-end="824" vertical-scroll-proportion="0.084937714">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/Stack2Turing.java">
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MetricComputer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="96" column="0" selection-start="3291" selection-end="3291" vertical-scroll-proportion="0.527027">
+        <state line="47" column="47" selection-start="1600" selection-end="1600" vertical-scroll-proportion="0.3106509">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/collection/KeyedMultiStack.java">
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/Testability.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="146" column="11" selection-start="4001" selection-end="4001" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/Type.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="13" selection-start="640" selection-end="640" vertical-scroll-proportion="0.050675675">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/asm-3.0.jar!/org/objectweb/asm/MethodWriter.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="73" column="16" selection-start="2688" selection-end="2688" vertical-scroll-proportion="0.3328347">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/asm-3.0.jar!/org/objectweb/asm/MethodAdapter.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="16" selection-start="1335" selection-end="1335" vertical-scroll-proportion="0.32535526">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$PROJECT_DIR$/lib/asm-3.0.jar!/org/objectweb/asm/MethodVisitor.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="27" column="9" selection-start="839" selection-end="839" vertical-scroll-proportion="0.29169783">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/stack/StackOperation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="0" selection-start="1389" selection-end="1389" vertical-scroll-proportion="0.32174557">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/stack/PutField.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="0" selection-start="1239" selection-end="1239" vertical-scroll-proportion="0.3567384">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/stack/GetField.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="0" selection-start="1117" selection-end="1117" vertical-scroll-proportion="0.3567384">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/asm/MethodVisitorBuilder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="906" column="36" selection-start="27040" selection-end="27040" vertical-scroll-proportion="0.35447338">
+        <state line="120" column="77" selection-start="4599" selection-end="4599" vertical-scroll-proportion="0.7226331">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassInfo.java">
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="20" selection-start="2234" selection-end="2234" vertical-scroll-proportion="0.35447338">
+        <state line="67" column="25" selection-start="2322" selection-end="2322" vertical-scroll-proportion="0.5325444">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/build.xml">
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityContextTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="44" selection-start="96" selection-end="96" vertical-scroll-proportion="0.017361112">
+        <state line="22" column="88" selection-start="857" selection-end="857" vertical-scroll-proportion="0.088757396">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.5912162">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="85" column="81" selection-start="2855" selection-end="2855" vertical-scroll-proportion="0.68613976">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="66" selection-start="950" selection-end="950" vertical-scroll-proportion="0.016891891">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="66" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.2027027">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="39" selection-start="593" selection-end="593" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.2195946">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/classpath/DirectoryClasspathRoot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="13" selection-start="851" selection-end="851" vertical-scroll-proportion="0.08445946">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23648648">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="29" selection-start="1298" selection-end="1298" vertical-scroll-proportion="0.33333334">
           <folding />
         </state>
       </provider>
