@@ -52,6 +52,7 @@ public class KeyedMultiStackTest extends TestCase {
       this.size = size;
     }
 
+    @Override
     public List<Integer> pop(String key, List<Integer> value) {
       log += value;
       return emptyList();
@@ -71,6 +72,7 @@ public class KeyedMultiStackTest extends TestCase {
   public void testBasicOperationsOnSingleDimension() throws Exception {
     stack.apply("", new Push(0));
     stack.apply("", new PopClosure<String, Integer>() {
+      @Override
       public List<Integer> pop(String key, List<Integer> value) {
         assertEquals("", key);
         assertEquals(1, value.size());

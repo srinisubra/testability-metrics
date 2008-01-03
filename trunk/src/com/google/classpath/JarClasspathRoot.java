@@ -41,6 +41,7 @@ public class JarClasspathRoot extends ClasspathRoot {
     preloadNamesFromJar();
   }
 
+  @Override
   public Collection<String> getResources(String packageName) {
     if (packageName.endsWith("/")) {
       packageName = packageName.substring(0, packageName.length() - 1);

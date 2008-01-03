@@ -32,6 +32,7 @@ public class DirectoryClasspathRoot extends ClasspathRoot {
     classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
   }
 
+  @Override
   public Collection<String> getResources(String packageName) {
     List<String> resources = new LinkedList<String>();
     File dir = new File(url.getFile() + "/" + packageName);

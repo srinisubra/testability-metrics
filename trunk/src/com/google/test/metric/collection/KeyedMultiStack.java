@@ -154,7 +154,6 @@ public class KeyedMultiStack<KEY, VALUE> {
    * due to splits.
    *
    * @param key        key as stack selector
-   * @param size       Number of elements to pop
    * @param popClosure Closer which will be called once per each virtual stack.
    */
   @SuppressWarnings("unchecked")
