@@ -24,14 +24,16 @@ public class MethodCost {
 
   private final MethodInfo method;
   private int maxDepthToPrintCosts;
+  private int minCostThreshold;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
   private long totalGlobalCost = -1;
   private long totalComplexityCost = -1;
 
-  public MethodCost(MethodInfo method, int maxDepthToPrintCosts) {
+  public MethodCost(MethodInfo method, int maxDepthToPrintCosts, int minCostThreshold) {
     this.method = method;
     this.maxDepthToPrintCosts = maxDepthToPrintCosts;
+    this.minCostThreshold = minCostThreshold;
   }
 
   public long getTotalComplexityCost() {
@@ -77,11 +79,11 @@ public class MethodCost {
     return globalStateCosts.size();
   }
 
-  // it would be nice to not take in the currentDepth as a parameter. exposes too much of the implementation in the toString()
+  // it would be nice to not take in the currentDepth as a parameter. exposes too much of the implementation in the buildCostString()
   // another option is to revise to not take prefix in as string, but append to buf based on current depth -jawolter 12/18/2007  
-  public void toString(String prefix, StringBuilder buf, Set<MethodCost> alreadySeen,
+  public void buildCostString(String prefix, StringBuilder buf, Set<MethodCost> alreadySeen,
       int currentDepth) {
-    if (alreadySeen.contains(this)) {
+    if (alreadySeen.contains(this) || getTotalComplexityCost() < minCostThreshold) {
       return;
     }
     buf.append(method.getClassInfo().getName() + " ");
@@ -97,10 +99,11 @@ public class MethodCost {
           buf.append(prefix + "  line ");
           buf.append(line.getLineNumber());
           buf.append(": ");
-          childCost.toString(prefix + "  ", buf, alreadySeen, ++currentDepth);
+          childCost.buildCostString(prefix + "  ", buf, alreadySeen, ++currentDepth);
         }
       }
     }
+
   }
 
   public List<LineNumberCost> getOperationCosts() {
@@ -121,9 +124,9 @@ public class MethodCost {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    toString("", buf, new HashSet<MethodCost>(), 0);
-    return buf.toString();
+      StringBuilder buf = new StringBuilder();
+      buildCostString("", buf, new HashSet<MethodCost>(), 0);
+      return buf.toString();
   }
 
 }

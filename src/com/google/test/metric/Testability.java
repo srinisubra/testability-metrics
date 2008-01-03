@@ -17,7 +17,6 @@ package com.google.test.metric;
 
 import com.google.classpath.ClasspathRootFactory;
 import com.google.classpath.ClasspathRootGroup;
-
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -39,6 +38,10 @@ public class Testability {
       usage = "Maximum depth to recurse and print costs of classes/methods that the "
           + "classes under analysis depend on. Defaults to 0.")
   int maxDepthToPrintCosts = 0;
+
+  @Option(name = "-costThreshold", metaVar = "costThreshold",
+      usage = "Minimum Total Class cost required to print that class' metrics.")
+  int minCostThreshold = 0;
 
 /* not currently implemented
   @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
@@ -118,7 +121,7 @@ public class Testability {
   }
 
   public ClassCost computeCost(String className, ClassRepository repo) {
-    MetricComputer metricComputer = new MetricComputer(repo, err, maxDepthToPrintCosts);
+    MetricComputer metricComputer = new MetricComputer(repo, err, maxDepthToPrintCosts, minCostThreshold);
     ClassCost classCost = null;
     try {
       classCost = metricComputer.compute(repo.getClass(className));
