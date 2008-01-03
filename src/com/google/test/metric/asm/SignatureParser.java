@@ -36,6 +36,7 @@ public class SignatureParser extends NoopSignatureVisitor {
       this.setter = setter;
     }
 
+    @Override
     public SignatureVisitor visitArrayType() {
       return new TypeVisitor(new Setter() {
         public void set(Type type) {

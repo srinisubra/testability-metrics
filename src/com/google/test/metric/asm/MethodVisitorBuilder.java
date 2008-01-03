@@ -17,18 +17,15 @@ package com.google.test.metric.asm;
 
 import static com.google.test.metric.asm.SignatureParser.parse;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-import com.google.test.metric.*;
+import com.google.test.metric.ClassInfo;
+import com.google.test.metric.ClassRepository;
+import com.google.test.metric.FieldInfo;
+import com.google.test.metric.FieldNotFoundException;
+import com.google.test.metric.LocalVariableInfo;
+import com.google.test.metric.MethodInfo;
+import com.google.test.metric.ParameterInfo;
+import com.google.test.metric.Type;
+import com.google.test.metric.Variable;
 import com.google.test.metric.method.BlockDecomposer;
 import com.google.test.metric.method.Constant;
 import com.google.test.metric.method.op.stack.ArrayLoad;
@@ -49,6 +46,17 @@ import com.google.test.metric.method.op.stack.Store;
 import com.google.test.metric.method.op.stack.Swap;
 import com.google.test.metric.method.op.stack.Throw;
 import com.google.test.metric.method.op.stack.Transform;
+
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class MethodVisitorBuilder implements MethodVisitor {
 
@@ -888,52 +896,52 @@ public class MethodVisitorBuilder implements MethodVisitor {
   }
 
     private class PutFieldRunnable implements Runnable {
-        private final String owner;
-        private final String name;
-        private String desc;
+        private final String fieldOwner;
+        private final String fieldName;
+        private String fieldDesc;
         private boolean isStatic;
 
         public PutFieldRunnable(String owner, String name, String desc, boolean isStatic) {
-            this.owner = owner;
-            this.name = name;
-            this.desc = desc;
+            this.fieldOwner = owner;
+            this.fieldName = name;
+            this.fieldDesc = desc;
             this.isStatic = isStatic;
         }
 
         public void run() {
             FieldInfo field = null;
-            ClassInfo ownerClass = repository.getClass(owner);
+            ClassInfo ownerClass = repository.getClass(fieldOwner);
             try {
-                field = ownerClass.getField(name);
+                field = ownerClass.getField(fieldName);
             } catch (FieldNotFoundException e) {
-                System.err.println("WARNING: field not found: " + name);
-                field = new FieldInfo(ownerClass, "FAKE:" + name, Type.fromDesc(desc), isStatic, false);
+                System.err.println("WARNING: field not found: " + fieldName);
+                field = new FieldInfo(ownerClass, "FAKE:" + fieldName, Type.fromDesc(fieldDesc), isStatic, false);
             }
             block.addOp(new com.google.test.metric.method.op.stack.PutField(lineNumber, field));
         }
     }
 
     private class GetFieldRunnable implements Runnable {
-        private final String owner;
-        private final String name;
-        private String desc;
+        private final String fieldOwner;
+        private final String fieldName;
+        private String fieldDesc;
         private boolean isStatic;
 
         public GetFieldRunnable(String owner, String name, String desc, boolean isStatic) {
-            this.owner = owner;
-            this.name = name;
-            this.desc = desc;
+            this.fieldOwner = owner;
+            this.fieldName = name;
+            this.fieldDesc = desc;
             this.isStatic = isStatic;
         }
 
         public void run() {
             FieldInfo field = null;
-            ClassInfo ownerClass = repository.getClass(owner);
+            ClassInfo ownerClass = repository.getClass(fieldOwner);
             try {
-                field = ownerClass.getField(name);
+                field = ownerClass.getField(fieldName);
             } catch (FieldNotFoundException e) {
-                System.err.println("WARNING: field not found: " + name);
-                field = new FieldInfo(ownerClass, "FAKE:" + name, Type.fromDesc(desc), isStatic, false);
+                System.err.println("WARNING: field not found: " + fieldName);
+                field = new FieldInfo(ownerClass, "FAKE:" + fieldName, Type.fromDesc(fieldDesc), isStatic, false);
             }
             block.addOp(new GetField(lineNumber, field));
         }

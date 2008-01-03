@@ -25,8 +25,6 @@ import java.util.List;
  * Builds a ClasspathRoot instance, depending on if you pass in a jar or directory.
  * Inspired by the <a href="http://code.google.com/p/google-singleton-detector">Google
  * Singleton Detector</a>.
- *
- * @author: jwolter
  */
 public class ClasspathRootFactory {
 

@@ -43,7 +43,9 @@ public class LocalAssignment extends Operation {
     return variable + " <- " + value;
   }
 
-  // todo will need to add prevention to enter this if currentMethod.getClassInfo() is in a class we don't want to enter
+  // TODO will need to add prevention to enter this if currentMethod.getClassInfo()
+  // is in a class we don't want to enter
+  @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
     context.localAssginment(variable, value);
   }
