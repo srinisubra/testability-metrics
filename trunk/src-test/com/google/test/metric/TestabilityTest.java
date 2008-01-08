@@ -15,7 +15,11 @@
  */
 package com.google.test.metric;
 
-import com.google.classpath.DirectoryClasspathRootTest;
+import static com.google.classpath.DirectoryClasspathRootTest.ROOT_1_CLASS_FOR_TEST;
+import static com.google.classpath.DirectoryClasspathRootTest.ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST;
+import static com.google.classpath.JarClasspathRootTest.ASM_JAR;
+import static com.google.classpath.JarClasspathRootTest.JUNIT_JAR;
+
 import com.google.classpath.JarClasspathRootTest;
 
 import org.kohsuke.args4j.CmdLineException;
@@ -31,19 +35,8 @@ public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream err;
   private Testability testability;
 
-  static final String ANT_OUTPUT_DIR = "build/classes";
-  static final String IDEA_OUTPUT_DIR = "out/production/testability-metrics";
-  static final String ECLIPSE_OUTPUT_DIR = "bin/";
-
-  /**
-   * The output directory this project compiles to by default. For compatibility,
-   * this defaults to the ant output directory.
-   */
-  private static String whereToLookForClasses;
-
   @Override
   protected void setUp() {
-    whereToLookForClasses = ANT_OUTPUT_DIR;
     out = new WatchedOutputStream();
     err = new WatchedOutputStream();
     testability = new Testability(new PrintStream(out), new PrintStream(err));
@@ -88,26 +81,35 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
 
   public void testJarFileParseSetupAndComputeGroupMetric() throws Exception {
-    testability.parseSetup("", "-cp", JarClasspathRootTest.JUNIT_JAR);
+    testability.parseSetup("", "-cp", JUNIT_JAR);
     testability.computeGroupMetric();
     assertTrue("output too short, expected parsing lots of files correctly",
         out.toString().length() > 1000);
     assertEquals(1, testability.entryList.size());
     assertEquals("", testability.entryList.get(0));
-    assertTrue(testability.classpath.endsWith(JarClasspathRootTest.JUNIT_JAR));
+    assertTrue(testability.classpath.endsWith(JUNIT_JAR));
   }
 
   public void testClassesNotInClasspath() throws Exception {
-    /* root2/ contains some classes from this project, but not all. There are
-     * many references to classes that will not be in this test's -cp classpath.
-     * We are testing that when the ClassRepository encounters a
-     * ClassNotFoundException, it continues nicely and prints the values for
-     * the classes that it _does_ find. */
-    testability.run("", "-cp", DirectoryClasspathRootTest.ROOT_2_CLASSES_FOR_TEST);
+    testability.run("", "-cp", ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST);
     assertTrue(out.toString().length() > 0);
     assertTrue(err.toString().length() > 0);
   }
 
+  public void testIncompleteClasspath() throws Exception {
+    /* ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST contains some classes from this 
+     * project, but not all. There are many references to classes that will 
+     * not be in this test's -cp classpath.
+     * We are testing that when the ClassRepository encounters a
+     * ClassNotFoundException, it continues nicely and prints the values for
+     * the classes that it _does_ find. */
+    testability.run("" /* blank will look for everything */, "-cp", 
+        ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST);
+    assertTrue("Output was empty, some output expected", out.toString().length() > 0);
+    assertTrue("Error output was empty, expected error output from class not found",
+        err.toString().length() > 0);
+  }
+  
   public void testJarFileAndJunitSwinguiProgressBarEntryPattern() throws Exception {
     testability.run("junit.swingui.ProgressBar", "-cp", JarClasspathRootTest.JUNIT_JAR);
     assertTrue(out.toString().length() > 0);
@@ -118,7 +120,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR);
     assertTrue(out.toString().length() > 0);
     assertTrue(err.toString().length() == 0);
-    System.out.println(out.toString());
+//    System.out.println(out.toString());
   }
 
   public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthTwo() {
@@ -147,50 +149,74 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
   public void testJarsAndDirectoryWildcardEntryPattern() throws Exception {
     testability.run("" /* blank will look for everything */, "-cp",
-        JarClasspathRootTest.ASM_JAR + ":" + JarClasspathRootTest.JUNIT_JAR + ":" + whereToLookForClasses);
+        ASM_JAR + ":" + JUNIT_JAR + ":" + ROOT_1_CLASS_FOR_TEST);
+    System.out.println(err.toString());
     assertTrue(out.toString().length() > 0);
     assertEquals(0, err.toString().length());
   }
 
-  public void testIncompleteClasspath() throws Exception {
-    testability.run("" /* blank will look for everything */, "-cp", whereToLookForClasses);
-    assertTrue("Output was empty, some output expected", out.toString().length() > 0);
-    assertTrue("Error output was empty, expected error output from class not found",
-        err.toString().length() > 0);
-  }
 
-  public void testMainWithJarsAndDirectoryOfClassesAndFilter() throws Exception {
+  public void testJarsAndDirectoryOfClassesAndFilter() throws Exception {
     testability.run("junit.swingui.ProgressBar", "-cp",
-        JarClasspathRootTest.JUNIT_JAR + ":" + whereToLookForClasses);
+        JUNIT_JAR + ":" + ROOT_1_CLASS_FOR_TEST);
     assertTrue(out.toString().length() > 0);
     assertEquals(0, err.toString().length());
   }
 
   public void testForWarningWhenClassesRecurseToIncludeClassesOutOfClasspath() throws Exception {
-    testability.run("" /* blank will look for everything */, "-cp", whereToLookForClasses);
+    //TODO jwolter 1-8-08 this fails because the ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST root 
+    // extends from classes that are out of the classpath. This causes a different error
+    // than when I have a member variable out of the classpath. I need to create a 
+    // source dir that encapsulates the exact tests I want to test on all of these test cases.
+    // ALSO, creating custom jars with the interdependencies would speed up these tests.
+    // SO 2 birds with 1 stone. 1. less 'mysterous' classes-for-test/ and 2. faster tests
+    
+    testability.run("" /* blank will look for everything */, 
+        "-cp", ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST, "-maxPrintingDepth", "5");
     assertTrue("Output was empty, some output expected", out.toString().length() > 0);
     assertTrue("Error output was empty, expected error output from class not found",
         err.toString().length() > 0);
-    assertTrue(err.toString().indexOf("WARNING: class not found") > -1);
+    System.out.println("--------");
+    System.out.println(err.toString());
+    System.out.println("--------");    
+    assertTrue(err.toString().indexOf("WARNING: class not found: ") > -1);
   }
 
   public void testForWarningWhenClassExtendsFromClassOutOfClasspath() throws Exception {
     testability.computeCost("ThisClassDoesNotExist");
-    assertEquals(0, out.toString().length());
+    assertEquals(0, out.toString().length());    
     assertTrue(err.toString().length() > 0);
+    System.out.println("--------");
+    System.out.println(err.toString());
+    System.out.println("--------");    
     assertTrue(err.toString().startsWith("WARNING: can not analyze class 'ThisClassDoesNotExist"));
   }
 
   public void testFilterCostOverTotalCostThreshold() throws Exception {
     testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR);
     int baselineLength = out.toString().length();
-    testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR, "-costThreshold", "1000");
+    String baselineOutput = out.toString();
+    out.clear();
+    testability.run("junit.runner", "-cp", JUNIT_JAR, "-costThreshold", "1000");
     int throttledLength = out.toString().length();
-    assertTrue(baselineLength < throttledLength);
+    String throttledOutput = out.toString();
+    assertTrue(throttledOutput.length() < baselineOutput.length());
+    assertFalse(baselineOutput.equals(throttledOutput));
+  }
+  
+  public void testOneEntryWhitelist() throws Exception {
+    testability.run("junit.runner", "-cp", JUNIT_JAR);
+    String baselineOutput = out.toString();
+    out.clear();
+    testability.run("junit.runner", "-cp", JUNIT_JAR, 
+        "-whitelist", "java.lang");
+    String throttledOutput = out.toString();
+    assertTrue(throttledOutput.length() < baselineOutput.length());
+    assertFalse(baselineOutput.equals(throttledOutput));
   }
 
   public static class WatchedOutputStream extends OutputStream {
-    StringBuffer sb = new StringBuffer();
+    StringBuffer sb = new StringBuffer(5000);
 
     @Override
     public void write(int ch) {
@@ -210,6 +236,10 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     @Override
     public String toString() {
       return sb.toString();
+    }
+    
+    public void clear() {
+      sb = new StringBuffer(5000);
     }
 
   }

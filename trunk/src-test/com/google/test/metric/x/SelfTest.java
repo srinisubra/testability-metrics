@@ -15,10 +15,16 @@
  */
 package com.google.test.metric.x;
 
-import com.google.test.metric.*;
+import com.google.test.metric.ClassCost;
+import com.google.test.metric.ClassRepository;
+import com.google.test.metric.ClassRepositoryTestCase;
+import com.google.test.metric.MethodCost;
+import com.google.test.metric.MetricComputer;
+import com.google.test.metric.PackageWhiteList;
 import com.google.test.metric.example.Primeness;
 import com.google.test.metric.example.SumOfPrimes;
 import com.google.test.metric.example.SumOfPrimes2;
+
 import org.objectweb.asm.ClassReader;
 
 public class SelfTest extends ClassRepositoryTestCase {
@@ -28,7 +34,8 @@ public class SelfTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0);
+    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
+        new PackageWhiteList());
   }
   
   @Override

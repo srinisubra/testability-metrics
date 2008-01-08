@@ -43,11 +43,12 @@ public class Testability {
       usage = "Minimum Total Class cost required to print that class' metrics.")
   int minCostThreshold = 0;
 
-/* not currently implemented
   @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
           usage = "colon delimited whitelisted packages that will not " +
-                  "count against you. Includes matching all subpackages.")
-  private String whitelist = "";*/
+                  "count against you. Matches packages/classes starting with " +
+                  "given values.")
+  private String wl = null;
+  private WhiteList whitelist = new PackageWhiteList();
 
   @Argument(metaVar = "classes/packages",
           usage = "Classes or packages to analyze. " +
@@ -78,6 +79,8 @@ public class Testability {
 
   public void parseSetup(String... args) throws CmdLineException {
     parseArgs(args);
+    whitelist =
+        new PackageWhiteList(wl == null ? new String[0] : wl.split(":"));
     out.println(entryList.get(0));
     if (classpath.length() == 0) {
       classpath = System.getProperty("java.class.path", ".");
@@ -122,7 +125,7 @@ public class Testability {
 
   public ClassCost computeCost(String className, ClassRepository repo) {
     MetricComputer metricComputer = new MetricComputer(repo, err, 
-        maxDepthToPrintCosts, minCostThreshold);
+        maxDepthToPrintCosts, minCostThreshold, whitelist);
     ClassCost classCost = null;
     try {
       classCost = metricComputer.compute(repo.getClass(className));

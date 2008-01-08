@@ -26,15 +26,17 @@ public class MetricComputer {
 
   private final ClassRepository classRepository;
   private final PrintStream err;
-  private int maxDepthToPrintCosts;
-  private int minCostThreshold;
+  private final int maxDepthToPrintCosts;
+  private final int minCostThreshold;
+  private final WhiteList whitelist;
 
-  public MetricComputer(ClassRepository classRepository, PrintStream err, int maxDepthToPrintCosts,
-      int minCostThreshold) {
+  public MetricComputer(ClassRepository classRepository, PrintStream err, 
+      int maxDepthToPrintCosts, int minCostThreshold, WhiteList whitelist) {
     this.classRepository = classRepository;
     this.err = err;
     this.maxDepthToPrintCosts = maxDepthToPrintCosts;
     this.minCostThreshold = minCostThreshold;
+    this.whitelist = whitelist;
   }
 
   /* used for testing */
@@ -45,7 +47,8 @@ public class MetricComputer {
   }
 
   public MethodCost compute(MethodInfo method) {
-    TestabilityContext context = new TestabilityContext(classRepository, err, maxDepthToPrintCosts, minCostThreshold);
+    TestabilityContext context = new TestabilityContext(classRepository, err, 
+        maxDepthToPrintCosts, minCostThreshold, whitelist);
     addStaticCost(method, context);
     addConstructorCost(method, context);
     addSetterInjection(method, context);

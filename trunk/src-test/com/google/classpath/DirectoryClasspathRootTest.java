@@ -23,17 +23,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DirectoryClasspathRootTest extends TestCase {
+  
   /**
    * Directories to be used for testing that contains class files, for testing.
    * These are included in subversion so that any checkout will have a consistent
    * environment for testing.
    */
   public static final String CLASSES_FOR_TEST = "classes-for-test";
-  public static final String ROOT_1_CLASSES_FOR_TEST = CLASSES_FOR_TEST + "/root1";
-  public static final String ROOT_2_CLASSES_FOR_TEST = CLASSES_FOR_TEST + "/root2";
+  
+  /**
+   * Directory root that contains one class. This class has no external 
+   * dependancies.
+   */
+  public static final String ROOT_1_CLASS_FOR_TEST = 
+    CLASSES_FOR_TEST + "/root1";
+  
+  /**
+   * Directory root containing classes with external class dependencies, outside
+   * of this directory. So expect to have problems with classes not found.
+   */
+  public static final String ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST = 
+    CLASSES_FOR_TEST + "/root2";
 
   public void testCreateNewDirectoryClasspathRoot() throws Exception {
-    File dir = new File(ROOT_1_CLASSES_FOR_TEST);
+    File dir = new File(ROOT_1_CLASS_FOR_TEST);
     assertTrue(dir.isDirectory());
     ClasspathRoot root = ClasspathRootFactory.makeClasspathRoot(dir, "");
     assertNotNull(root);
@@ -41,7 +54,8 @@ public class DirectoryClasspathRootTest extends TestCase {
   }
 
    public void testCreateNewJarsClasspathRootTest() throws Exception {
-    final String cp = ROOT_1_CLASSES_FOR_TEST + ":" + ROOT_2_CLASSES_FOR_TEST;
+    final String cp = ROOT_1_CLASS_FOR_TEST + ":" + 
+      ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST;
     ClasspathRootGroup group = ClasspathRootFactory.makeClasspathRootGroup(cp);
     assertNotNull(group);
     assertEquals(2, group.getGroupCount());
