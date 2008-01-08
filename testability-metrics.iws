@@ -16,19 +16,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/ArrayAssignment.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/ArrayAssignment.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/testability-metrics.iws" afterPath="$PROJECT_DIR$/testability-metrics.iws" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/classpath/DirectoryClasspathRoot.java" afterPath="$PROJECT_DIR$/src/com/google/classpath/DirectoryClasspathRoot.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/CostUtilTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/classpath/ColonDelimitedStringParser.java" afterPath="$PROJECT_DIR$/src/com/google/classpath/ColonDelimitedStringParser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/FieldAssignment.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/FieldAssignment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/classpath/ClasspathRootFactory.java" afterPath="$PROJECT_DIR$/src/com/google/classpath/ClasspathRootFactory.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/LocalAssignment.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/LocalAssignment.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/MethodInfo.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/MethodInfo.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/Operation.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/Operation.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/classpath/JarClasspathRoot.java" afterPath="$PROJECT_DIR$/src/com/google/classpath/JarClasspathRoot.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityContextTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityContextTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/Testability.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/Testability.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/MetricComputer.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/MetricComputer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/classpath/ColonDelimitedStringParserTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/classpath/ColonDelimitedStringParserTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java" afterPath="$PROJECT_DIR$/src/com/google/test/metric/TestabilityContext.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" afterPath="$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java" />
     </list>
     <ignored path="testability-metrics.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -164,7 +172,7 @@
       <file leaf-file-name="ClassCost.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.5912162">
+            <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.59456396">
               <folding />
             </state>
           </provider>
@@ -173,7 +181,7 @@
       <file leaf-file-name="MethodCost.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="85" column="81" selection-start="2855" selection-end="2855" vertical-scroll-proportion="0.68613976">
+            <state line="64" column="78" selection-start="1998" selection-end="1998" vertical-scroll-proportion="0.13703284">
               <folding />
             </state>
           </provider>
@@ -182,7 +190,16 @@
       <file leaf-file-name="TestabilityTest.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="29" selection-start="1298" selection-end="1298" vertical-scroll-proportion="0.33333334">
+            <state line="186" column="77" selection-start="8020" selection-end="8020" vertical-scroll-proportion="0.57870895">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ClasspathRoot.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/google/classpath/ClasspathRoot.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="32" column="22" selection-start="1061" selection-end="1061" vertical-scroll-proportion="0.18686296">
               <folding />
             </state>
           </provider>
@@ -191,7 +208,7 @@
       <file leaf-file-name="DirectoryClasspathRootTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.2195946">
+            <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.22083806">
               <folding />
             </state>
           </provider>
@@ -200,7 +217,7 @@
       <file leaf-file-name="JarClasspathRootTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23648648">
+            <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23782559">
               <folding />
             </state>
           </provider>
@@ -209,7 +226,7 @@
       <file leaf-file-name="MetricComputerTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="66" selection-start="950" selection-end="950" vertical-scroll-proportion="0.016891891">
+            <state line="28" column="66" selection-start="911" selection-end="911" vertical-scroll-proportion="0.016987542">
               <folding />
             </state>
           </provider>
@@ -218,7 +235,7 @@
       <file leaf-file-name="SelfTest.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="66" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.2027027">
+            <state line="30" column="66" selection-start="1030" selection-end="1030" vertical-scroll-proportion="0.16987543">
               <folding />
             </state>
           </provider>
@@ -465,143 +482,7 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method/op" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method/op/turing" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method/op" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/method/op/stack" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
           <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/collection" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="testability-metrics" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:$PROJECT_DIR$/src/com/google/test/metric/asm" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
@@ -705,7 +586,7 @@
     <RUBY_DOC NAME="DEFAULTS" VALUE="TRUE" />
     <RUBY_DOC NAME="NUMBER" VALUE="0" />
   </component>
-  <component name="RunManager" selected="JUnit.All in testability-metrics">
+  <component name="RunManager" selected="Application.android.jar">
     <tempConfiguration default="false" name="All in testability-metrics" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="testability-metrics" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -788,18 +669,6 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
@@ -816,10 +685,22 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+    </configuration>
     <configuration default="false" name="android.jar" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="com.google.test.metric.Testability" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="-cp /home/jwolter/projects/android-learn/android_sdk_linux_m3-rc37a/android.jar android -maxPrintingDepth 0" />
+      <option name="PROGRAM_PARAMETERS" value="-cp /home/jwolter/projects/android-learn/android_sdk_linux_m3-rc37a/android.jar android -costThreshold 1000" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" value="" />
@@ -889,10 +770,10 @@
       </method>
     </configuration>
     <list size="4">
-      <item index="0" class="java.lang.String" itemvalue="Application.android.jar" />
-      <item index="1" class="java.lang.String" itemvalue="Application.Unnamed1" />
-      <item index="2" class="java.lang.String" itemvalue="Application.junit" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.All in testability-metrics" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.All in testability-metrics" />
+      <item index="1" class="java.lang.String" itemvalue="Application.android.jar" />
+      <item index="2" class="java.lang.String" itemvalue="Application.Unnamed1" />
+      <item index="3" class="java.lang.String" itemvalue="Application.junit" />
     </list>
     <configuration default="true" type="RubyRunConfigurationType" factoryName="Ruby test">
       <RTEST_RUN_CONFIG_SETTINGS_ID NAME="TESTS_FOLDER_PATH" VALUE="" />
@@ -963,7 +844,7 @@
     <editor active="true" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32976446" order="8" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32976446" order="8" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.12791431" order="1" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32619557" order="1" />
@@ -971,7 +852,7 @@
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32619557" order="8" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32619557" order="8" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24925373" order="1" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
@@ -982,7 +863,7 @@
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.08615137" order="2" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
       <window_info id="Duplicates" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="true" weight="0.38543898" order="2" x="1394" y="25" width="1123" height="1209" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" weight="0.38543898" order="2" x="1394" y="25" width="1123" height="1209" />
       <window_info id="Mach" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="8" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902467" order="8" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="5" />
@@ -1002,7 +883,7 @@
     <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
     <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added a flag to limit how deep the printing of scores goes, to make it easier when using the application. Also updated the README (from wiki on google code)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added a flag to allow only showing classes that have a total testababilty cost over a threshold. Also pulled out the jars used for tests and moved them into classes-for-test/*.jar. This way upgrading lib/*.jar's will not risk breaking tests." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
@@ -1016,6 +897,7 @@
     <MESSAGE value="removed a todo to myself, it didn't belong, never should have been checked in." />
     <MESSAGE value="beefed up the tests for the immenent release. one more change to go, in the next changeset.   2 tests still failing:&#10; com.google.test.metric.AutoFieldClearTestCase FAILED&#10; com.google.test.metric.ClassRepositoryTestCase FAILED&#10;(this is easy and the next change will fix it)" />
     <MESSAGE value="Added a flag to limit how deep the printing of scores goes, to make it easier when using the application. Also updated the README (from wiki on google code)" />
+    <MESSAGE value="Added a flag to allow only showing classes that have a total testababilty cost over a threshold. Also pulled out the jars used for tests and moved them into classes-for-test/*.jar. This way upgrading lib/*.jar's will not risk breaking tests." />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1064,13 +946,6 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/method/op/turing/MethodInvokation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="0" selection-start="1748" selection-end="1748" vertical-scroll-proportion="0.79841447">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassInfo.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="28" column="45" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.06849315">
@@ -1095,9 +970,7 @@
     <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/Testability.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="120" column="77" selection-start="4599" selection-end="4599" vertical-scroll-proportion="0.7226331">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1115,30 +988,58 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/classpath/DirectoryClasspathRoot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="13" selection-start="851" selection-end="851" vertical-scroll-proportion="0.08445946">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/ClassCost.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.5912162">
+        <state line="50" column="27" selection-start="1489" selection-end="1489" vertical-scroll-proportion="0.59456396">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/google/test/metric/MethodCost.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="85" column="81" selection-start="2855" selection-end="2855" vertical-scroll-proportion="0.68613976">
+        <state line="64" column="78" selection-start="1998" selection-end="1998" vertical-scroll-proportion="0.13703284">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/google/classpath/ClasspathRoot.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="22" selection-start="1061" selection-end="1061" vertical-scroll-proportion="0.18686296">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.22083806">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23782559">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/MetricComputerTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="66" selection-start="950" selection-end="950" vertical-scroll-proportion="0.016891891">
+        <state line="28" column="66" selection-start="911" selection-end="911" vertical-scroll-proportion="0.016987542">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/x/SelfTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="66" selection-start="1286" selection-end="1286" vertical-scroll-proportion="0.2027027">
+        <state line="30" column="66" selection-start="1030" selection-end="1030" vertical-scroll-proportion="0.16987543">
           <folding />
         </state>
       </provider>
@@ -1150,30 +1051,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/DirectoryClasspathRootTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="32" column="2" selection-start="818" selection-end="1174" vertical-scroll-proportion="0.2195946">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/google/classpath/DirectoryClasspathRoot.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="26" column="13" selection-start="851" selection-end="851" vertical-scroll-proportion="0.08445946">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src-test/com/google/classpath/JarClasspathRootTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="77" selection-start="547" selection-end="547" vertical-scroll-proportion="0.23648648">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src-test/com/google/test/metric/TestabilityTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="29" selection-start="1298" selection-end="1298" vertical-scroll-proportion="0.33333334">
+        <state line="186" column="77" selection-start="8020" selection-end="8020" vertical-scroll-proportion="0.57870895">
           <folding />
         </state>
       </provider>

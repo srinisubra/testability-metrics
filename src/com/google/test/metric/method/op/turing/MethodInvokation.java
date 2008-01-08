@@ -23,7 +23,7 @@ import java.util.List;
 public class MethodInvokation extends Operation {
 
   private final String name;
-  private final String clazzName;
+  public final String clazzName;
   private final String signature;
   private final Variable methodThis;
   private final List<Variable> parameters;
@@ -61,6 +61,9 @@ public class MethodInvokation extends Operation {
 
   @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
+    if (context.isClassWhiteListed(clazzName)) {
+      return;
+    }
     try {
       MethodInfo toMethod = context.getMethod(clazzName, name + signature);
       if (context.methodAlreadyVisited(toMethod)) {

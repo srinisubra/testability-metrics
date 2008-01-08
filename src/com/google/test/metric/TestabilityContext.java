@@ -15,6 +15,7 @@
  */
 package com.google.test.metric;
 
+
 import java.io.PrintStream;
 import java.util.*;
 
@@ -25,15 +26,17 @@ public class TestabilityContext {
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
-  private int maxDepthToPrintCosts;
-  private int minCostThreshold;
+  private final int maxDepthToPrintCosts;
+  private final int minCostThreshold;
+  private final WhiteList whitelist;
 
   public TestabilityContext(ClassRepository classRepository, PrintStream err,
-    int maxDepthToPrintCosts, int minCostThreshold) {
+    int maxDepthToPrintCosts, int minCostThreshold, WhiteList whitelist) {
     this.classRepository = classRepository;
     this.err = err;
     this.maxDepthToPrintCosts = maxDepthToPrintCosts;
     this.minCostThreshold = minCostThreshold;
+    this.whitelist = whitelist;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
@@ -148,5 +151,13 @@ public class TestabilityContext {
 
   public void reportError(String errorMessage) {
     err.println(errorMessage);
+  }
+
+  public WhiteList getWhitelist() {
+    return whitelist;
+  }
+
+  public boolean isClassWhiteListed(String className) {
+    return whitelist.isClassWhiteListed(className);
   }
 }

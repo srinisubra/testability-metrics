@@ -14,14 +14,14 @@ public class ColonDelimitedStringParserTest extends TestCase {
 
     public void testParsesEmptyProperly() throws Exception {
         list = new ColonDelimitedStringParser("")
-                .getListAsStrings();
+                .getListOfStrings();
         assertEquals(1, list.size());
         assertEquals("", list.get(0));        
     }
 
     public void testParsesNormally() throws Exception {
         list = new ColonDelimitedStringParser("one:two:three.and.a.half")
-                .getListAsStrings();
+                .getListOfStrings();
         assertEquals(3, list.size());
         assertEquals("one", list.get(0));
         assertEquals("two", list.get(1));
@@ -30,12 +30,12 @@ public class ColonDelimitedStringParserTest extends TestCase {
 
   public void testParseAndAddToClasspathList() throws Exception {
     String classpath = "test-one.jar;";
-    List<URL> completeClasspath = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    List<URL> completeClasspath = new ColonDelimitedStringParser(classpath).getListOfURLs();
     assertStringEndsWith("test-one.jar", completeClasspath.get(0).toString());
 
     completeClasspath.clear();
     classpath = "lib/one.jar:lib/two.jar;three.jar";
-    completeClasspath = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    completeClasspath = new ColonDelimitedStringParser(classpath).getListOfURLs();
 
     assertStringEndsWith("lib/one.jar", completeClasspath.get(0).toString());
     assertStringEndsWith("lib/two.jar", completeClasspath.get(1).toString());

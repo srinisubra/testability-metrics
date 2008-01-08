@@ -23,14 +23,15 @@ import java.util.Set;
 public class MethodCost {
 
   private final MethodInfo method;
-  private int maxDepthToPrintCosts;
-  private int minCostThreshold;
+  private final int maxDepthToPrintCosts;
+  private final int minCostThreshold;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
   private long totalGlobalCost = -1;
   private long totalComplexityCost = -1;
 
-  public MethodCost(MethodInfo method, int maxDepthToPrintCosts, int minCostThreshold) {
+  public MethodCost(MethodInfo method, int maxDepthToPrintCosts, 
+      int minCostThreshold) {
     this.method = method;
     this.maxDepthToPrintCosts = maxDepthToPrintCosts;
     this.minCostThreshold = minCostThreshold;
@@ -79,13 +80,20 @@ public class MethodCost {
     return globalStateCosts.size();
   }
 
-  // it would be nice to not take in the currentDepth as a parameter. exposes too much of the implementation in the buildCostString()
-  // another option is to revise to not take prefix in as string, but append to buf based on current depth -jawolter 12/18/2007  
+  // it would be nice to not take in the currentDepth as a parameter. exposes 
+  // too much of the implementation in the buildCostString()
+  // another option is to revise to not take prefix in as string, but append 
+  // to buf based on current depth -jawolter 12/18/2007  
   public void buildCostString(String prefix, StringBuilder buf, Set<MethodCost> alreadySeen,
       int currentDepth) {
     if (alreadySeen.contains(this) || getTotalComplexityCost() < minCostThreshold) {
       return;
     }
+//    buf.append("\n  ");
+    // TODO you see below sometimes even when I have -whitelist java.lang it still gets the 1st call into the report
+//    if (method.getClassInfo().getName().endsWith("Math")) {
+//      System.out.println("BINGO!");
+//    }
     buf.append(method.getClassInfo().getName() + " ");
     buf.append(method.getNameDesc());
     buf.append("[" + getComplexityCost() + ", " + getGlobalCost() + " / "

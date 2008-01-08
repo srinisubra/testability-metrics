@@ -22,11 +22,13 @@ import java.util.List;
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
+  private PackageWhiteList whiteList = new PackageWhiteList();
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0);
+    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
+        whiteList);
   }
 
   public static class Medium {
@@ -384,6 +386,17 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
     assertEquals(2, line2.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 2, line2.getLineNumber());
+  }
+  
+  public static class WhiteListTest {
+    public void testMethod() {
+      new String(new byte[0]);
+    }
+  }
+  
+  public void testWhiteList() throws Exception {
+    MethodCost cost = computer.compute(WhiteListTest.class, "testMethod()V");
+    assertEquals(0L, cost.getTotalGlobalCost());
   }
 
 }

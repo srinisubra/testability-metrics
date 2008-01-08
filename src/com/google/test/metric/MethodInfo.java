@@ -37,9 +37,9 @@ public class MethodInfo {
 
   public MethodInfo(ClassInfo classInfo, String methodName,
       int startingLineNumber, String desc, Variable methodThis,
-      List<ParameterInfo> parameters,
-      List<LocalVariableInfo> localVariables, Visibility visibility,
-      long cylomaticComplexity, List<Operation> operations) {
+      List<ParameterInfo> parameters, List<LocalVariableInfo> localVariables,
+      Visibility visibility, long cylomaticComplexity,
+      List<Operation> operations) {
     this.classInfo = classInfo;
     this.name = methodName;
     this.startingLineNumber = startingLineNumber;
@@ -98,7 +98,8 @@ public class MethodInfo {
   }
 
   public boolean canOverride() {
-    return !isConstructor() && (!isStatic()) && getVisibility() != Visibility.PRIVATE;
+    return !isConstructor() && (!isStatic())
+        && getVisibility() != Visibility.PRIVATE;
   }
 
   public Variable getMethodThis() {

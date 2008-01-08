@@ -19,10 +19,12 @@ public class ColonDelimitedStringParser {
     private List<String> list = new ArrayList<String>();
 
     public ColonDelimitedStringParser(String str) {
+      if (str != null) {
         list.addAll(Arrays.asList(str.split(DELIMITER_REGEX)));
+      }
     }
 
-    public List<URL> getListAsURLs() {
+    public List<URL> getListOfURLs() {
       List<URL> classpath = new ArrayList<URL>();
       try {
         for (String path : list) {
@@ -35,7 +37,7 @@ public class ColonDelimitedStringParser {
       return classpath;
     }
 
-    public List<File> getListAsFiles() {
+    public List<File> getListOfFiles() {
       List<File> classpath = new ArrayList<File>();
       for (String path : list) {
         File file = new File(path);
@@ -44,7 +46,7 @@ public class ColonDelimitedStringParser {
       return classpath;
     }
 
-    public List<String> getListAsStrings() {
+    public List<String> getListOfStrings() {
         return list;
     }
 }

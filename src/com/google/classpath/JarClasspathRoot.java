@@ -36,7 +36,7 @@ public class JarClasspathRoot extends ClasspathRoot {
 
   public JarClasspathRoot(URL url, String classpath) {
     this.url = url;
-    List<URL> cp = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    List<URL> cp = new ColonDelimitedStringParser(classpath).getListOfURLs();
     classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
     preloadNamesFromJar();
   }
@@ -50,7 +50,7 @@ public class JarClasspathRoot extends ClasspathRoot {
     return resources == null ? new HashSet<String>() : resources;
   }
 
-  public void preloadNamesFromJar() {
+  private void preloadNamesFromJar() {
     Enumeration<JarEntry> enumeration = jarFileForUrl().entries();
     while (enumeration.hasMoreElements()) {
       JarEntry entry = enumeration.nextElement();

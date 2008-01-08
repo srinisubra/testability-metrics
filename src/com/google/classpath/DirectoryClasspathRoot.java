@@ -28,7 +28,7 @@ public class DirectoryClasspathRoot extends ClasspathRoot {
 
   public DirectoryClasspathRoot(URL root, String classpath) {
     this.url = root;
-    List<URL> cp = new ColonDelimitedStringParser(classpath).getListAsURLs();
+    List<URL> cp = new ColonDelimitedStringParser(classpath).getListOfURLs();
     classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
   }
 
