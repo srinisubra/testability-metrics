@@ -104,6 +104,9 @@ com.google.test.metric.example.SumOfPrimes
   sum(I)I[2, 0 / 4, 0]
     line 25: isPrime(I)Z[2, 0 / 2, 0]
 }}}
+
+In the above analysis the cost of the sum method is 2/4 (2 comes from the `sum` method directory and additional 2 comes from `isPrime` method). The reason for this is that there is no way for us to execute the `sum` method and intercept the call to `isPrime` method. In other words there is no way to write a true unit test which will test only the class `SunOfPrimes`. In this case it may not be a problem as the `isPrime` method is not very expensive (in terms of complexity), however if the `isPrime` method represented something expensive like an external system this would posses a testing problem as there would be no way to test `sum` method without incurring the cost of `isPrime`.
+
 SOURCE:
 {{{
 public class SumOfPrimes2 {
@@ -133,6 +136,15 @@ com.google.test.metric.example.SumOfPrimes2
   <init>(Lcom/google/test/metric/example/Primeness;)V[0, 0 / 0, 0]
   sum(I)I[2, 0 / 2, 0]
 }}}
+
+This is same example as the `SumOfPrimes` above but this case we inject the `Primeness` class into the constructor of the `SomOfPrimes`. In this case the cost of the `sum` method is 2 and the cost of `isPrime` is not shown, since we could easily inject a mock of `Primeness` and test `SumOfPrimes2` as a true unit test.
+
+A variable(local variable/field/parameter) is considered injectable as it can be set from the outside of the class (ie the Test). We say that the variable is injectable. any variable which then consequently gets assigned from a variable which is considered injectable is then also considered injectable. In other words injectability is transitive. An Injectable variable can be controlled from a test and hence can be replaced by a mock. Therefore, any method dispatch on such a variable can be intercepted and is not counted against the cost of testing (Provided that the method is not private or static, as those methods can not be overridden). 
+
+In the example above we also add the cost of construction to the cost of Testing the class. (As you can only test a class which you can construct). In order to compute the cost we go through several phases.
+  # Compute the cost of constructor mark all variables injectable as appropriate
+  # Look for setter methods and use those to mark more fields as injectable.
+  # Compute the cost of the method while respecting the injectability of fields, and method parameters.
 
 ==Example: Global State==
 
