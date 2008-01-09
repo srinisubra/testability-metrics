@@ -84,7 +84,8 @@ public class Stack2Turing {
       @Override
       public List<Variable> pop(Block key, List<Variable> input) {
         List<Variable> variables = operation.apply(input);
-        assertValid(variables);
+        // For performance reasons the line is commented out.
+        //assertValid(variables);
         Operation turingOp = operation.toOperation(input);
         if (turingOp != null) {
           operations.add(turingOp);

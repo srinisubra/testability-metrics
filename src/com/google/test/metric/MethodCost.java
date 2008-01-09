@@ -89,11 +89,6 @@ public class MethodCost {
     if (alreadySeen.contains(this) || getTotalComplexityCost() < minCostThreshold) {
       return;
     }
-//    buf.append("\n  ");
-    // TODO you see below sometimes even when I have -whitelist java.lang it still gets the 1st call into the report
-//    if (method.getClassInfo().getName().endsWith("Math")) {
-//      System.out.println("BINGO!");
-//    }
     buf.append(method.getClassInfo().getName() + " ");
     buf.append(method.getNameDesc());
     buf.append("[" + getComplexityCost() + ", " + getGlobalCost() + " / "

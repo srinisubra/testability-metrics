@@ -135,7 +135,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
     public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthTwo() {
         testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR,
-                "-maxPrintingDepth", "2");
+                "-printDepth", "2");
         assertTrue(out.toString().length() > 0);
 
         Pattern sixSpacesThenLinePattern = Pattern.compile("^(\\s){6}line",
