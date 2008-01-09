@@ -34,7 +34,7 @@ public class Testability {
           "\nEx. lib/one.jar:lib/two.jar")
   protected String classpath = "";
 
-  @Option(name = "-maxPrintingDepth", metaVar = "maxPrintingDepth",
+  @Option(name = "-printDepth", metaVar = "maxPrintingDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
   int maxDepthToPrintCosts = 0;

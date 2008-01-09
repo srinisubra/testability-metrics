@@ -33,14 +33,14 @@
 
     <target name="compile">
         <mkdir dir="${classes.dir}"/>
-        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true" debuglevel="source">
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true">
           <classpath refid="compile.classpath" />
         </javac>
     </target>
 
     <target name="compile-tests" depends="compile">
         <mkdir dir="${test.classes.dir}"/>
-        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" debug="true" debuglevel="lines,vars,source">
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" debug="true">
           <classpath refid="test.classpath" />
         </javac>
     </target>
