@@ -9,8 +9,8 @@ public class PackageWhiteList implements WhiteList {
 
   private final List<String> packages;
 
-  public PackageWhiteList(String... pacakges) {
-    this.packages = new ArrayList<String>(asList(pacakges));
+  public PackageWhiteList(String... packages) {
+    this.packages = new ArrayList<String>(asList(packages));
   }
 
   public boolean isClassWhiteListed(String className) {

@@ -22,13 +22,12 @@ import java.util.List;
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
-  private PackageWhiteList whiteList = new PackageWhiteList();
-
+  
   @Override
   protected void setUp() throws Exception {
     super.setUp();
     computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
-        whiteList);
+        new PackageWhiteList());
   }
 
   public static class Medium {
@@ -395,6 +394,9 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   }
   
   public void testWhiteList() throws Exception {
+    PackageWhiteList whiteList = new PackageWhiteList("java.lang");
+    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
+            whiteList);
     MethodCost cost = computer.compute(WhiteListTest.class, "testMethod()V");
     assertEquals(0L, cost.getTotalGlobalCost());
   }

@@ -1,11 +1,11 @@
 package com.google.classpath;
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 /**
  * User: jwolter
@@ -17,9 +17,9 @@ public class JarClasspathRootTest extends TestCase {
    * These are included in subversion so that any checkout will have a consistent
    * environment for testing.
    */
-  public static final String JUNIT_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/junit.jar";
-  public static final String ASM_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/asm-3.0.jar";
-  public static final String JARJAR_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/jarjar.jar";
+  public static final String JUNIT_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/lib/junit.jar";
+  public static final String ASM_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/lib/asm-3.0.jar";
+  public static final String JARJAR_JAR = DirectoryClasspathRootTest.CLASSES_FOR_TEST + "/lib/jarjar.jar";
 
   public void testCreateNewJarClasspathRootTest() throws Exception {
     File jar = new File(ASM_JAR);
