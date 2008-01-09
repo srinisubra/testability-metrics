@@ -15,17 +15,17 @@
  */
 package com.google.test.metric;
 
-import com.google.classpath.ClasspathRootFactory;
-import com.google.classpath.ClasspathRootGroup;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.classpath.ClasspathRootFactory;
+import com.google.classpath.ClasspathRootGroup;
 
 public class Testability {
 
@@ -47,8 +47,8 @@ public class Testability {
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
                   "given values.")
-  private String wl = null;
-  private WhiteList whitelist = new PackageWhiteList();
+  private final String wl = null;
+  private final PackageWhiteList whitelist = new PackageWhiteList();
 
   @Argument(metaVar = "classes/packages",
           usage = "Classes or packages to analyze. " +
@@ -63,6 +63,7 @@ public class Testability {
   public Testability(PrintStream out, PrintStream err) {
     this.out = out;
     this.err = err;
+    this.whitelist.addPackage("java.");
   }
 
   public static void main(String... args) {
@@ -79,8 +80,11 @@ public class Testability {
 
   public void parseSetup(String... args) throws CmdLineException {
     parseArgs(args);
-    whitelist =
-        new PackageWhiteList(wl == null ? new String[0] : wl.split(":"));
+    if (wl != null) {
+        for (String packageName : wl.split(":")) {
+            whitelist.addPackage(packageName);
+        }
+    }
     out.println(entryList.get(0));
     if (classpath.length() == 0) {
       classpath = System.getProperty("java.class.path", ".");

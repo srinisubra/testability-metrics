@@ -232,7 +232,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
         String baselineOutput = out.toString();
         out.clear();
         testability.run("junit.runner", "-cp", JUNIT_JAR, "-whitelist",
-                "java.lang");
+                "junit.framework.");
         String throttledOutput = out.toString();
         assertTrue(throttledOutput.length() < baselineOutput.length());
         assertFalse(baselineOutput.equals(throttledOutput));
