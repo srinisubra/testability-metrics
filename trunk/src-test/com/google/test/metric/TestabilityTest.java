@@ -153,7 +153,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
 
     public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() {
         testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR,
-                "-maxPrintingDepth", "0");
+                "-printDepth", "0");
         assertTrue(out.toString().length() > 0);
 
         Pattern noLinesPattern = Pattern.compile("^(\\s)*line",
@@ -187,7 +187,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
             throws Exception {
         testability.run("" /* blank will look for everything */, "-cp",
                         CLASSES_EXTERNAL_DEPS_NO_SUPERCLASSES,
-                        "-maxPrintingDepth", "1");
+                        "-printDepth", "1");
         assertTrue(out.toString().length() > 0);
         assertTrue(err.toString().length() > 0);
         assertTrue(err.toString().startsWith("WARNING: class not found: "));
@@ -200,7 +200,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     public void testForWarningWhenClassExtendsFromClassOutOfClasspath()
             throws Exception {
         testability.run("" /* blank will look for everything */, "-cp",
-                CLASSES_EXTERNAL_DEPS_AND_SUPERCLASSES, "-maxPrintingDepth",
+                CLASSES_EXTERNAL_DEPS_AND_SUPERCLASSES, "-printDepth",
                 "1");
         assertTrue(out.toString().length() > 0);
         assertTrue(err.toString().length() > 0);
