@@ -18,7 +18,7 @@ package com.google.test.metric;
 public class GlobalStateCost {
 
   public GlobalStateCost(int lineNumber, Variable variable) {
-    // TODO Auto-generated constructor stub
+    // TODO (misko) Auto-generated constructor stub
   }
 
 }

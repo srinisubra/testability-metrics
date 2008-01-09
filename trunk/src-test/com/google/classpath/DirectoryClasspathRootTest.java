@@ -15,12 +15,12 @@
  */
 package com.google.classpath;
 
-import junit.framework.TestCase;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import junit.framework.TestCase;
 
 public class DirectoryClasspathRootTest extends TestCase {
   
@@ -32,21 +32,28 @@ public class DirectoryClasspathRootTest extends TestCase {
   public static final String CLASSES_FOR_TEST = "classes-for-test";
   
   /**
-   * Directory root that contains one class. This class has no external 
-   * dependancies.
+   * Directory root that contains one class with no external 
+   * dependencies.
    */
-  public static final String ROOT_1_CLASS_FOR_TEST = 
-    CLASSES_FOR_TEST + "/root1";
+  public static final String CLASS_NO_EXTERNAL_DEPS = CLASSES_FOR_TEST + 
+    "/root1";
   
   /**
-   * Directory root containing classes with external class dependencies, outside
-   * of this directory. So expect to have problems with classes not found.
+   * Directory root containing classes that extend from, and reference, external 
+   * classes outside of this directory. 
    */
-  public static final String ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST = 
+  public static final String CLASSES_EXTERNAL_DEPS_AND_SUPERCLASSES = 
     CLASSES_FOR_TEST + "/root2";
 
+  /**
+   * Directory root containing classes extending from Object that reference 
+   * external classes outside of this directory. 
+   */
+  public static final String CLASSES_EXTERNAL_DEPS_NO_SUPERCLASSES = 
+    CLASSES_FOR_TEST + "/root3";
+
   public void testCreateNewDirectoryClasspathRoot() throws Exception {
-    File dir = new File(ROOT_1_CLASS_FOR_TEST);
+    File dir = new File(CLASS_NO_EXTERNAL_DEPS);
     assertTrue(dir.isDirectory());
     ClasspathRoot root = ClasspathRootFactory.makeClasspathRoot(dir, "");
     assertNotNull(root);
@@ -54,8 +61,8 @@ public class DirectoryClasspathRootTest extends TestCase {
   }
 
    public void testCreateNewJarsClasspathRootTest() throws Exception {
-    final String cp = ROOT_1_CLASS_FOR_TEST + ":" + 
-      ROOT_CLASSES_EXTERNAL_DEPS_FOR_TEST;
+    final String cp = CLASS_NO_EXTERNAL_DEPS + ":" + 
+      CLASSES_EXTERNAL_DEPS_AND_SUPERCLASSES;
     ClasspathRootGroup group = ClasspathRootFactory.makeClasspathRootGroup(cp);
     assertNotNull(group);
     assertEquals(2, group.getGroupCount());

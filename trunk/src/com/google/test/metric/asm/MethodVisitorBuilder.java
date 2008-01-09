@@ -162,7 +162,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
               if2("IF_ICMPNE");
               break;
             case Opcodes.JSR :
-              // TODO: This is not quite right.
+              // TODO (misko): This is not quite right.
               block.jumpSubroutine(label, lineNumber);
               break;
             default :
