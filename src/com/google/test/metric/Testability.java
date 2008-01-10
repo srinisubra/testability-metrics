@@ -37,11 +37,11 @@ public class Testability {
   @Option(name = "-printDepth", metaVar = "maxPrintingDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
-  int maxDepthToPrintCosts = 0;
+  int maxDepthToPrintCosts = 1;
 
   @Option(name = "-costThreshold", metaVar = "costThreshold",
       usage = "Minimum Total Class cost required to print that class' metrics.")
-  int minCostThreshold = 0;
+  int minCostThreshold = 1;
 
   @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
           usage = "colon delimited whitelisted packages that will not " +
@@ -123,7 +123,7 @@ public class Testability {
     for (String className : classpath.getAllContainedClassNames(entryList)) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
-        printer.print(classCost, maxDepthToPrintCosts, 0);
+        printer.print(classCost, maxDepthToPrintCosts, minCostThreshold);
       } catch (ClassNotFoundException e) {
         err.println("WARNING: can not analyze class '" + className + 
             "' since class '" + e.getClassName() + "' was not found.");
