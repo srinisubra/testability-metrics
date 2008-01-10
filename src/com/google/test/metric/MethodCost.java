@@ -15,26 +15,19 @@
  */
 package com.google.test.metric;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class MethodCost {
 
   private final MethodInfo method;
-  private final int maxDepthToPrintCosts;
-  private final int minCostThreshold;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
   private long totalGlobalCost = -1;
   private long totalComplexityCost = -1;
 
-  public MethodCost(MethodInfo method, int maxDepthToPrintCosts, 
-      int minCostThreshold) {
+  public MethodCost(MethodInfo method) {
     this.method = method;
-    this.maxDepthToPrintCosts = maxDepthToPrintCosts;
-    this.minCostThreshold = minCostThreshold;
   }
 
   public long getTotalComplexityCost() {
@@ -80,35 +73,6 @@ public class MethodCost {
     return globalStateCosts.size();
   }
 
-  // it would be nice to not take in the currentDepth as a parameter. exposes 
-  // too much of the implementation in the buildCostString()
-  // another option is to revise to not take prefix in as string, but append 
-  // to buf based on current depth -jawolter 12/18/2007  
-  public void buildCostString(String prefix, StringBuilder buf, Set<MethodCost> alreadySeen,
-      int currentDepth) {
-    if (alreadySeen.contains(this) || getTotalComplexityCost() < minCostThreshold) {
-      return;
-    }
-    buf.append(method.getClassInfo().getName() + " ");
-    buf.append(method.getNameDesc());
-    buf.append("[" + getComplexityCost() + ", " + getGlobalCost() + " / "
-        + totalComplexityCost + ", " + totalGlobalCost + "]");
-    alreadySeen.add(this);
-    for (LineNumberCost line : lineNumberCosts) {
-      if (currentDepth < maxDepthToPrintCosts) {
-        MethodCost childCost = line.getMethodCost();
-        if (childCost.totalGlobalCost > 0 || childCost.totalComplexityCost > 0) {
-          buf.append("\n");
-          buf.append(prefix + "  line ");
-          buf.append(line.getLineNumber());
-          buf.append(": ");
-          childCost.buildCostString(prefix + "  ", buf, alreadySeen, ++currentDepth);
-        }
-      }
-    }
-
-  }
-
   public List<LineNumberCost> getOperationCosts() {
     return lineNumberCosts;
   }
@@ -127,9 +91,8 @@ public class MethodCost {
 
   @Override
   public String toString() {
-      StringBuilder buf = new StringBuilder();
-      buildCostString("", buf, new HashSet<MethodCost>(), 0);
-      return buf.toString();
+      return method + "[" + getComplexityCost() + ", " + getGlobalCost() + " / "
+        + totalComplexityCost + ", " + totalGlobalCost + "]";
   }
 
 }

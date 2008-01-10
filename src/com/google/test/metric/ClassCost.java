@@ -15,7 +15,6 @@
  */
 package com.google.test.metric;
 
-import java.util.HashSet;
 import java.util.List;
 
 public class ClassCost {
@@ -49,8 +48,16 @@ public class ClassCost {
     buf.append(classInfo.toString());
     for (MethodCost cost : methods) {
       buf.append("\n  ");
-      cost.buildCostString("  ", buf, new HashSet<MethodCost>(), 0);
+      buf.append(cost);
     }
+  }
+
+  public ClassInfo getClassInfo() {
+    return classInfo;
+  }
+
+  public List<MethodCost> getMethods() {
+    return methods;
   }
 
 }

@@ -32,7 +32,8 @@ public class Primeness {
   }
 }
 }}}
-*TRY IT:*`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
+*TRY IT:
+   *`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
 
 *OUTPUT:*
 {{{

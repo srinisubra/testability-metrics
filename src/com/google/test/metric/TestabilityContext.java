@@ -26,16 +26,12 @@ public class TestabilityContext {
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
-  private final int maxDepthToPrintCosts;
-  private final int minCostThreshold;
   private final WhiteList whitelist;
 
   public TestabilityContext(ClassRepository classRepository, PrintStream err,
-    int maxDepthToPrintCosts, int minCostThreshold, WhiteList whitelist) {
+    WhiteList whitelist) {
     this.classRepository = classRepository;
     this.err = err;
-    this.maxDepthToPrintCosts = maxDepthToPrintCosts;
-    this.minCostThreshold = minCostThreshold;
     this.whitelist = whitelist;
   }
 
@@ -64,7 +60,7 @@ public class TestabilityContext {
   private MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
-      methodCost = new MethodCost(method, maxDepthToPrintCosts, minCostThreshold);
+      methodCost = new MethodCost(method);
       methodCosts.put(method, methodCost);
     }
     return methodCost;
@@ -80,8 +76,9 @@ public class TestabilityContext {
     StringBuilder buf = new StringBuilder();
     buf.append("MethodCost:");
     for (MethodCost cost : methodCosts.values()) {
+      buf.append("  ");
+      buf.append(cost);
       buf.append("\n");
-      cost.buildCostString("   ", buf, new HashSet<MethodCost>(), 0);
     }
     buf.append("\nInjectables:");
     for (Variable var : injectables) {

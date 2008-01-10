@@ -44,14 +44,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
                 new PrintStream(err));
     }
 
-    public void testComputeCostSingleClass() throws Exception {
-        String classUnderTest = com.google.test.metric.Testability.class
-                .getName();
-        ClassCost classCost = testability.computeCost(classUnderTest);
-        assertNotNull(classCost);
-        assertTrue(classCost.toString().length() > 0);
-    }
-
     public void testParseNoArgs() {
         try {
             testability.parseArgs();
@@ -68,7 +60,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
                 .parseArgs("-cp", "not/default/path", "com.google.TestClass");
 
         assertEquals("", err.toString());
-        assertEquals("not/default/path", testability.classpath);
+        assertEquals("not/default/path", testability.cp);
         List<String> expectedArgs = new ArrayList<String>();
         expectedArgs.add("com.google.TestClass");
         assertNotNull(testability.entryList);
@@ -93,7 +85,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
                 out.toString().length() > 1000);
         assertEquals(1, testability.entryList.size());
         assertEquals("", testability.entryList.get(0));
-        assertTrue(testability.classpath.endsWith(JUNIT_JAR));
+        assertTrue(testability.cp.endsWith(JUNIT_JAR));
     }
 
     public void testClassesNotInClasspath() throws Exception {
@@ -131,24 +123,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
         assertTrue(out.toString().length() > 0);
         assertTrue(err.toString().length() == 0);
         // System.out.println(out.toString());
-    }
-
-    public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthTwo() {
-        testability.run("junit.runner", "-cp", JarClasspathRootTest.JUNIT_JAR,
-                "-printDepth", "2");
-        assertTrue(out.toString().length() > 0);
-
-        Pattern sixSpacesThenLinePattern = Pattern.compile("^(\\s){6}line",
-                Pattern.MULTILINE);
-        assertTrue("Expected 6 leading spaces spaces for maxPrintingDepth=2",
-                sixSpacesThenLinePattern.matcher(out.toString()).find());
-
-        Pattern over7SpacesThenLinePattern = Pattern.compile("^(\\s){7,}line",
-                Pattern.MULTILINE);
-        assertFalse(
-                "Should not have had more than 2 + 2*2 = 6 leading spaces for maxPrintingDepth=2",
-                over7SpacesThenLinePattern.matcher(out.toString()).find());
-        assertTrue(err.toString().length() == 0);
     }
 
     public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() {
@@ -205,15 +179,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
         assertTrue(out.toString().length() > 0);
         assertTrue(err.toString().length() > 0);
         assertTrue(err.toString().startsWith("WARNING: can not analyze class "));
-    }
-
-    public void testForWarningWhenClassDoesNotExistInClasspath()
-            throws Exception {
-        testability.computeCost("ThisClassDoesNotExist");
-        assertEquals(0, out.toString().length());
-        assertTrue(err.toString().length() > 0);
-        assertTrue(err.toString().startsWith(
-                "WARNING: can not analyze class 'ThisClassDoesNotExist"));
     }
 
     public void testFilterCostOverTotalCostThreshold() throws Exception {

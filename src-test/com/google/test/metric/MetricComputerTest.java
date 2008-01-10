@@ -26,8 +26,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
-        new PackageWhiteList());
+    computer = new MetricComputer(repo, null, new PackageWhiteList());
   }
 
   public static class Medium {
@@ -395,8 +394,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   
   public void testWhiteList() throws Exception {
     PackageWhiteList whiteList = new PackageWhiteList("java.lang");
-    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
-            whiteList);
+    computer = new MetricComputer(repo, null, whiteList);
     MethodCost cost = computer.compute(WhiteListTest.class, "testMethod()V");
     assertEquals(0L, cost.getTotalGlobalCost());
   }

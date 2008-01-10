@@ -13,31 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.example;
 
-/**
- * User: jwolter Date: Nov 30, 2007
- */
-public class LineNumberCost {
-  private final int lineNumber;
-  private final MethodCost methodCost;
+public class SumOfPrimes1 {
 
-  public LineNumberCost(int lineNumber, MethodCost methodCost) {
-    this.lineNumber = lineNumber;
-    this.methodCost = methodCost;
+  private final Primeness primeness = new Primeness();
+  
+  public int sum(int max) {
+    int sum = 0;
+    for (int i = 0; i < max; i++) {
+      if (primeness.isPrime(i)) {
+        sum += i;
+      }
+    }
+    return sum;
   }
-
-  public int getLineNumber() {
-    return lineNumber;
-  }
-
-  public MethodCost getMethodCost() {
-    return methodCost;
-  }
-
-  @Override
-  public String toString() {
-    return methodCost.getMethod() + ":" + lineNumber;
-  }
-
+  
 }
