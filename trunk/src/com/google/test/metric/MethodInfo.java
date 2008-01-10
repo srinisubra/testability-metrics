@@ -125,8 +125,7 @@ public class MethodInfo {
     // the same unless we change the offset of the method and say that
     // a simple method is 0 and hence splitting 0 to N 0 is still zero
     // and we gain the equivalence.
-    long implicitCost = getNonRecursiveCyclomaticComplexity() - 1;
-    return implicitCost;
+    return getNonRecursiveCyclomaticComplexity() - 1;
   }
 
   public void computeMetric(TestabilityContext context) {

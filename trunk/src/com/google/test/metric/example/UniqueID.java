@@ -15,18 +15,18 @@
  */
 package com.google.test.metric.example;
 
-public class SumOfPrimes {
+public class UniqueID {
 
-  private final Primeness primeness = new Primeness();
+  public static final UniqueID instance = new UniqueID();
   
-  public int sum(int max) {
-    int sum = 0;
-    for (int i = 0; i < max; i++) {
-      if (primeness.isPrime(i)) {
-        sum += i;
-      }
-    }
-    return sum;
+  private int lastId;
+  
+  public int getNextId() {
+    return ++lastId;
+  }
+  
+  public int getLastId() {
+    return lastId;
   }
   
 }

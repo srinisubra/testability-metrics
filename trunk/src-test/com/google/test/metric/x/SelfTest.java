@@ -22,7 +22,7 @@ import com.google.test.metric.MethodCost;
 import com.google.test.metric.MetricComputer;
 import com.google.test.metric.PackageWhiteList;
 import com.google.test.metric.example.Primeness;
-import com.google.test.metric.example.SumOfPrimes;
+import com.google.test.metric.example.SumOfPrimes1;
 import com.google.test.metric.example.SumOfPrimes2;
 
 import org.objectweb.asm.ClassReader;
@@ -34,8 +34,7 @@ public class SelfTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, Integer.MAX_VALUE, 0, 
-        new PackageWhiteList());
+    computer = new MetricComputer(repo, null, new PackageWhiteList());
   }
   
   @Override
@@ -65,7 +64,7 @@ public class SelfTest extends ClassRepositoryTestCase {
   }
 
   public void testSumOfPrimes() throws Exception {
-    System.out.println(computer.compute(SumOfPrimes.class));
+    System.out.println(computer.compute(SumOfPrimes1.class));
   }
   
   public void testSumOfPrimes2() throws Exception {

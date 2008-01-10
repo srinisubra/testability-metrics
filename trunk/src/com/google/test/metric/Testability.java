@@ -32,7 +32,7 @@ public class Testability {
   @Option(name = "-cp", metaVar = "classpath",
       usage = "colon delimited classpath to analyze (jars or directories)" +
           "\nEx. lib/one.jar:lib/two.jar")
-  protected String classpath = "";
+  protected String cp = "";
 
   @Option(name = "-printDepth", metaVar = "maxPrintingDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
@@ -58,7 +58,7 @@ public class Testability {
   protected List<String> entryList = new ArrayList<String>();
   private final PrintStream out;
   private final PrintStream err;
-  protected ClasspathRootGroup classpathRootGroup;
+  protected ClasspathRootGroup classpath;
 
   public Testability(PrintStream out, PrintStream err) {
     this.out = out;
@@ -86,10 +86,10 @@ public class Testability {
         }
     }
     out.println(entryList.get(0));
-    if (classpath.length() == 0) {
-      classpath = System.getProperty("java.class.path", ".");
+    if (cp.length() == 0) {
+      cp = System.getProperty("java.class.path", ".");
     }
-    classpathRootGroup = ClasspathRootFactory.makeClasspathRootGroup(classpath);
+    classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
   }
 
   public void parseArgs(String... args) throws CmdLineException {
@@ -116,31 +116,21 @@ public class Testability {
   }
 
   public void computeGroupMetric() {
-    ClassRepository classRepository = new ClassRepository(classpathRootGroup);
-    List<String> allContainedClassNames =
-        classpathRootGroup.getAllContainedClassNames(entryList);
-    for (String className : allContainedClassNames) {
-      ClassCost classCost = computeCost(className, classRepository);
-      out.println("Testability cost for " + classCost + "\n");
+    ClassRepository repository = new ClassRepository(classpath);
+    MetricComputer computer = new MetricComputer(repository, err, 
+        whitelist);
+    HumanReadablePrinter printer = new HumanReadablePrinter(out);
+    for (String className : classpath.getAllContainedClassNames(entryList)) {
+      try {
+        ClassCost classCost = computer.compute(repository.getClass(className));
+        printer.print(classCost, maxDepthToPrintCosts, 0);
+      } catch (ClassNotFoundException e) {
+        err.println("WARNING: can not analyze class '" + className + 
+            "' since class '" + e.getClassName() + "' was not found.");
+      }
     }
-    out.println("Analyzed " + allContainedClassNames.size() +
+    out.println("Analyzed " + classpath.getAllContainedClassNames(entryList).size() +
         " classes (plus how ever many of their external dependencies)");
   }
 
-  public ClassCost computeCost(String className, ClassRepository repo) {
-    MetricComputer metricComputer = new MetricComputer(repo, err, 
-        maxDepthToPrintCosts, minCostThreshold, whitelist);
-    ClassCost classCost = null;
-    try {
-      classCost = metricComputer.compute(repo.getClass(className));
-    } catch (ClassNotFoundException e) {
-      err.println("WARNING: can not analyze class '" + className + 
-          "' since class '" + e.getClassName() + "' was not found.");
-    }
-    return classCost;
-  }
-
-  public ClassCost computeCost(String className) {
-    return computeCost(className, new ClassRepository());
-  }
 }
