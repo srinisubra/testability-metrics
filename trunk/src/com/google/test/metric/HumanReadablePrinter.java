@@ -25,6 +25,13 @@ public class HumanReadablePrinter {
     this.out = out;
   }
 
+  public void print(ClassCost classCost, int maxDepth, int minCost) {
+    out.println("Testability cost for " + classCost.getClassInfo() + "\n");
+    for (MethodCost cost : classCost.getMethods()) {
+      print("", cost, maxDepth, minCost);
+    }
+  }
+
   public void print(String prefix, MethodCost cost, int maxDepth, int minCost) {
     out.print(prefix);
     out.println(cost);
@@ -32,14 +39,17 @@ public class HumanReadablePrinter {
       print("  " + prefix, child, maxDepth - 1, minCost);
     }
   }
-
+  
   private void print(String prefix, LineNumberCost line, int maxDepth, 
       int minCost) {
     if (maxDepth <= 0) {
       return;
     }
     MethodCost method = line.getMethodCost();
-    if (method.getTotalComplexityCost()== 0 && method.getTotalGlobalCost()==0) {
+    long totalComplexityCost = method.getTotalComplexityCost();
+    long totalGlobalCost = method.getTotalGlobalCost();
+    if ((totalComplexityCost == 0 && totalGlobalCost == 0)
+            || (totalGlobalCost < minCost && totalComplexityCost < minCost)) {
       return;
     }
     out.print(prefix);
@@ -49,13 +59,6 @@ public class HumanReadablePrinter {
     out.println(method);
     for (LineNumberCost child : method.getOperationCosts()) {
       print("  " + prefix, child, maxDepth - 1, minCost);
-    }
-  }
-
-  public void print(ClassCost classCost, int maxDepth, int minCost) {
-    out.println("Testability cost for " + classCost.getClassInfo() + "\n");
-    for (MethodCost cost : classCost.getMethods()) {
-      print("", cost, maxDepth, minCost);
     }
   }
 
