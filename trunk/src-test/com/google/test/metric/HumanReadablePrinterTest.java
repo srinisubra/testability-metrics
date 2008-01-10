@@ -80,7 +80,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void test2DeepSupress0Cost() throws Exception {
     cost1.addMethodCost(8, cost0);
     cost1.link();
-    printer.print("", cost1, MAX_VALUE, 0);
+    printer.print("", cost1, MAX_VALUE, 1);
     assertEquals("c.g.t.A.method1()V[1, 0 / 1, 0]\n", out.toString());
   }
   
@@ -97,7 +97,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
       out = new ByteArrayOutputStream();
     cost2.addMethodCost(81, new MethodCost(method1));
     cost2.link();
-    printer.print("", cost2, Integer.MAX_VALUE, 100);
+    printer.print("", cost2, MAX_VALUE, 100);
     assertEquals("", out.toString());
   }
   
@@ -106,6 +106,15 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     cost2.link();
     printer.print("", cost2, Integer.MAX_VALUE, 2);
     assertEquals("c.g.t.A.method2()V[2, 0 / 3, 0]\n", out.toString());
+  }
+  
+  public void testSecendLevelRecursive() throws Exception {
+    cost2.addMethodCost(2, cost2);
+    cost3.addMethodCost(1, cost2);
+    cost3.link();
+    printer.print("", cost3, 10, 0);
+    assertEquals("c.g.t.A.method3()V[3, 0 / 5, 0]\n"
+      + "  line 1: c.g.t.A.method2()V[2, 0 / 2, 0]\n", out.toString());
   }
   
 }
