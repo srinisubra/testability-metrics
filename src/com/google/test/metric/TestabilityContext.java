@@ -47,8 +47,10 @@ public class TestabilityContext {
       MethodInfo toMethod) {
     MethodCost from = getMethodCost(fromMethod);
     MethodCost to = getMethodCost(toMethod);
-    from.addMethodCost(fromLineNumber, to);
-    toMethod.computeMetric(this);
+    if (from != to) {
+      from.addMethodCost(fromLineNumber, to);
+      toMethod.computeMetric(this);
+    }
   }
 
   public MethodCost getLinkedMethodCost(MethodInfo method) {

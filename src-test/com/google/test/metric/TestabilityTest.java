@@ -21,15 +21,13 @@ import static com.google.classpath.DirectoryClasspathRootTest.CLASS_NO_EXTERNAL_
 import static com.google.classpath.JarClasspathRootTest.ASM_JAR;
 import static com.google.classpath.JarClasspathRootTest.JUNIT_JAR;
 
+import org.kohsuke.args4j.CmdLineException;
+
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import org.kohsuke.args4j.CmdLineException;
-
-import com.google.classpath.JarClasspathRootTest;
 
 public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream out;
@@ -140,7 +138,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.cp = ASM_JAR + ":" + JUNIT_JAR + ":" + CLASS_NO_EXTERNAL_DEPS;
     testability.printDepth = 0;
     testability.execute();
-    System.out.println(err.toString());
     assertTrue(out.toString().length() > 0);
     assertEquals(0, err.toString().length());
   }
@@ -185,12 +182,10 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.cp = JUNIT_JAR;
     testability.execute();
     String baselineOutput = out.toString();
-    System.out.println(baselineOutput);
     out.clear();
     testability.minCostThreshold = 9;
     testability.execute();
     String throttledOutput = out.toString();
-    System.out.println(throttledOutput);
     assertTrue(throttledOutput, throttledOutput.length() < baselineOutput
         .length());
     assertFalse(baselineOutput.equals(throttledOutput));
