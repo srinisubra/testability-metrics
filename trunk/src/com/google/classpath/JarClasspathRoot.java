@@ -36,7 +36,7 @@ public class JarClasspathRoot extends ClasspathRoot {
 
   public JarClasspathRoot(URL url, String classpath) {
     this.url = url;
-    List<URL> cp = new ColonDelimitedStringParser(classpath).getListOfURLs();
+    List<URL> cp = new ColonDelimitedStringParser(classpath).getURLs();
     classloader = new URLClassLoader(cp.toArray(new URL[cp.size()]), null);
     preloadNamesFromJar();
   }

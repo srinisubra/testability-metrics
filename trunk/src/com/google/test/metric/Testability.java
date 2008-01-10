@@ -15,29 +15,30 @@
  */
 package com.google.test.metric;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.classpath.ClasspathRootFactory;
+import com.google.classpath.ClasspathRootGroup;
+import com.google.classpath.ColonDelimitedStringParser;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import com.google.classpath.ClasspathRootFactory;
-import com.google.classpath.ClasspathRootGroup;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Testability {
 
   @Option(name = "-cp", metaVar = "classpath",
       usage = "colon delimited classpath to analyze (jars or directories)" +
           "\nEx. lib/one.jar:lib/two.jar")
-  protected String cp = "";
+  protected String cp = System.getProperty("java.class.path", ".");
 
   @Option(name = "-printDepth", metaVar = "maxPrintingDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
-  int maxDepthToPrintCosts = 1;
+  int printDepth = 1;
 
   @Option(name = "-costThreshold", metaVar = "costThreshold",
       usage = "Minimum Total Class cost required to print that class' metrics.")
@@ -47,7 +48,7 @@ public class Testability {
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
                   "given values.")
-  private final String wl = null;
+  String wl = null;
   private final PackageWhiteList whitelist = new PackageWhiteList();
 
   @Argument(metaVar = "classes/packages",
@@ -56,9 +57,10 @@ public class Testability {
           "Ex. com.example.analyze.these com.google.and.these.packages " +
           "com.google.or.AClass", required = true)
   protected List<String> entryList = new ArrayList<String>();
+  protected ClasspathRootGroup classpath;
+
   private final PrintStream out;
   private final PrintStream err;
-  protected ClasspathRootGroup classpath;
 
   public Testability(PrintStream out, PrintStream err) {
     this.out = out;
@@ -67,29 +69,15 @@ public class Testability {
   }
 
   public static void main(String... args) {
-    Testability testability = new Testability(System.out, System.err);
-    testability.run(args);
+    main(System.out, System.err, args);
   }
 
-  public void run(String... args) {
+  public static void main(PrintStream out, PrintStream err, String... args) {
+    Testability testability = new Testability(out, err);
     try {
-      parseSetup(args);
-      computeGroupMetric();
+      testability.parseArgs(args);
+      testability.execute();
     } catch (CmdLineException ignored) { }
-  }
-
-  public void parseSetup(String... args) throws CmdLineException {
-    parseArgs(args);
-    if (wl != null) {
-        for (String packageName : wl.split(":")) {
-            whitelist.addPackage(packageName);
-        }
-    }
-    out.println(entryList.get(0));
-    if (cp.length() == 0) {
-      cp = System.getProperty("java.class.path", ".");
-    }
-    classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
   }
 
   public void parseArgs(String... args) throws CmdLineException {
@@ -115,7 +103,19 @@ public class Testability {
     }
   }
 
-  public void computeGroupMetric() {
+  private void postParse() {
+    for (String packageName : new ColonDelimitedStringParser(wl).getStrings()) {
+        whitelist.addPackage(packageName);
+    }
+    if (entryList.isEmpty()) {
+      entryList.add("");
+    }
+    out.println(entryList.get(0));
+    classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
+  }
+
+  public void execute() {
+    postParse();
     ClassRepository repository = new ClassRepository(classpath);
     MetricComputer computer = new MetricComputer(repository, err, 
         whitelist);
@@ -123,7 +123,7 @@ public class Testability {
     for (String className : classpath.getAllContainedClassNames(entryList)) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
-        printer.print(classCost, maxDepthToPrintCosts, minCostThreshold);
+        printer.print(classCost, printDepth, minCostThreshold);
       } catch (ClassNotFoundException e) {
         err.println("WARNING: can not analyze class '" + className + 
             "' since class '" + e.getClassName() + "' was not found.");
