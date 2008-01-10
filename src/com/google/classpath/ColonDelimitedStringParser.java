@@ -24,7 +24,7 @@ public class ColonDelimitedStringParser {
       }
     }
 
-    public List<URL> getListOfURLs() {
+    public List<URL> getURLs() {
       List<URL> classpath = new ArrayList<URL>();
       try {
         for (String path : list) {
@@ -37,7 +37,7 @@ public class ColonDelimitedStringParser {
       return classpath;
     }
 
-    public List<File> getListOfFiles() {
+    public List<File> getFiles() {
       List<File> classpath = new ArrayList<File>();
       for (String path : list) {
         File file = new File(path);
@@ -46,7 +46,7 @@ public class ColonDelimitedStringParser {
       return classpath;
     }
 
-    public List<String> getListOfStrings() {
+    public List<String> getStrings() {
         return list;
     }
 }

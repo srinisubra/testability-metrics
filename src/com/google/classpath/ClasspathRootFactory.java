@@ -33,7 +33,7 @@ public class ClasspathRootFactory {
   }
 
   public static ClasspathRootGroup makeClasspathRootGroup(String classpath) {
-    List<File> classpathElements = new ColonDelimitedStringParser(classpath).getListOfFiles();
+    List<File> classpathElements = new ColonDelimitedStringParser(classpath).getFiles();
     List<ClasspathRoot> roots = new ArrayList<ClasspathRoot>();
     for (File fileOrJar: classpathElements) {
       try {
