@@ -112,14 +112,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(err.toString().length() == 0);
   }
 
-  public void testJarFileAndJunitRunnerEntryPattern() {
-    testability.cp = JUNIT_JAR;
-    testability.entryList.add("junit.runner");
-    testability.execute();
-    assertTrue(out.toString().length() > 0);
-    assertTrue(err.toString().length() == 0);
-  }
-
   public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() {
     testability.cp = JUNIT_JAR;
     testability.printDepth = 0;
@@ -175,6 +167,16 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(out.toString().length() > 0);
     assertTrue(err.toString().length() > 0);
     assertTrue(err.toString().startsWith("WARNING: can not analyze class "));
+  }
+  
+  public void testReadInnerClassCost() throws Exception {
+    testability.entryList.add("com.google.test.metric.example.Glo");
+    testability.printDepth = 10;
+    testability.execute();
+    List<String> classes = testability.classpath
+        .getAllContainedClassNames(testability.entryList);
+    assertTrue(3 == classes.size());
+    assertTrue(4 == out.toString().split("Testability cost for").length);
   }
 
   public void testFilterCostOverTotalCostThreshold() throws Exception {
