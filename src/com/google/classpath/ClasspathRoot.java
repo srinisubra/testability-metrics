@@ -67,13 +67,11 @@ public abstract class ClasspathRoot {
       if (resource.endsWith(".class")) {
         String className = packageName + resource;
         className = className.replace(".class", "").replace('/', '.');
-        if (!className.contains("$")) {
-          if (validClassNameByPrefixFilter(className, requiredPrefixes)) {
-            if (verbose) {
-              System.out.println("Found: " + className.replace("/", "."));
-            }
-            classNamesList.add(className);
+        if (validClassNameByPrefixFilter(className, requiredPrefixes)) {
+          if (verbose) {
+            System.out.println("Found: " + className.replace("/", "."));
           }
+          classNamesList.add(className);
         }
       } else if (resource.endsWith(".jar")) {
         String temp = root.getPath() + packageName + resource;

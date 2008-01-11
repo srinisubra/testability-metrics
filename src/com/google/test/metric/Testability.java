@@ -15,18 +15,18 @@
  */
 package com.google.test.metric;
 
-import com.google.classpath.ClasspathRootFactory;
-import com.google.classpath.ClasspathRootGroup;
-import com.google.classpath.ColonDelimitedStringParser;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.classpath.ClasspathRootFactory;
+import com.google.classpath.ClasspathRootGroup;
+import com.google.classpath.ColonDelimitedStringParser;
 
 public class Testability {
 
