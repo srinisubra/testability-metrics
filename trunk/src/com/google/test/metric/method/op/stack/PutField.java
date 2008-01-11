@@ -33,19 +33,19 @@ public class PutField extends StackOperation {
 
   @Override
   public String toString() {
-    return "put " + (fieldInfo.isStatic() ? "static " : "") + fieldInfo;
+    return "put " + (fieldInfo.isGlobal() ? "static " : "") + fieldInfo;
   }
 
   @Override
   public int getOperatorCount() {
     int valueCount = fieldInfo.getType().isDoubleSlot() ? 2 : 1;
-    int fieldThis = fieldInfo.isStatic() ? 0 : 1;
+    int fieldThis = fieldInfo.isGlobal() ? 0 : 1;
     return valueCount + fieldThis;
   }
 
   @Override
   public Operation toOperation(List<Variable> input) {
-    if (fieldInfo.isStatic()) {
+    if (fieldInfo.isGlobal()) {
       Variable value = input.get(0);
       return new FieldAssignment(lineNumber, null, fieldInfo, value);
     } else {

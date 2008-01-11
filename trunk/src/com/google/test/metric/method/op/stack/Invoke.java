@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -33,6 +33,7 @@ public class Invoke extends StackOperation {
   private final boolean isStatic;
   private final Type returnType;
   private final List<Type> params;
+  private final Variable returnValue;
 
   public Invoke(int lineNumber, String clazz, String name, String signature,
       List<Type> params, boolean isStatic, Type returnType) {
@@ -43,6 +44,7 @@ public class Invoke extends StackOperation {
     this.params = params;
     this.isStatic = isStatic;
     this.returnType = returnType;
+    this.returnValue = new Constant("?", returnType);
   }
 
   @Override
@@ -59,7 +61,7 @@ public class Invoke extends StackOperation {
     if (returnType == Type.VOID) {
       return Collections.emptyList();
     } else {
-      return list(new Constant("?", returnType));
+      return list(returnValue);
     }
   }
 
@@ -68,7 +70,7 @@ public class Invoke extends StackOperation {
     List<Variable> parameters = removeDuplicateSlots(input);
     Variable methodThis = isStatic ? null : parameters.remove(0);
     return new MethodInvokation(lineNumber, clazz, name, signature,
-        methodThis, parameters);
+        methodThis, parameters, returnValue);
   }
 
   private List<Variable> removeDuplicateSlots(List<Variable> input) {

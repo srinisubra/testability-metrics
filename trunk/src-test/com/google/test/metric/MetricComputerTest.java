@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -22,7 +22,7 @@ import java.util.List;
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
-  
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();
@@ -349,7 +349,9 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
 
   public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
     MethodCost cost = computer.compute(GlobalStateUser.class, "accessMutableState()V");
-    assertEquals(1L, cost.getTotalGlobalCost());
+    new HumanReadablePrinter(System.out).print("", cost, 10, 0);
+    assertEquals("Expecting one for read and one for write", 2L, cost
+        .getTotalGlobalCost());
   }
 
   public void testJavaLangObjectParsesCorrectly() throws Exception {
@@ -369,13 +371,13 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     assertEquals(3, cost.getTotalComplexityCost());
     List<LineNumberCost> lineNumberCosts = cost.getOperationCosts();
     assertEquals(3, lineNumberCosts.size());
-    
+
     LineNumberCost line0 = lineNumberCosts.get(0);
     LineNumberCost line1 = lineNumberCosts.get(1);
     LineNumberCost line2 = lineNumberCosts.get(2);
 
     int methodStartingLine = cost.getMethod().getStartingLineNumber();
-    
+
     assertEquals(0, line0.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 0, line0.getLineNumber());
 
@@ -385,13 +387,13 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     assertEquals(2, line2.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 2, line2.getLineNumber());
   }
-  
+
   public static class WhiteListTest {
     public void testMethod() {
       new String(new byte[0]);
     }
   }
-  
+
   public void testWhiteList() throws Exception {
     PackageWhiteList whiteList = new PackageWhiteList("java.lang");
     computer = new MetricComputer(repo, null, whiteList);

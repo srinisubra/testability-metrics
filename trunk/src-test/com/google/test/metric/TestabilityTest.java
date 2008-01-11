@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -168,15 +168,19 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(err.toString().length() > 0);
     assertTrue(err.toString().startsWith("WARNING: can not analyze class "));
   }
-  
+
   public void testReadInnerClassCost() throws Exception {
     testability.entryList.add("com.google.test.metric.example.Glo");
     testability.printDepth = 10;
     testability.execute();
     List<String> classes = testability.classpath
         .getAllContainedClassNames(testability.entryList);
-    assertTrue(3 == classes.size());
-    assertTrue(4 == out.toString().split("Testability cost for").length);
+    String global = "com.google.test.metric.example.GlobalExample";
+    assertTrue(classes.contains(global));
+    assertTrue(classes.contains(global + "Test"));
+    assertTrue(classes.contains(global + "$Globals"));
+    assertTrue(classes.contains(global + "$Gadget"));
+    assertEquals(4, classes.size());
   }
 
   public void testFilterCostOverTotalCostThreshold() throws Exception {

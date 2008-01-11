@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -895,56 +895,62 @@ public class MethodVisitorBuilder implements MethodVisitor {
     return classInfo + "." + name + desc + "\n" + block;
   }
 
-    private class PutFieldRunnable implements Runnable {
-        private final String fieldOwner;
-        private final String fieldName;
-        private String fieldDesc;
-        private boolean isStatic;
+  private class PutFieldRunnable implements Runnable {
+    private final String fieldOwner;
+    private final String fieldName;
+    private final String fieldDesc;
+    private final boolean isStatic;
 
-        public PutFieldRunnable(String owner, String name, String desc, boolean isStatic) {
-            this.fieldOwner = owner;
-            this.fieldName = name;
-            this.fieldDesc = desc;
-            this.isStatic = isStatic;
-        }
-
-        public void run() {
-            FieldInfo field = null;
-            ClassInfo ownerClass = repository.getClass(fieldOwner);
-            try {
-                field = ownerClass.getField(fieldName);
-            } catch (FieldNotFoundException e) {
-                System.err.println("WARNING: field not found: " + fieldName);
-                field = new FieldInfo(ownerClass, "FAKE:" + fieldName, Type.fromDesc(fieldDesc), isStatic, false);
-            }
-            block.addOp(new com.google.test.metric.method.op.stack.PutField(lineNumber, field));
-        }
+    public PutFieldRunnable(String owner, String name, String desc,
+        boolean isStatic) {
+      this.fieldOwner = owner;
+      this.fieldName = name;
+      this.fieldDesc = desc;
+      this.isStatic = isStatic;
     }
 
-    private class GetFieldRunnable implements Runnable {
-        private final String fieldOwner;
-        private final String fieldName;
-        private String fieldDesc;
-        private boolean isStatic;
-
-        public GetFieldRunnable(String owner, String name, String desc, boolean isStatic) {
-            this.fieldOwner = owner;
-            this.fieldName = name;
-            this.fieldDesc = desc;
-            this.isStatic = isStatic;
-        }
-
-        public void run() {
-            FieldInfo field = null;
-            ClassInfo ownerClass = repository.getClass(fieldOwner);
-            try {
-                field = ownerClass.getField(fieldName);
-            } catch (FieldNotFoundException e) {
-                System.err.println("WARNING: field not found: " + fieldName);
-                field = new FieldInfo(ownerClass, "FAKE:" + fieldName, Type.fromDesc(fieldDesc), isStatic, false);
-            }
-            block.addOp(new GetField(lineNumber, field));
-        }
-
+    public void run() {
+      FieldInfo field = null;
+      ClassInfo ownerClass = repository.getClass(fieldOwner);
+      try {
+        field = ownerClass.getField(fieldName);
+      } catch (FieldNotFoundException e) {
+        System.err.println("WARNING: field not found: " + fieldName);
+        field =
+            new FieldInfo(ownerClass, "FAKE:" + fieldName, Type
+                .fromDesc(fieldDesc), false, isStatic, false);
+      }
+      block.addOp(new com.google.test.metric.method.op.stack.PutField(
+          lineNumber, field));
     }
+  }
+
+  private class GetFieldRunnable implements Runnable {
+    private final String fieldOwner;
+    private final String fieldName;
+    private final String fieldDesc;
+    private final boolean isStatic;
+
+    public GetFieldRunnable(String owner, String name, String desc,
+        boolean isStatic) {
+      this.fieldOwner = owner;
+      this.fieldName = name;
+      this.fieldDesc = desc;
+      this.isStatic = isStatic;
+    }
+
+    public void run() {
+      FieldInfo field = null;
+      ClassInfo ownerClass = repository.getClass(fieldOwner);
+      try {
+        field = ownerClass.getField(fieldName);
+      } catch (FieldNotFoundException e) {
+        System.err.println("WARNING: field not found: " + fieldName);
+        field = new FieldInfo(ownerClass, "FAKE:" + fieldName, Type
+                .fromDesc(fieldDesc), false, isStatic, false);
+      }
+      block.addOp(new GetField(lineNumber, field));
+    }
+
+  }
 }
