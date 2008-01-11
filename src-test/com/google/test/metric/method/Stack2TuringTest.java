@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -34,9 +34,10 @@ public class Stack2TuringTest extends TestCase {
     Block main = new Block("main");
     Block sub = new Block("sub");
 
-    main.addOp(new Load(0, new Variable("this", Type.OBJECT)));
+    main.addOp(new Load(0, new Variable("this", Type.OBJECT, false, false)));
     main.addOp(new JSR(0, sub));
-    main.addOp(new PutField(0, new FieldInfo(null, "a", Type.INT, false, false)));
+    main.addOp(new PutField(0, new FieldInfo(null, "a", Type.INT, false, false,
+        false)));
 
     sub.addOp(new Load(0, new Constant(1, Type.INT)));
     sub.addOp(new Return(0, Type.VOID));

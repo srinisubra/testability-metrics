@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -16,17 +16,23 @@
 package com.google.test.metric;
 
 
+
 import java.io.PrintStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class TestabilityContext {
 
-  private Set<Variable> injectables = new HashSet<Variable>();
-  private Set<Variable> statics = new HashSet<Variable>();
+  private final Set<Variable> injectables = new HashSet<Variable>();
+  private final Set<Variable> statics = new HashSet<Variable>();
   private final ClassRepository classRepository;
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
   private final WhiteList whitelist;
+  private Variable returnValue;
 
   public TestabilityContext(ClassRepository classRepository, PrintStream err,
     WhiteList whitelist) {
@@ -108,32 +114,42 @@ public class TestabilityContext {
     setInjectable(method.getParameters());
   }
 
-  public void localAssginment(Variable destination, Variable source) {
+  public void localAssignment(MethodInfo inMethod, int lineNumber,
+      Variable destination, Variable source) {
     if (isInjectable(source)) {
       setInjectable(destination);
     }
-    if (destination.isStatic() || isGlobal(source)) {
+    if (destination.isGlobal() || isGlobal(source)) {
       setGlobal(destination);
+      if (source instanceof LocalField && !source.isFinal()) {
+        getMethodCost(inMethod).addGlobalCost(lineNumber, source);
+      }
     }
   }
 
-  public void fieldAssignment(Variable fieldInstance, Variable field,
+  public boolean isGlobal(Variable var) {
+    if (var instanceof LocalField) {
+      LocalField field = (LocalField) var;
+      return isGlobal(field.getInstance()) || isGlobal(field.getField());
+    }
+    return var != null && (var.isGlobal() || statics.contains(var));
+  }
+
+  public void fieldAssignment(Variable fieldInstance, FieldInfo field,
       Variable value, MethodInfo inMethod, int lineNumber) {
-    localAssginment(field, value);
+    localAssignment(inMethod, lineNumber, field, value);
     if (fieldInstance == null || statics.contains(fieldInstance)) {
       getMethodCost(inMethod).addGlobalCost(lineNumber, fieldInstance);
       statics.add(field);
     }
   }
 
-  public void arrayAssignment(Variable array, Variable index, Variable value, MethodInfo inMethod, int lineNumber) {
-    localAssginment(array, value);
+  public void arrayAssignment(Variable array, Variable index, Variable value,
+      MethodInfo inMethod, int lineNumber) {
+    localAssignment(inMethod, lineNumber, array, value);
     if (statics.contains(array)) {
       getMethodCost(inMethod).addGlobalCost(lineNumber, array);
     }
-  }
-  public boolean isGlobal(Variable var) {
-    return var.isStatic() || statics.contains(var);
   }
 
   public void setGlobal(Variable var) {
@@ -141,6 +157,9 @@ public class TestabilityContext {
   }
 
   public boolean isInjectable(Variable var) {
+    if (var instanceof LocalField) {
+      return isInjectable(((LocalField)var).getField());
+    }
     return injectables.contains(var);
   }
 
@@ -158,5 +177,13 @@ public class TestabilityContext {
 
   public boolean isClassWhiteListed(String className) {
     return whitelist.isClassWhiteListed(className);
+  }
+
+  public void setReturnValue(Variable value) {
+    this.returnValue = value;
+  }
+
+  public Variable getReturnValue() {
+    return returnValue;
   }
 }

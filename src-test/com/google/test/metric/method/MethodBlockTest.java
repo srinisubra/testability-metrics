@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -28,8 +28,7 @@ import java.util.List;
 public class MethodBlockTest extends TestCase {
 
   public static class Simple {
-    @SuppressWarnings("unused")
-    private Object a;
+    private final Object a;
 
     public Simple() {
       super();
@@ -156,7 +155,7 @@ public class MethodBlockTest extends TestCase {
   }
 
   public static class CallMethods {
-    private String text = "ABC";
+    private final String text = "ABC";
     private static String staticText = "abc";
 
     public int length() {
@@ -170,12 +169,12 @@ public class MethodBlockTest extends TestCase {
 
   public void testCallMethodsLength() throws Exception {
     MethodInfo method = getMethod("length()I", CallMethods.class);
-    assertOperations(method.getOperations(), "java.lang.String.length()I");
+    assertOperations(method.getOperations(), "java.lang.String.length()I", "return ?{int}");
   }
 
   public void testCallMethodsStaticLength() throws Exception {
     MethodInfo method = getMethod("staticLength()I", CallMethods.class);
-    assertOperations(method.getOperations(), "java.lang.String.length()I");
+    assertOperations(method.getOperations(), "java.lang.String.length()I", "return ?{int}");
   }
 
   static class Foreach {

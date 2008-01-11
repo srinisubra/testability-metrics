@@ -13,38 +13,32 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric.method.op.stack;
+package com.google.test.metric;
 
-import com.google.test.metric.FieldInfo;
-import com.google.test.metric.LocalField;
-import com.google.test.metric.Variable;
 
-import java.util.List;
+public class LocalField extends Variable {
 
-public class GetField extends StackOperation {
-
+  private final Variable instance;
   private final FieldInfo fieldInfo;
 
-  public GetField(int lineNumber, FieldInfo fieldInfo) {
-    super(lineNumber);
+  public LocalField(Variable instance, FieldInfo fieldInfo) {
+    super(fieldInfo.getName(), fieldInfo.getType(), fieldInfo.isFinal(),
+        fieldInfo.isGlobal());
+    this.instance = instance;
     this.fieldInfo = fieldInfo;
   }
 
   @Override
   public String toString() {
-    return "get " + (fieldInfo.isGlobal() ? "static " : "") + fieldInfo;
+    return fieldInfo.toString();
   }
 
-  @Override
-  public int getOperatorCount() {
-    return fieldInfo.isGlobal() ? 0 : 1;
+  public FieldInfo getField() {
+    return fieldInfo;
   }
 
-  @Override
-  public List<Variable> apply(List<Variable> input) {
-    Variable instance = fieldInfo.isGlobal() ? null : input.get(0);
-    return list(new LocalField(instance, fieldInfo));
-//    return list(fieldInfo);
+  public Variable getInstance() {
+    return instance;
   }
 
 }

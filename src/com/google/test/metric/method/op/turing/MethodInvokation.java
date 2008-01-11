@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,27 +15,32 @@
  */
 package com.google.test.metric.method.op.turing;
 
-import com.google.test.metric.*;
 import com.google.test.metric.ClassNotFoundException;
+import com.google.test.metric.MethodInfo;
+import com.google.test.metric.TestabilityContext;
+import com.google.test.metric.Variable;
 
 import java.util.List;
 
 public class MethodInvokation extends Operation {
 
   private final String name;
-  public final String clazzName;
+  private final String clazzName;
   private final String signature;
   private final Variable methodThis;
   private final List<Variable> parameters;
+  private final Variable returnValue;
 
   public MethodInvokation(int lineNumber, String clazz, String name,
-      String signature, Variable methodThis, List<Variable> parameters) {
+      String signature, Variable methodThis, List<Variable> parameters,
+      Variable returnValue) {
     super(lineNumber);
     this.clazzName = clazz;
     this.name = name;
     this.signature = signature;
     this.methodThis = methodThis;
     this.parameters = parameters;
+    this.returnValue = returnValue;
   }
 
   public List<Variable> getParameters() {
@@ -74,7 +79,8 @@ public class MethodInvokation extends Operation {
         // Method can not be intercepted we have to add the cost
         // recursively
         if (toMethod.isInstance()) {
-          context.localAssginment(toMethod.getMethodThis(), methodThis);
+          context.localAssignment(toMethod, getLineNumber(), toMethod
+              .getMethodThis(), methodThis);
         }
         int i = 0;
         if (parameters.size() != toMethod.getParameters().size()) {
@@ -82,9 +88,12 @@ public class MethodInvokation extends Operation {
               "Argument count does not match method parameter count.");
         }
         for (Variable var : parameters) {
-          context.localAssginment(toMethod.getParameters().get(i++), var);
+          context.localAssignment(toMethod, getLineNumber(), toMethod
+              .getParameters().get(i++), var);
         }
         context.recordMethodCall(currentMethod, getLineNumber(), toMethod);
+        context.localAssignment(toMethod, getLineNumber(), returnValue,
+            context.getReturnValue());
       }
     } catch (ClassNotFoundException e) {
       context.reportError("WARNING: class not found: " + clazzName);

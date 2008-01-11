@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -46,7 +46,7 @@ public class BlockTest extends TestCase {
     Block block = new Block("1");
     block.addOp(new Load(-1, var(1)));
     block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
-        true, false)));
+        false, true, false)));
 
     List<Operation> operations = new Stack2Turing(block).translate();
     assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
@@ -57,7 +57,7 @@ public class BlockTest extends TestCase {
     block.addOp(new Load(-1, var("this"))); // this
     block.addOp(new Load(-1, var(1)));
     block.addOp(new PutField(-1, new FieldInfo(null, "abc", OBJECT,
-        false, false)));
+        false, false, false)));
 
     List<Operation> operations = new Stack2Turing(block).translate();
     assertEquals("[null.abc{java.lang.Object} <- 1{java.lang.Object}]", operations.toString());
@@ -66,9 +66,9 @@ public class BlockTest extends TestCase {
   public void testGetField() throws Exception {
     Block block = new Block("1");
     block.addOp(new GetField(-1, new FieldInfo(null, "src", OBJECT,
-        true, false)));
+        false, true, false)));
     block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
-        true, false)));
+        false, true, false)));
 
     List<Operation> operations = new Stack2Turing(block).translate();
     assertEquals("[null.dst{java.lang.Object} <- null.src{java.lang.Object}]", operations
@@ -79,13 +79,13 @@ public class BlockTest extends TestCase {
     Block block = new Block("1");
     block.addOp(new Load(-1, var("methodThis"))); // this
     block.addOp(new GetField(-1, new FieldInfo(null, "p1", OBJECT,
-        true, false)));
+        false, true, false)));
     block.addOp(new GetField(-1, new FieldInfo(null, "p2", OBJECT,
-        true, false)));
+        false, true, false)));
     block.addOp(new Invoke(-1, null, "methodA", "(II)A", asList(Type.INT,
         Type.INT), false, OBJECT));
     block.addOp(new PutField(-1, new FieldInfo(null, "dst", OBJECT,
-        true, false)));
+        false, true, false)));
 
     List<Operation> operations = new Stack2Turing(block).translate();
     assertEquals("[null.methodA(II)A, null.dst{java.lang.Object} <- ?{java.lang.Object}]",

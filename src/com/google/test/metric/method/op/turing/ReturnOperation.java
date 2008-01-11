@@ -19,32 +19,23 @@ import com.google.test.metric.MethodInfo;
 import com.google.test.metric.TestabilityContext;
 import com.google.test.metric.Variable;
 
-public class LocalAssignment extends Operation {
+public class ReturnOperation extends Operation {
 
   private final Variable value;
-  private final Variable variable;
 
-  public LocalAssignment(int lineNumber, Variable dst, Variable value) {
+  public ReturnOperation(int lineNumber, Variable value) {
     super(lineNumber);
     this.value = value;
-    this.variable = dst;
-  }
-
-  public Variable getVariable() {
-    return variable;
-  }
-
-  public Variable getValue() {
-    return value;
-  }
-
-  @Override
-  public String toString() {
-    return variable + " <- " + value;
   }
 
   @Override
   public void computeMetric(TestabilityContext context, MethodInfo currentMethod) {
-    context.localAssignment(currentMethod, getLineNumber(), variable, value);
+    context.setReturnValue(value);
   }
+
+  @Override
+  public String toString() {
+    return "return " + value;
+  }
+
 }

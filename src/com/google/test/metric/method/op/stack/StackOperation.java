@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -30,6 +30,11 @@ public abstract class StackOperation {
     this.lineNumber = lineNumber;
   }
 
+  /**
+   * Stack transformation operation.
+   * @param input list of operands which this operations consumes on stack
+   * @return a list of operands which get pushed back on stack.
+   */
   public List<Variable> apply(List<Variable> input) {
     return Collections.emptyList();
   }
@@ -38,6 +43,12 @@ public abstract class StackOperation {
     return 0;
   }
 
+  /**
+   * High level Turing Operations which get produced from the stack operations
+   *
+   * @param input
+   * @return null if no operations; Turing Operation otherwise
+   */
   public Operation toOperation(List<Variable> input) {
     return null;
   }
