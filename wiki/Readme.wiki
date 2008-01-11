@@ -8,6 +8,7 @@ piece of code. The difficulty is a measure of:
   # how hard it will be to construct this object
   # how hard will it be to execute the method in order to be able to assert something in a test.
 
+==Output Format==
 An example score for a method is:
   `methodName()V[1, 2 / 3, 4]`
 
@@ -34,7 +35,7 @@ public class Primeness {
 }
 }}}
 *TRY IT:
-   *`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
+   `testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
 
 *OUTPUT:*
 {{{
@@ -44,26 +45,6 @@ com.google.test.metric.example.Primeness
 }}}
 
 *EXPLANATION:*
-{{{
-com.google.test.metric.example.Primeness
-                            | Name of the class
-  <init>()V[0, 0 / 0, 0]    | Name of the method under test 
-                            |   The <init> notation refers to the 
-                            |   constructor.
-                            | The [0, 0 / 0, 0] refers to the metric
-                            | [tc, gc / ttc, tgc]
-                            | (tc,gc) is per method complexity
-                            | (ttc, tgc) total/recursive complexity
-                            | tc: test complexity
-                            | gc: global state complexity.
-                            | ttc: Total test complexity (recursive)
-                            | tgc: Total global complexity (recursive)
-  isPrime(I)Z[2, 0 / 2, 0]  | This method has testing complexity of 2
-                            | and has no global statics
-
-}}}
-
-==Test Complexity==
 In the above example the test complexity is 2. This is because the
 method `isPrime` has a loop and an `if` statement. Therefore there are 2
 additional paths of execution for a total of 3.
@@ -271,7 +252,7 @@ is no global mutable state associated with this method.
 
 ===`getInstance()`===
 
-Similarly `getInstance()` has no global cost either. as it only accesses
+Similarly `getInstance()` has no global cost either as it only accesses
 variables which are final.
 
 ===`getGlobalCount()`===
