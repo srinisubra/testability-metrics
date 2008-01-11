@@ -21,13 +21,13 @@ import static com.google.classpath.DirectoryClasspathRootTest.CLASS_NO_EXTERNAL_
 import static com.google.classpath.JarClasspathRootTest.ASM_JAR;
 import static com.google.classpath.JarClasspathRootTest.JUNIT_JAR;
 
-import org.kohsuke.args4j.CmdLineException;
-
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.kohsuke.args4j.CmdLineException;
 
 public class TestabilityTest extends AutoFieldClearTestCase {
   private WatchedOutputStream out;
@@ -46,10 +46,9 @@ public class TestabilityTest extends AutoFieldClearTestCase {
       testability.parseArgs();
       fail("Should have thrown a CmdLineException exception");
     } catch (CmdLineException expected) {
-      // expecting this
     }
     assertTrue(err.toString().indexOf(
-        "Argument \"classes/packages\" is required") > -1);
+        "Argument \"classes and packages\" is required") > -1);
   }
 
   public void testParseClasspathAndSingleClass() throws Exception {
@@ -90,7 +89,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(err.toString().length() > 0);
   }
 
-  /**
+  /*
    * The given classpath contains some classes from this project, but not all.
    * There are many references to classes that will not be in this test's -cp
    * classpath. This test verifies that when the ClassRepository encounters a
@@ -150,7 +149,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertEquals(err.toString(), 0, err.toString().length());
   }
 
-  /**
+  /*
    * Tries calculating the cost for classes that reference other classes not in
    * the classpath.
    */
@@ -164,7 +163,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(err.toString().startsWith("WARNING: class not found: "));
   }
 
-  /**
+  /*
    * Tries calculating the cost for classes that extend from another class,
    * which does not exist in the classpath.
    */

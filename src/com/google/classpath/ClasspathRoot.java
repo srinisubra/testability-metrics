@@ -27,8 +27,6 @@ import java.util.List;
 /**
  * An entry on the classpath, which may be a directory or jar. Concrete classes
  * are provided for each type.
- * 
- * @author misko@google.com, pepstein@google.com, jwolter@google.com
  */
 public abstract class ClasspathRoot {
   protected URLClassLoader classloader;
