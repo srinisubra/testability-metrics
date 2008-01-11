@@ -240,9 +240,9 @@ public class GlobalExample {
 
 *TRY IT:*
    `java -cp bin:lib/args4j-2.0.8.jar:lib/asm-3.0.jar 
-    com.google.test.metric.Testability -cp bin -printDepth 10  
-    -costThreshold 0 com.google.test.metric.example.GlobalExample 
-    com.google.test.metric.example.GlobalExample`
+   com.google.test.metric.Testability -cp bin -printDepth 10  
+   -costThreshold 0 com.google.test.metric.example.GlobalExample 
+   com.google.test.metric.example.GlobalExample`
 
 *OUTPUT:*
 
