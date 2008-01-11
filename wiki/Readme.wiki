@@ -33,7 +33,8 @@ public class Primeness {
   }
 }
 }}}
-*TRY IT:*`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
+*TRY IT:
+   *`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
 
 *OUTPUT:*
 {{{
@@ -187,7 +188,78 @@ overridden)._
 
 ==Example: Global State==
 
-==Example: ... ==
+*SOURCE:*
+{{{
+package com.google.test.metric.example;
+
+public class GlobalExample {
+
+  public static class Gadget {
+    private final String id;
+    private int count;
+
+    public Gadget(String id, int count) {
+      this.id = id;
+      this.count = count;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public int getCount() {
+      return count;
+    }
+
+    public int increment() {
+      return ++count;
+    }
+  }
+
+  public static class Globals {
+    public static final Gadget instance = new Gadget("Global", 1);
+  }
+
+  public Gadget getInstance() {
+    return Globals.instance;
+  }
+
+  public String getGlobalId() {
+    return Globals.instance.getId();
+  }
+
+  public int getGlobalCount() {
+    return Globals.instance.getCount();
+  }
+
+  public int globalIncrement() {
+    return Globals.instance.increment();
+  }
+}
+}}}
+
+*TRY IT:*
+   `java -cp bin:lib/args4j-2.0.8.jar:lib/asm-3.0.jar 
+    com.google.test.metric.Testability -cp bin -printDepth 10  
+    -costThreshold 0 com.google.test.metric.example.GlobalExample 
+    com.google.test.metric.example.GlobalExample`
+
+*OUTPUT:*
+
+Testability cost for com.google.test.metric.example.GlobalExample
+  com.google.test.metric.example.GlobalExample.getGlobalId()Ljava/lang/String;[0, 0 / 0, 0]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 51: com.google.test.metric.example.GlobalExample$Gadget.getId()Ljava/lang/String;[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.getInstance()Lcom/google/test/metric/example/GlobalExample$Gadget;[0, 0 / 0, 0]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.getGlobalCount()I[0, 0 / 0, 1]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I[0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample.globalIncrement()I[0, 0 / 0, 1]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I[0, 1 / 0, 1]
+
 
 ==Future Enhancements / Requests==
 Please talk about what you want on the mailing list:
