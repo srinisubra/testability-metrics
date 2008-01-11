@@ -187,7 +187,106 @@ overridden)._
 
 ==Example: Global State==
 
-==Example: ... ==
+*SOURCE:*
+{{{
+package com.google.test.metric.example;
+
+public class GlobalExample {
+
+  public static class Gadget {
+    private final String id;
+    private int count;
+
+    public Gadget(String id, int count) {
+      this.id = id;
+      this.count = count;
+    }
+
+    public String getId() {
+      return id;
+    }
+
+    public int getCount() {
+      return count;
+    }
+
+    public int increment() {
+      return ++count;
+    }
+  }
+
+  public static class Globals {
+    public static final Gadget instance = new Gadget("Global", 1);
+  }
+
+  public Gadget getInstance() {
+    return Globals.instance;
+  }
+
+  public String getGlobalId() {
+    return Globals.instance.getId();
+  }
+
+  public int getGlobalCount() {
+    return Globals.instance.getCount();
+  }
+
+  public int globalIncrement() {
+    return Globals.instance.increment();
+  }
+}
+}}}
+
+*TRY IT:*
+   `java -cp bin:lib/args4j-2.0.8.jar:lib/asm-3.0.jar 
+   com.google.test.metric.Testability -cp bin -printDepth 10  
+   -costThreshold 0 com.google.test.metric.example.GlobalExample 
+   com.google.test.metric.example.GlobalExample`
+
+*OUTPUT:*
+
+{{{
+Testability cost for com.google.test.metric.example.GlobalExample
+  com.google.test.metric.example.GlobalExample.getGlobalId()Ljava/lang/String;[0, 0 / 0, 0]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 51: com.google.test.metric.example.GlobalExample$Gadget.getId()Ljava/lang/String;[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.getInstance()Lcom/google/test/metric/example/GlobalExample$Gadget;[0, 0 / 0, 0]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+  com.google.test.metric.example.GlobalExample.getGlobalCount()I[0, 0 / 0, 1]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I[0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample.globalIncrement()I[0, 0 / 0, 1]
+    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
+    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I[0, 1 / 0, 1]
+}}}
+
+===`getGlobalId()`===
+
+Method `getGlobalId()` has no global cost. This may be surprising given that
+it accesses static variables. However, upon closer examinations, these
+variables are not mutable (they are declared `final`). For this reason there
+is no global mutable state associated with this method.
+
+===`getInstance()`===
+
+Similarly `getInstance()` has no global cost either as it only accesses
+variables which are final.
+
+===`getGlobalCount()`===
+
+Method `getGlobalCount()` accesses the `Globals.instance` which is a global
+constant hence does not count. It then calls the `Gadget.getCount()` which
+accesses the `count` variable. The `Globals.instance` is global but it is
+not mutable, but the global property is transitive and it is transfered
+to `this` of `Gadget` so when `this.count` is accessed it is considered
+a global access as well. Because  `count` is mutable (no `final` keyword)
+therefore the `count` variable is global and mutable, and as a result reading
+it incurs a cost.
+
+===`globalIncrement()`===
+
+Method `getGlobalIncrement()` follows the same logic as `getGlobalCount()`.
 
 ==Future Enhancements / Requests==
 Please talk about what you want on the mailing list:
