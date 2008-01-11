@@ -30,32 +30,32 @@ import java.util.List;
 
 public class Testability {
 
-  @Option(name = "-cp", metaVar = "classpath",
+  @Option(name = "-cp", 
       usage = "colon delimited classpath to analyze (jars or directories)" +
           "\nEx. lib/one.jar:lib/two.jar")
   protected String cp = System.getProperty("java.class.path", ".");
 
-  @Option(name = "-printDepth", metaVar = "maxPrintingDepth",
+  @Option(name = "-printDepth", 
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
   int printDepth = 1;
 
-  @Option(name = "-costThreshold", metaVar = "costThreshold",
+  @Option(name = "-costThreshold",
       usage = "Minimum Total Class cost required to print that class' metrics.")
   int minCostThreshold = 1;
 
-  @Option(name = "-whitelist", metaVar ="com.foo.one:com.foo.two",
+  @Option(name = "-whitelist", 
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
-                  "given values.")
+                  "given values. (Always whitelists java.*)")
   String wl = null;
   private final PackageWhiteList whitelist = new PackageWhiteList();
 
-  @Argument(metaVar = "classes/packages",
+  @Argument(metaVar = "classes and packages",
           usage = "Classes or packages to analyze. " +
           "Matches any class starting with these.\n" +
           "Ex. com.example.analyze.these com.google.and.these.packages " +
-          "com.google.or.AClass", required = true)
+          "com.google.AClass", required = true)
   protected List<String> entryList = new ArrayList<String>();
   protected ClasspathRootGroup classpath;
 
@@ -95,10 +95,6 @@ public class Testability {
       err.println(e.getMessage() + "\n");
       parser.setUsageWidth(120);
       parser.printUsage(err);
-      err.println("\njava com.google.test.metric.Testability" +
-        " -cp classpath packages.to.analyze");
-      err.println("\nExample: java -cp lib/foo.jar com.foo.model.Device\n" +
-        "Example: java -cp lib/foo.jar:classes com.foo.subpkg foo.AClass\n");
       throw new CmdLineException("Exiting...");
     }
   }
@@ -117,8 +113,7 @@ public class Testability {
   public void execute() {
     postParse();
     ClassRepository repository = new ClassRepository(classpath);
-    MetricComputer computer = new MetricComputer(repository, err, 
-        whitelist);
+    MetricComputer computer = new MetricComputer(repository, err, whitelist);
     HumanReadablePrinter printer = new HumanReadablePrinter(out);
     for (String className : classpath.getAllContainedClassNames(entryList)) {
       try {
@@ -130,7 +125,7 @@ public class Testability {
       }
     }
     out.println("Analyzed " + classpath.getAllContainedClassNames(entryList).size() +
-        " classes (plus how ever many of their external dependencies)");
+        " classes (plus non-whitelisted external dependencies)");
   }
 
 }

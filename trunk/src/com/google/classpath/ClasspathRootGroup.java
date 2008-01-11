@@ -2,14 +2,11 @@ package com.google.classpath;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Collection;
+import java.util.List;
 
-/**
- * User: jwolter Date: Dec 12, 2007
- */
 public class ClasspathRootGroup {
-  private List<ClasspathRoot> roots;
+  private final List<ClasspathRoot> roots;
 
   public ClasspathRootGroup(List<ClasspathRoot> roots) {
     this.roots = roots;

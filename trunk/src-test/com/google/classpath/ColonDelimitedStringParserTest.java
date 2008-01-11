@@ -1,14 +1,10 @@
 package com.google.classpath;
 
+import java.net.URL;
+import java.util.List;
+
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.net.URL;
-
-/**
- * User: jwolter
- * Date: Dec 13, 2007
- */
 public class ColonDelimitedStringParserTest extends TestCase {
      List<String> list;
 

@@ -10,13 +10,10 @@ import java.util.List;
 /**
  * Splits up a string on colons or semicolons for pulling out as a list of
  * Files, Strings, or URLs.
- *
- * User: jwolter
- * Date: Dec 13, 2007
  */
 public class ColonDelimitedStringParser {
     private final String DELIMITER_REGEX = "(:|;)";
-    private List<String> list = new ArrayList<String>();
+    private final List<String> list = new ArrayList<String>();
 
     public ColonDelimitedStringParser(String str) {
       if (str != null) {

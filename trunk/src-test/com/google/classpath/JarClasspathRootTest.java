@@ -7,10 +7,6 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-/**
- * User: jwolter
- * Date: Dec 13, 2007
- */
 public class JarClasspathRootTest extends TestCase {
   /**
    * Directories to be used for testing that contains class files, for testing.

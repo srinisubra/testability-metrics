@@ -15,9 +15,6 @@
  */
 package com.google.test.metric;
 
-/**
- * User: jwolter Date: Nov 30, 2007
- */
 public class LineNumberCost {
   private final int lineNumber;
   private final MethodCost methodCost;
