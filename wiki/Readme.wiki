@@ -57,9 +57,27 @@ public class Primeness {
 
 *OUTPUT:*
 {{{
-com.google.test.metric.example.Primeness
-  <init>()V[0, 0 / 0, 0]
-  isPrime(I)Z[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.Primeness*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.Primeness [ 2 TCC, 0 TGC ]
+  com.google.test.metric.example.Primeness.isPrime(I)Z [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 2
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 2.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 *EXPLANATION:*
@@ -109,10 +127,28 @@ public class SumOfPrimes1 {
 
 *OUTPUT:*
 {{{
-com.google.test.metric.example.SumOfPrimes
-  <init>()V[0, 0 / 0, 0]
-  sum(I)I[2, 0 / 4, 0]
-    line 25: isPrime(I)Z[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.SumOfPrimes1*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.SumOfPrimes1 [ 4 TCC, 0 TGC ]
+  com.google.test.metric.example.SumOfPrimes1.sum(I)I [2, 0 / 4, 0]
+    line 25: com.google.test.metric.example.Primeness.isPrime(I)Z [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 4
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 4.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 The testability and global state costs for the constructor (indicated by <init>)
@@ -157,9 +193,27 @@ public class SumOfPrimes2 {
 
 *OUTPUT:*
 {{{ 
-com.google.test.metric.example.SumOfPrimes2
-  <init>(Lcom/google/test/metric/example/Primeness;)V[0, 0 / 0, 0]
-  sum(I)I[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.SumOfPrimes2*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.SumOfPrimes2 [ 2 TCC, 0 TGC ]
+  com.google.test.metric.example.SumOfPrimes2.sum(I)I [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 2
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 2.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 In this case `Primeness` is injected the into the constructor of the 
@@ -249,11 +303,35 @@ public class GlobalExample {
 *OUTPUT:*
 
 {{{
-Testability cost for com.google.test.metric.example.GlobalExample
-  com.google.test.metric.example.GlobalExample.getGlobalCount()I[0, 0 / 0, 1]
-    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I[0, 1 / 0, 1]
-  com.google.test.metric.example.GlobalExample.globalIncrement()I[0, 0 / 0, 1]
-    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I[0, 1 / 0, 1]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.GlobalExample*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.GlobalExample [ 0 TCC, 2 TGC ]
+  com.google.test.metric.example.GlobalExample.getGlobalCount()I [0, 0 / 0, 1]
+    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I [0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample.globalIncrement()I [0, 0 / 0, 1]
+    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I [0, 1 / 0, 1]
+
+Testability cost for com.google.test.metric.example.GlobalExample$Globals [ 0 TCC, 3 TGC ]
+  com.google.test.metric.example.GlobalExample$Globals.<init>()V [0, 0 / 0, 1]
+    line 43: com.google.test.metric.example.GlobalExample$Globals.<clinit>()V [0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample$Globals.<clinit>()V [0, 2 / 0, 2]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 0
+ TGC for all classes entered: 5
+ Average TCC for all classes entered: 0.00
+ Average TGC for all classes entered: 1.67
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 3 classes (plus non-whitelisted external dependencies)
 }}}
 
 ===`getGlobalId()`===
