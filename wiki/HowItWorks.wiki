@@ -1,0 +1,57 @@
+How it Works
+
+= Introduction =
+
+For those who are interested how the numbers are computed you can find the inner workings here.
+
+= What is Testable? =
+
+== Injectability ==
+We consider a class testable if it would be easy for us to exercise all paths of execution of the class without exercising  the rest of the system. (The classic definition of 'unit test' only test one class at a time ) In order to test only the class, we need to be able to intercept any calls going out of the class, (or at least be sure that those few calls which we can not intercept are inexpensive).
+
+   Overall, we believe that a two classes (all other things equal) the one which allows interception of outbound calls will be easier to test, *because it can be isolated in a test*.
+
+We intercept calls by:
+  * Overriding a method in a subclass.
+  * Working with a mock/fake implementation instead of real one.
+
+In order to be able to override method, or pass in a mock, we must control object construction, so that we can construct a mock or a subclass of the class under test. Lets look at an example:
+{{{
+public class SumOfPrimes1 {
+  private final Primeness primeness = new Primeness();
+  public int sum(int max) {
+    int sum = 0;
+    for (int i = 0; i < max; i++) {
+      if (primeness.isPrime(i)) {
+        sum += i;
+      }
+    }
+    return sum;
+  }
+}
+}}}
+
+In the code above, there is no way to test `SumOfPrimes1` class without exercising `Primeness` class as well. This is because  we can not intercept the call to `primeness.isPrime()`. This is because in order to override the method we would need to pass in a subclass of `Primeness`, but the test does not control the construction of the `Primeness` and hence can not intercept it.
+
+   In this case the cost of `primeness.isPrime()` is low and is not an issue. But image the the call would talk to an external system and charge a credit card, in such a case interception becomes top priority.
+
+In the similar code below the call to `primeness.isPrime()` can be intercepted in the test. We therefore believe that this class is easier to test. The reason, is that the test can easily pass in a subclass of `Primeness` with its `isPrime()` method stubbed out.
+{{{
+public class SumOfPrimes2 {
+  private final Primeness primeness;
+  public SumOfPrimes2(Primeness primeness) {
+    this.primeness = primeness;
+  }
+  public int sum(int max) {
+    int sum = 0;
+    for (int i = 0; i < max; i++) {
+      if (primeness.isPrime(i)) {
+        sum += i;
+      }
+    }
+    return sum;
+  }
+}
+}}}
+
+We say that the field `primeness` is *injectable*. This implies that any method dispatch (except `final`/`private`/`static`) on the `primeness` field  can be intercepted.
