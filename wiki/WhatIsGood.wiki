@@ -13,7 +13,7 @@ In the end the tool only reports some numbers, which need to be interpreted with
 Our empirical evidence has shown us that these are typical numbers for Excellent / Good / Needs Work projects.
 
 == Excellent ==
- Code which was test driven tends to have almost all method complexity cost of less then 20 and zero global variables
+Code which was test driven tends to have almost all method complexity cost of less then 20 and zero global variables
 
 == Good ==
 
