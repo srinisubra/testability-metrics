@@ -174,7 +174,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.printDepth = 10;
     testability.execute();
     List<String> classes = testability.classpath
-        .getAllContainedClassNames(testability.entryList);
+        .getClassNamesToEnter(testability.entryList);
     String global = "com.google.test.metric.example.GlobalExample";
     assertTrue(classes.contains(global));
     assertTrue(classes.contains(global + "Test"));

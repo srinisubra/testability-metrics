@@ -17,24 +17,27 @@ public class ClasspathRootGroup {
     return roots.size();
   }
 
-  /** Returns the first matching resource in one of the grouped ClasspathRoots */
+  /**
+   * Returns the first matching resource in one of the grouped ClasspathRoots
+   */
   public InputStream getResourceAsStream(String resourceName) {
-      InputStream stream = null;
-      for (ClasspathRoot classpathRoot : roots) {
-         stream = classpathRoot.getResourceAsStream(resourceName);
-         if (stream != null) {
-            break;
-         }
+    InputStream stream = null;
+    for (ClasspathRoot classpathRoot : roots) {
+      stream = classpathRoot.getResourceAsStream(resourceName);
+      if (stream != null) {
+        break;
       }
-      return stream;
+    }
+    return stream;
   }
 
-  public List<String> getAllContainedClassNames(List<String> packagesAndClasses) {
-      List<String> classNames = new ArrayList<String>();
-      for (ClasspathRoot classpathRoot : roots) {
-          Collection<String> clazzes = classpathRoot.getAllContainedClassNames(packagesAndClasses);
-          classNames.addAll(clazzes);
-      }
-      return classNames;
+  public List<String> getClassNamesToEnter(List<String> entryList) {
+    List<String> classNames = new ArrayList<String>();
+    for (ClasspathRoot classpathRoot : roots) {
+      Collection<String> clazzes = classpathRoot
+          .getAllContainedClassNames(entryList);
+      classNames.addAll(clazzes);
+    }
+    return classNames;
   }
 }

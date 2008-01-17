@@ -91,8 +91,12 @@ public class MethodCost {
 
   @Override
   public String toString() {
-      return method + "[" + getComplexityCost() + ", " + getGlobalCost() + " / "
-        + totalComplexityCost + ", " + totalGlobalCost + "]";
+      return getMethod() + toCostsString();
+  }
+
+  public String toCostsString() {
+    return " [" + getComplexityCost() + ", " + getGlobalCost() + " / "
+    + getTotalComplexityCost() + ", " + getTotalGlobalCost() + "]";
   }
 
 }
