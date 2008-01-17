@@ -70,3 +70,33 @@ The heuristics are:
     * Recursively add the cost of any method called from this method which are dispatched on a non-injectable instance. (Injectable instances can be intercepted and hence their cost can be avoided in test).
 
    NOTE: The cyclomatic complexity used by the tools is decremented by 1. A standard way of computing cyclomatic complexity is to start at 1, but a method with a cyclomatic complexity of 1 can be split to `N` smaller methods. The one single method and `N` smaller ones each with cyclomatic complexity of 1. When we perform a sum over the `N` methods the cyclomatic complexity is not the same. This penalizes code which is broken into lots of small methods (but lots of small methods is a good thing). For this reasons we changed the offset of the method and say that a simple method is 0 and hence splitting 0 to `N` 0 is still zero and we gain the equivalence.
+
+= Global State is Undesirable = 
+
+Many software developers are of the opinion that a global state is undesirable. Few of the reasons are: 
+  * hidden dependencies
+  * poor isolation of tests (Order of tests may matter)
+
+   NOTE: It is not that all globals are bad, only those which are mutable. The immutable ones are constants for all practical purposes.
+
+
+== Global variables are transitive ==
+
+{{{
+  public static class Gadget {
+    public static final Gadget instance = new Gadget("Global", 1);
+    public final String id;
+    public int count;
+
+    private Gadget(String id, int count) {
+      this.id = id;
+      this.count = count;
+    }
+  }
+}}}
+
+In the example above all global (`static`) fields are declared as `final` hence one would think that there is no mutable global state. But this is not true. The field `count`is mutable and is globally reachable `Gadget.instance.count`. therefore if there is code which `Gadget.instance.count` it will incur global cost. The fields `Gadget.instance` is `static` and hence is marked global. However, because it is `final` it is immutable. However, traversing `Gadget.instance` makes the `Gadget` instance global. Accessing any fields on `Gadget` will be considered global access and accessing any non `final` fields (either read or write) will incur a global cost.
+
+= Summary =
+
+We believe that high injectability and low global state leads to testable code. High injectability is good because it gives the test plenty of choices where to intercept the code under tests and make the test as small as possible. Similarly low global state will aid in isolating the tests from each other. Both of which are highly desirable qualities.
