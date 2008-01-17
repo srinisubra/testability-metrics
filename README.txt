@@ -7,8 +7,27 @@ piece of code. The difficulty is a measure of:
   # how hard it will be to construct this object
   # how hard will it be to execute the method in order to be able to assert something in a test.
 
+==How to run it==
+{{{
+$ java -jar testability-metrics-1.0.0RC2.jar
+
+Argument "classes and packages" is required
+
+ classes and packages : Classes or packages to analyze. Matches any class starting with these.
+                        Ex. com.example.analyze.these com.google.and.these.packages com.google.AClass
+ -costThreshold N     : Minimum Total Class cost required to print that class' metrics.
+ -cp VAL              : colon delimited classpath to analyze (jars or directories)
+                        Ex. lib/one.jar:lib/two.jar
+ -printDepth N        : Maximum depth to recurse and print costs of classes/methods that the classes under analysis depe
+                        nd on. Defaults to 0.
+ -whitelist VAL       : colon delimited whitelisted packages that will not count against you. Matches packages/classes s
+                        tarting with given values. (Always whitelists java.*)
+}}}
+
+
+==Output Format==
 An example score for a method is:
-  `methodName()V[1, 2 / 3, 4]`
+  `package.Class.methodName()V[1, 2 / 3, 4]`
 
 The four numbers, in order, represent this method's:
   # _Testability Complexity_:
@@ -33,36 +52,35 @@ public class Primeness {
 }
 }}}
 *TRY IT:
-   *`testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
+   `testability.sh -printDepth 10 com.google.test.metric.example.Primeness`
 
 *OUTPUT:*
 {{{
-com.google.test.metric.example.Primeness
-  <init>()V[0, 0 / 0, 0]
-  isPrime(I)Z[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.Primeness*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.Primeness [ 2 TCC, 0 TGC ]
+  com.google.test.metric.example.Primeness.isPrime(I)Z [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 2
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 2.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 *EXPLANATION:*
-{{{
-com.google.test.metric.example.Primeness
-                            | Name of the class
-  <init>()V[0, 0 / 0, 0]    | Name of the method under test 
-                            |   The <init> notation refers to the 
-                            |   constructor.
-                            | The [0, 0 / 0, 0] refers to the metric
-                            | [tc, gc / ttc, tgc]
-                            | (tc,gc) is per method complexity
-                            | (ttc, tgc) total/recursive complexity
-                            | tc: test complexity
-                            | gc: global state complexity.
-                            | ttc: Total test complexity (recursive)
-                            | tgc: Total global complexity (recursive)
-  isPrime(I)Z[2, 0 / 2, 0]  | This method has testing complexity of 2
-                            | and has no global statics
 
-}}}
-
-==Test Complexity==
 In the above example the test complexity is 2. This is because the
 method `isPrime` has a loop and an `if` statement. Therefore there are 2
 additional paths of execution for a total of 3.
@@ -108,10 +126,28 @@ public class SumOfPrimes1 {
 
 *OUTPUT:*
 {{{
-com.google.test.metric.example.SumOfPrimes
-  <init>()V[0, 0 / 0, 0]
-  sum(I)I[2, 0 / 4, 0]
-    line 25: isPrime(I)Z[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.SumOfPrimes1*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.SumOfPrimes1 [ 4 TCC, 0 TGC ]
+  com.google.test.metric.example.SumOfPrimes1.sum(I)I [2, 0 / 4, 0]
+    line 25: com.google.test.metric.example.Primeness.isPrime(I)Z [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 4
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 4.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 The testability and global state costs for the constructor (indicated by <init>)
@@ -156,9 +192,27 @@ public class SumOfPrimes2 {
 
 *OUTPUT:*
 {{{ 
-com.google.test.metric.example.SumOfPrimes2
-  <init>(Lcom/google/test/metric/example/Primeness;)V[0, 0 / 0, 0]
-  sum(I)I[2, 0 / 2, 0]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.SumOfPrimes2*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.SumOfPrimes2 [ 2 TCC, 0 TGC ]
+  com.google.test.metric.example.SumOfPrimes2.sum(I)I [2, 0 / 2, 0]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 2
+ TGC for all classes entered: 0
+ Average TCC for all classes entered: 2.00
+ Average TGC for all classes entered: 0.00
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 1 classes (plus non-whitelisted external dependencies)
 }}}
 
 In this case `Primeness` is injected the into the constructor of the 
@@ -186,6 +240,11 @@ _(Caveat: The method can not be static, private, or final, as those methods can 
 overridden)._ 
 
 ==Example: Global State==
+
+Global state makes it hard to tests ones code as it allows cross talk between
+test. This makes it so that tests can pass by themselves but fail when run in 
+a suite. It is also possible to make tests which will run in only a specific
+order.
 
 *SOURCE:*
 {{{
@@ -238,27 +297,40 @@ public class GlobalExample {
 }}}
 
 *TRY IT:*
-   `java -cp bin:lib/args4j-2.0.8.jar:lib/asm-3.0.jar 
-   com.google.test.metric.Testability -cp bin -printDepth 10  
-   -costThreshold 0 com.google.test.metric.example.GlobalExample 
-   com.google.test.metric.example.GlobalExample`
+   `testability.sh -printDepth 10 com.google.test.metric.example.GlobalExample com.google.test.metric.example.GlobalExample`
 
 *OUTPUT:*
 
 {{{
-Testability cost for com.google.test.metric.example.GlobalExample
-  com.google.test.metric.example.GlobalExample.getGlobalId()Ljava/lang/String;[0, 0 / 0, 0]
-    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
-    line 51: com.google.test.metric.example.GlobalExample$Gadget.getId()Ljava/lang/String;[0, 0 / 0, 0]
-  com.google.test.metric.example.GlobalExample.getInstance()Lcom/google/test/metric/example/GlobalExample$Gadget;[0, 0 / 0, 0]
-    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
-  com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
-  com.google.test.metric.example.GlobalExample.getGlobalCount()I[0, 0 / 0, 1]
-    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
-    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I[0, 1 / 0, 1]
-  com.google.test.metric.example.GlobalExample.globalIncrement()I[0, 0 / 0, 1]
-    line 18: com.google.test.metric.example.GlobalExample.<init>()V[0, 0 / 0, 0]
-    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I[0, 1 / 0, 1]
+-----------------------------------------
+Packages/Classes To Enter: 
+ com.google.test.metric.example.GlobalExample*
+-----------------------------------------
+
+
+Testability cost for com.google.test.metric.example.GlobalExample [ 0 TCC, 2 TGC ]
+  com.google.test.metric.example.GlobalExample.getGlobalCount()I [0, 0 / 0, 1]
+    line 55: com.google.test.metric.example.GlobalExample$Gadget.getCount()I [0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample.globalIncrement()I [0, 0 / 0, 1]
+    line 59: com.google.test.metric.example.GlobalExample$Gadget.increment()I [0, 1 / 0, 1]
+
+Testability cost for com.google.test.metric.example.GlobalExample$Globals [ 0 TCC, 3 TGC ]
+  com.google.test.metric.example.GlobalExample$Globals.<init>()V [0, 0 / 0, 1]
+    line 43: com.google.test.metric.example.GlobalExample$Globals.<clinit>()V [0, 1 / 0, 1]
+  com.google.test.metric.example.GlobalExample$Globals.<clinit>()V [0, 2 / 0, 2]
+
+-----------------------------------------
+Summary Statistics:
+ TCC for all classes entered: 0
+ TGC for all classes entered: 5
+ Average TCC for all classes entered: 0.00
+ Average TGC for all classes entered: 1.67
+
+Key:
+ TCC: Total Compexity Cost
+ TGC: Total Global Cost
+
+Analyzed 3 classes (plus non-whitelisted external dependencies)
 }}}
 
 ===`getGlobalId()`===
@@ -276,13 +348,11 @@ variables which are final.
 ===`getGlobalCount()`===
 
 Method `getGlobalCount()` accesses the `Globals.instance` which is a global
-constant hence does not count. It then calls the `Gadget.getCount()` which
-accesses the `count` variable. The `Globals.instance` is global but it is
-not mutable, but the global property is transitive and it is transfered
-to `this` of `Gadget` so when `this.count` is accessed it is considered
-a global access as well. Because  `count` is mutable (no `final` keyword)
-therefore the `count` variable is global and mutable, and as a result reading
-it incurs a cost.
+constant. Accessing global constants is not a problem and hence does not 
+incur a cost. It then calls the `Gadget.getCount()` which accesses the `count`
+field. Because the `Gadget`'s `this` is a global constant, all of its
+fields are global as well. The global property is transitive. Because  `count`
+is mutable (no `final` keyword) reading `count` incurs a cost.
 
 ===`globalIncrement()`===
 

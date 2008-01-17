@@ -89,7 +89,7 @@ public class ClassCost {
   public long getHighestMethodGlobalCost() {
     long cost = 0;
     for (MethodCost methodCost : getMethods()) {
-      if (methodCost.getTotalComplexityCost() > cost) {
+      if (methodCost.getTotalGlobalCost() > cost) {
         cost = methodCost.getTotalGlobalCost();
       }
     }
