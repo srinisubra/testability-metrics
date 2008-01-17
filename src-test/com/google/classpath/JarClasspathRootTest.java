@@ -32,7 +32,7 @@ public class JarClasspathRootTest extends TestCase {
     assertEquals(3, group.getGroupCount());
     ArrayList<String> packageFilter = new ArrayList<String>();
     packageFilter.add("");
-    List<String> names = group.getAllContainedClassNames(packageFilter);
+    List<String> names = group.getClassNamesToEnter(packageFilter);
     assertTrue(names.contains("junit.runner.Sorter"));
     assertTrue(names.contains("junit.textui.TestRunner"));
     assertTrue(names.contains("com.tonicsystems.jarjar.ext_util.JarProcessor"));

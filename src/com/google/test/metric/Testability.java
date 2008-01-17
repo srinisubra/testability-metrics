@@ -30,12 +30,12 @@ import com.google.classpath.ColonDelimitedStringParser;
 
 public class Testability {
 
-  @Option(name = "-cp", 
+  @Option(name = "-cp",
       usage = "colon delimited classpath to analyze (jars or directories)" +
           "\nEx. lib/one.jar:lib/two.jar")
   protected String cp = System.getProperty("java.class.path", ".");
 
-  @Option(name = "-printDepth", 
+  @Option(name = "-printDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
   int printDepth = 1;
@@ -44,7 +44,7 @@ public class Testability {
       usage = "Minimum Total Class cost required to print that class' metrics.")
   int minCostThreshold = 1;
 
-  @Option(name = "-whitelist", 
+  @Option(name = "-whitelist",
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
                   "given values. (Always whitelists java.*)")
@@ -106,7 +106,6 @@ public class Testability {
     if (entryList.isEmpty()) {
       entryList.add("");
     }
-    out.println(entryList.get(0));
     classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
   }
 
@@ -114,18 +113,18 @@ public class Testability {
     postParse();
     ClassRepository repository = new ClassRepository(classpath);
     MetricComputer computer = new MetricComputer(repository, err, whitelist);
-    HumanReadablePrinter printer = new HumanReadablePrinter(out);
-    for (String className : classpath.getAllContainedClassNames(entryList)) {
+    HumanReadablePrinter printer = new HumanReadablePrinter(out, entryList);
+    printer.printHeader();
+    List<String> classNames = classpath.getClassNamesToEnter(entryList);
+    for (String className : classNames) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
         printer.print(classCost, printDepth, minCostThreshold);
       } catch (ClassNotFoundException e) {
-        err.println("WARNING: can not analyze class '" + className + 
+        err.println("WARNING: can not analyze class '" + className +
             "' since class '" + e.getClassName() + "' was not found.");
       }
     }
-    out.println("Analyzed " + classpath.getAllContainedClassNames(entryList).size() +
-        " classes (plus non-whitelisted external dependencies)");
+    printer.printFooter(classNames.size());
   }
-
 }
