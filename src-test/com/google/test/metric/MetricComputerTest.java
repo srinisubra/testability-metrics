@@ -338,8 +338,10 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testGlobalLoadMethodDispatchNoStateAccessShouldBeZero() {
     ClassCost cost = computer.compute(GlobalStateUser.class);
     assertEquals(0L, cost.getMethodCost("noLoad()V").getTotalGlobalCost());
-    assertEquals(0L, cost.getMethodCost("accessFinalState()V").getTotalGlobalCost());
-    assertEquals(0L, cost.getMethodCost("accessFinalState2()V").getTotalGlobalCost());
+    assertEquals(0L, cost.getMethodCost("accessFinalState()V")
+        .getTotalGlobalCost());
+    assertEquals(0L, cost.getMethodCost("accessFinalState2()V")
+        .getTotalGlobalCost());
   }
 
   public void testGlobalLoadAccessStateShouldBeOne() {
@@ -348,10 +350,12 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   }
 
   public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
-    MethodCost cost = computer.compute(GlobalStateUser.class, "accessMutableState()V");
-    new HumanReadablePrinter(System.out, null).print("", cost, 10, 0);
-    assertEquals("Expecting one for read and one for write", 2L, cost
-        .getTotalGlobalCost());
+    MethodCost cost =
+        computer.compute(GlobalStateUser.class, "accessMutableState()V");
+    new HumanReadablePrinter(System.out, null, Integer.MAX_VALUE, 0)
+        .print("", cost, 10, 0);
+    assertEquals("Expecting one for read and one for write", 2L,
+        cost.getTotalGlobalCost());
   }
 
   public void testJavaLangObjectParsesCorrectly() throws Exception {

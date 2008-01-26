@@ -16,6 +16,7 @@
 package com.google.test.metric;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,10 +27,53 @@ public class HumanReadablePrinter {
   private final List<String> entryList;
   private long cumulativeTCC = 0;
   private long cumulativeTGC = 0;
+  private final List<ClassCost> toPrint = new ArrayList<ClassCost>();
+  private final int maxDepth;
+  private final int minCost;
 
-  public HumanReadablePrinter(PrintStream out, List<String> entryList) {
+  public HumanReadablePrinter(PrintStream out, List<String> entryList,
+      int maxDepth, int minCost) {
     this.out = out;
     this.entryList = entryList;
+    this.maxDepth = maxDepth;
+    this.minCost = minCost;
+  }
+
+  public void printHeader() {
+    out.println(DIVIDER + "Packages/Classes To Enter: ");
+    for (String entry : entryList) {
+      out.println("  " + entry + "*");
+    }
+    out.println("Max Method Print Depth: " + maxDepth);
+    out.println("Min Class Cost: " + minCost);
+    out.println(DIVIDER);
+  }
+
+  public void printFooter(int countAnalyzed) {
+    out.println("\n" + DIVIDER + "Summary Statistics:");
+    out.println(" TCC for all classes entered: " + cumulativeTCC);
+    out.println(" TGC for all classes entered: " + cumulativeTGC);
+    out.println(" Average TCC for all classes entered: " +
+        String.format("%.2f", ((double)cumulativeTCC) / countAnalyzed));
+    out.println(" Average TGC for all classes entered: " +
+        String.format("%.2f", ((double)cumulativeTGC) / countAnalyzed));
+
+    out.println("\nKey:");
+    out.println(" TCC: Total Compexity Cost");
+    out.println(" TGC: Total Global Cost");
+
+    out.println("\nAnalyzed " + countAnalyzed +
+    " classes (plus non-whitelisted external dependencies)");
+  }
+
+  public void addClassCostToPrint(ClassCost classCost) {
+    toPrint.add(classCost);
+  }
+
+  public void printClassCosts() {
+    for (ClassCost classCost : toPrint) {
+      print(classCost, maxDepth, minCost);
+    }
   }
 
   public void print(ClassCost classCost, int maxDepth, int minCost) {
@@ -89,31 +133,6 @@ public class HumanReadablePrinter {
       return false;
     }
     return true;
-  }
-
-  public void printHeader() {
-    out.println(DIVIDER + "Packages/Classes To Enter: ");
-    for (String entry : entryList) {
-      out.println(" " + entry + "*");
-    }
-    out.println(DIVIDER);
-  }
-
-  public void printFooter(int countAnalyzed) {
-    out.println("\n" + DIVIDER + "Summary Statistics:");
-    out.println(" TCC for all classes entered: " + cumulativeTCC);
-    out.println(" TGC for all classes entered: " + cumulativeTGC);
-    out.println(" Average TCC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTCC) / countAnalyzed));
-    out.println(" Average TGC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTGC) / countAnalyzed));
-
-    out.println("\nKey:");
-    out.println(" TCC: Total Compexity Cost");
-    out.println(" TGC: Total Global Cost");
-
-    out.println("\nAnalyzed " + countAnalyzed +
-    " classes (plus non-whitelisted external dependencies)");
   }
 
 }

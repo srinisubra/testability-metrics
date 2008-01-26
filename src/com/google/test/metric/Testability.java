@@ -113,7 +113,8 @@ public class Testability {
     postParse();
     ClassRepository repository = new ClassRepository(classpath);
     MetricComputer computer = new MetricComputer(repository, err, whitelist);
-    HumanReadablePrinter printer = new HumanReadablePrinter(out, entryList);
+    HumanReadablePrinter printer =
+        new HumanReadablePrinter(out, entryList, printDepth, minCostThreshold);
     printer.printHeader();
     List<String> classNames = classpath.getClassNamesToEnter(entryList);
     for (String className : classNames) {
