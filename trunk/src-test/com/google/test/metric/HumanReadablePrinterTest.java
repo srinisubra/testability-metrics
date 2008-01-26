@@ -18,11 +18,12 @@ package com.google.test.metric;
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.EMPTY_LIST;
 
-import com.google.test.metric.asm.Visibility;
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.google.test.metric.asm.Visibility;
 
 public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
@@ -135,7 +136,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
         out.toString());
   }
 
-  public void testAddSeveralClassCostsThenPrintThem() throws Exception {
+  public void testAddSeveralClassCostsAndPrintThem() throws Exception {
     ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
     ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
     ClassInfo classInfo2 = new ClassInfo("FAKE_classInfo2", false, null, null);
@@ -149,6 +150,32 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     assertEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n" +
         "\nTestability cost for FAKE_classInfo1 [ 0 TCC, 0 TGC ]\n" +
         "\nTestability cost for FAKE_classInfo2 [ 0 TCC, 0 TGC ]\n",
+        out.toString());
+  }
+
+  public void testAddSeveralClassCostsAndPrintThemInDescendingCostOrder()
+      throws Exception {
+    ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
+    ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
+    ClassInfo classInfo2 = new ClassInfo("FAKE_classInfo2", false, null, null);
+    List<MethodCost> methodCosts1 = new ArrayList<MethodCost>();
+    methodCosts1.add(methodCost1);
+    methodCost1.link();
+    List<MethodCost> methodCosts2 = new ArrayList<MethodCost>();
+    methodCosts2.add(methodCost2);
+    methodCost2.link();
+    ClassCost classCost0 = new ClassCost(classInfo0, new ArrayList<MethodCost>());
+    ClassCost classCost1 = new ClassCost(classInfo1, methodCosts1);
+    ClassCost classCost2 = new ClassCost(classInfo2, methodCosts2);
+    printer.addClassCostToPrint(classCost0);
+    printer.addClassCostToPrint(classCost1);
+    printer.addClassCostToPrint(classCost2);
+    printer.printClassCosts();
+    assertEquals("\nTestability cost for FAKE_classInfo2 [ 2 TCC, 0 TGC ]\n" +
+    		"  c.g.t.A.method2()V [2, 0 / 2, 0]\n" +
+        "\nTestability cost for FAKE_classInfo1 [ 1 TCC, 0 TGC ]\n" +
+        "  c.g.t.A.method1()V [1, 0 / 1, 0]\n" +
+        "\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 

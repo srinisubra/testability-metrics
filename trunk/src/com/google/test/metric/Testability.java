@@ -120,12 +120,13 @@ public class Testability {
     for (String className : classNames) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
-        printer.print(classCost, printDepth, minCostThreshold);
+        printer.addClassCostToPrint(classCost);
       } catch (ClassNotFoundException e) {
         err.println("WARNING: can not analyze class '" + className +
             "' since class '" + e.getClassName() + "' was not found.");
       }
     }
+    printer.printClassCosts();
     printer.printFooter(classNames.size());
   }
 }

@@ -17,6 +17,7 @@ package com.google.test.metric;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,6 +72,7 @@ public class HumanReadablePrinter {
   }
 
   public void printClassCosts() {
+    Collections.sort(toPrint, ClassCost.descendingClassCost);
     for (ClassCost classCost : toPrint) {
       print(classCost, maxDepth, minCost);
     }
