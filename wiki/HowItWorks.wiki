@@ -6,7 +6,7 @@ For those who are interested how the numbers are computed you can find the inner
 
 = What is Testable? =
 
-== Injectability ==
+== Injectability is Good ==
 We consider a class testable if it would be easy for us to exercise all paths of execution of the class without exercising  the rest of the system. (The classic definition of 'unit test' only test one class at a time) In order to test only the class, we need to be able to intercept any calls going out of the class, (or at least be sure that those few calls which we can not intercept are inexpensive).
 
    Overall, we believe that a two classes (all other things equal) the one which allows interception of outbound calls will be easier to test, *because it can be isolated in a test*.
@@ -33,9 +33,9 @@ public class SumOfPrimes1 {
 
 In the code above, there is no way to test `SumOfPrimes1` class without exercising `Primeness` class as well. This is because  we can not intercept the call to `primeness.isPrime()`. This is because in order to override the method we would need to pass in a subclass of `Primeness`, but the test does not control the construction of the `Primeness` and hence can not intercept it.
 
-   In this case the cost of `primeness.isPrime()` is low and is not an issue. But image the the call would talk to an external system and charge a credit card, in such a case interception becomes top priority.
+   In this case the cost of `primeness.isPrime()` is low and is not an issue. But imagine  if the the call talked to an external system and charged a credit card. A good unit test, that would not make. In the real world, interception becomes top priority.
 
-In the similar code below the call to `primeness.isPrime()` can be intercepted in the test. We therefore believe that this class is easier to test. The reason, is that the test can easily pass in a subclass of `Primeness` with its `isPrime()` method stubbed out.
+In the similar code below the call to `primeness.isPrime()` can be intercepted in the test. Primeness is set via the constructor, so the test can easily pass in a subclass of `Primeness` with its `isPrime()` method stubbed out. We therefore believe that this class is easier to test. 
 {{{
 public class SumOfPrimes2 {
   private final Primeness primeness;
@@ -58,22 +58,22 @@ We say that the field `primeness` is *injectable*. This implies that any method 
 
 == Injectability is Transitive ==
 
-The tool heuristically looks at a class and identifies all variables/fields/parameters which are injectable (ie can be controlled from the outside).
+The tool heuristically looks at a class and identifies all variables/fields/parameters which are injectable (i.e. can be controlled from the outside).
 
-The heuristics are:
+The heuristics to calculate injectability are:
   * Assume any public non final fields are injectable and mark them so. 
   * Find the constructor with the most (non-primitive) arguments and analyze the assignments marking fields injectable as necessary.
   * Find all setters and analyze their assignments marking fields injectable as necessary.
   * Analyze the method of interest.
-    * Compute the cyclomatic complexity of the method this is the method cost.
+    * Compute the cyclomatic complexity* of the method this is the method cost.
     * If the method is instance method add the cost (cyclomatic complexity) of the constructor (There is no way to instantiate an object and not call its constructor)
     * Recursively add the cost of any method called from this method which are dispatched on a non-injectable instance. (Injectable instances can be intercepted and hence their cost can be avoided in test).
 
-   NOTE: The cyclomatic complexity used by the tools is decremented by 1. A standard way of computing cyclomatic complexity is to start at 1, but a method with a cyclomatic complexity of 1 can be split to `N` smaller methods. The one single method and `N` smaller ones each with cyclomatic complexity of 1. When we perform a sum over the `N` methods the cyclomatic complexity is not the same. This penalizes code which is broken into lots of small methods (but lots of small methods is a good thing). For this reasons we changed the offset of the method and say that a simple method is 0 and hence splitting 0 to `N` 0 is still zero and we gain the equivalence.
+   *NOTE: The cyclomatic complexity used by the tools is decremented by 1. A standard way of computing cyclomatic complexity is to start at 1, but a method with a cyclomatic complexity of 1 can be split to `N` smaller methods. Splitting into methods would increase your complexity from 1 to N. This penalizes code which is broken into lots of small methods (but lots of small methods is a good thing!) For this reasons we changed the offset of the method and say that a simple method is 0 and hence splitting 0 to `N` is still zero.
 
 = Global State is Undesirable = 
 
-Many software developers are of the opinion that a global state is undesirable. Few of the reasons are: 
+Many software developers are of the opinion that a global state is undesirable. A few of the reasons are: 
   * hidden dependencies
   * poor isolation of tests (Order of tests may matter)
 
