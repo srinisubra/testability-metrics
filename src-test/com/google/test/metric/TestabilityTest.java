@@ -188,7 +188,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.execute();
     String baselineOutput = out.toString();
     out.clear();
-    testability.minCostThreshold = 9;
+    testability.minCost = 9;
     testability.execute();
     String throttledOutput = out.toString();
     assertTrue(throttledOutput, throttledOutput.length() < baselineOutput

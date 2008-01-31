@@ -40,9 +40,9 @@ public class Testability {
       	  "that the classes under analysis depend on. Defaults to 0.")
   int printDepth = 1;
 
-  @Option(name = "-costThreshold",
+  @Option(name = "-minCost",
       usage = "Minimum Total Class cost required to print that class' metrics.")
-  int minCostThreshold = 1;
+  int minCost = 1;
 
   @Option(name = "-whitelist",
           usage = "colon delimited whitelisted packages that will not " +
@@ -114,7 +114,7 @@ public class Testability {
     ClassRepository repository = new ClassRepository(classpath);
     MetricComputer computer = new MetricComputer(repository, err, whitelist);
     HumanReadablePrinter printer =
-        new HumanReadablePrinter(out, entryList, printDepth, minCostThreshold);
+        new HumanReadablePrinter(out, entryList, printDepth, minCost);
     printer.printHeader();
     List<String> classNames = classpath.getClassNamesToEnter(entryList);
     for (String className : classNames) {
