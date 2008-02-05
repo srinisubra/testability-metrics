@@ -50,7 +50,7 @@
         <junit printsummary="yes" haltonfailure="no" fork="yes" maxmemory="750M">
           <classpath refid="test.classpath" />
 
-            <formatter type="plain"/>
+            <formatter type="xml" usefile="true"/>
 
             <batchtest fork="yes" todir="${reports.dir}/junit">
                 <fileset dir="${test.src.dir}">
@@ -79,6 +79,11 @@
 
     <target name="dist" depends="clean, test, jar">
       <mkdir dir="${dist.dir}"/>
+        <zip destfile="${build.dir}/${project-name}-${version}-src.jar">
+            <fileset dir="src">
+            	<exclude name="**/.svn"/>
+            </fileset>
+        </zip>
         <zip destfile="${dist.dir}/${project-name}-${version}.zip">
             <fileset dir=".">
                 <include name="README.txt"/>
@@ -86,6 +91,7 @@
             </fileset>
             <fileset dir="${build.dir}">
                 <include name="${project-name}-${version}.jar"/>
+                <include name="${project-name}-${version}-src.jar"/>
             </fileset>
         </zip>
     </target>
