@@ -65,7 +65,7 @@
 
     <target name="jar" depends="compile">
         <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar.jar"/>
-        <jarjar jarfile="${build.dir}/${project-name}-${version}.jar">
+        <jarjar jarfile="${dist.dir}/${project-name}-${version}.jar">
             <manifest>
                 <attribute name="Main-Class" value="com.google.test.metric.Testability"/>
             </manifest>
@@ -79,7 +79,7 @@
 
     <target name="dist" depends="clean, test, jar">
       <mkdir dir="${dist.dir}"/>
-        <zip destfile="${build.dir}/${project-name}-${version}-src.jar">
+        <zip destfile="${dist.dir}/${project-name}-${version}-src.jar">
             <fileset dir="src">
             	<exclude name="**/.svn"/>
             </fileset>
@@ -89,7 +89,7 @@
                 <include name="README.txt"/>
                 <include name="LICENSE.txt"/>
             </fileset>
-            <fileset dir="${build.dir}">
+            <fileset dir="${dist.dir}">
                 <include name="${project-name}-${version}.jar"/>
                 <include name="${project-name}-${version}-src.jar"/>
             </fileset>
