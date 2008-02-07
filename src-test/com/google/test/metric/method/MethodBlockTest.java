@@ -28,6 +28,7 @@ import java.util.List;
 public class MethodBlockTest extends TestCase {
 
   public static class Simple {
+    @SuppressWarnings("unused")
     private final Object a;
 
     public Simple() {
