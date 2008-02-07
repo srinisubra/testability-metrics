@@ -15,6 +15,8 @@
  */
 package com.google.test.metric;
 
+import static java.lang.System.getProperty;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 public class HumanReadablePrinter {
-  private final String DIVIDER  = "-----------------------------------------\n";
+  public static final String NEW_LINE = getProperty("line.separator");
+
+  private static final String DIVIDER  = "-----------------------------------------\n";
   private final PrintStream out;
   private final List<String> entryList;
   private long cumulativeTCC = 0;
@@ -51,7 +55,7 @@ public class HumanReadablePrinter {
   }
 
   public void printFooter(int countAnalyzed) {
-    out.println("\n" + DIVIDER + "Summary Statistics:");
+    out.println(NEW_LINE + DIVIDER + "Summary Statistics:");
     out.println(" TCC for all classes entered: " + cumulativeTCC);
     out.println(" TGC for all classes entered: " + cumulativeTGC);
     out.println(" Average TCC for all classes entered: " +
@@ -59,11 +63,11 @@ public class HumanReadablePrinter {
     out.println(" Average TGC for all classes entered: " +
         String.format("%.2f", ((double)cumulativeTGC) / countAnalyzed));
 
-    out.println("\nKey:");
+    out.println(NEW_LINE + "Key:");
     out.println(" TCC: Total Compexity Cost");
     out.println(" TGC: Total Global Cost");
 
-    out.println("\nAnalyzed " + countAnalyzed +
+    out.println(NEW_LINE + "Analyzed " + countAnalyzed +
     " classes (plus non-whitelisted external dependencies)");
   }
 
@@ -84,7 +88,7 @@ public class HumanReadablePrinter {
       long tgc = classCost.getTotalGlobalCost();
       cumulativeTCC += tcc;
       cumulativeTGC += tgc;
-      out.println("\nTestability cost for " + classCost.getClassInfo() + " [ "
+      out.println(NEW_LINE + "Testability cost for " + classCost.getClassInfo() + " [ "
           + tcc + " TCC, " + tgc + " TGC ]");
       for (MethodCost cost : classCost.getMethods()) {
         print("  ", cost, maxDepth, minCost);

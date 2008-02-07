@@ -15,6 +15,7 @@
  */
 package com.google.test.metric;
 
+import static com.google.test.metric.HumanReadablePrinter.NEW_LINE;
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.EMPTY_LIST;
 
@@ -65,14 +66,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     costOnlyMethod1.addGlobalCost(0, null);
     costOnlyMethod1.link();
     printer.print("", costOnlyMethod1, Integer.MAX_VALUE, 0);
-    assertEquals("c.g.t.A.method1()V [1, 1 / 1, 1]\n", out.toString());
+    assertStringEquals("c.g.t.A.method1()V [1, 1 / 1, 1]\n", out.toString());
   }
 
   public void test2DeepPrintAll() throws Exception {
     methodCost2.addMethodCost(81, new MethodCost(method1));
     methodCost2.link();
     printer.print("", methodCost2, MAX_VALUE, 0);
-    assertEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
+    assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
         "  line 81: c.g.t.A.method1()V [1, 0 / 1, 0]\n", out.toString());
   }
 
@@ -81,7 +82,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     methodCost3.addMethodCost(2, methodCost2);
     methodCost3.link();
     printer.print("", methodCost3, MAX_VALUE, 0);
-    assertEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n" +
+    assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n" +
         "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
         "    line 8: c.g.t.A.method1()V [1, 0 / 1, 0]\n", out.toString());
   }
@@ -91,7 +92,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     methodCost1.addMethodCost(13, methodCost3);
     methodCost1.link();
     printer.print("", methodCost1, MAX_VALUE, 1);
-    assertEquals("c.g.t.A.method1()V [1, 0 / 4, 0]\n" +
+    assertStringEquals("c.g.t.A.method1()V [1, 0 / 4, 0]\n" +
     		"  line 13: c.g.t.A.method3()V [3, 0 / 3, 0]\n", out.toString());
   }
 
@@ -100,7 +101,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     methodCost2.addMethodCost(2, methodCost1);
     methodCost3.link();
     printer.print("", methodCost3, 2, 0);
-    assertEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n"
+    assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n"
       + "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
   }
 
@@ -108,14 +109,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     methodCost2.addMethodCost(81, new MethodCost(method1));
     methodCost2.link();
     printer.print("", methodCost2, MAX_VALUE, 4);
-    assertEquals("", out.toString());
+    assertStringEquals("", out.toString());
   }
 
   public void testSupressPartialWhenMinCostIs2() throws Exception {
     methodCost2.addMethodCost(81, new MethodCost(method1));
     methodCost2.link();
     printer.print("", methodCost2, Integer.MAX_VALUE, 2);
-    assertEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
+    assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
   }
 
   public void testSecondLevelRecursive() throws Exception {
@@ -123,7 +124,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     methodCost2.addMethodCost(2, methodCost2);
     methodCost3.link();
     printer.print("", methodCost3, 10, 0);
-    assertEquals("c.g.t.A.method3()V [3, 0 / 5, 0]\n"
+    assertStringEquals("c.g.t.A.method3()V [3, 0 / 5, 0]\n"
       + "  line 1: c.g.t.A.method2()V [2, 0 / 2, 0]\n", out.toString());
   }
 
@@ -132,7 +133,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     ClassCost classCost0 = new ClassCost(classInfo0, new ArrayList<MethodCost>());
     printer.addClassCostToPrint(classCost0);
     printer.printClassCosts();
-    assertEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
+    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 
@@ -147,7 +148,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     printer.addClassCostToPrint(classCost1);
     printer.addClassCostToPrint(classCost2);
     printer.printClassCosts();
-    assertEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n" +
+    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n" +
         "\nTestability cost for FAKE_classInfo1 [ 0 TCC, 0 TGC ]\n" +
         "\nTestability cost for FAKE_classInfo2 [ 0 TCC, 0 TGC ]\n",
         out.toString());
@@ -171,12 +172,16 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     printer.addClassCostToPrint(classCost1);
     printer.addClassCostToPrint(classCost2);
     printer.printClassCosts();
-    assertEquals("\nTestability cost for FAKE_classInfo2 [ 2 TCC, 0 TGC ]\n" +
+    assertStringEquals("\nTestability cost for FAKE_classInfo2 [ 2 TCC, 0 TGC ]\n" +
     		"  c.g.t.A.method2()V [2, 0 / 2, 0]\n" +
         "\nTestability cost for FAKE_classInfo1 [ 1 TCC, 0 TGC ]\n" +
         "  c.g.t.A.method1()V [1, 0 / 1, 0]\n" +
         "\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
+
+	private void assertStringEquals(String expected, String actual) {
+		assertEquals(expected.replace("\n", NEW_LINE), actual);
+	}
 
 }
