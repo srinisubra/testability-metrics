@@ -42,14 +42,9 @@ public class ClassCostTest extends TestCase {
   private final  MethodInfo method2 = new MethodInfo(A, "method2", 2, "()V",
           null, null, null, Visibility.PUBLIC, 3, EMPTY_LIST);
 
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method3 = new MethodInfo(A, "method3", 2, "()V",
-          null, null, null, Visibility.PUBLIC, 4, EMPTY_LIST);
-
   private final  MethodCost methodCost0 = new MethodCost(method0);
   private final  MethodCost methodCost1 = new MethodCost(method1);
   private final  MethodCost methodCost2 = new MethodCost(method2);
-  private final  MethodCost methodCost3 = new MethodCost(method3);
 
   ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
   ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
