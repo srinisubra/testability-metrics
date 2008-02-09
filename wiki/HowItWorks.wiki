@@ -9,7 +9,7 @@ For those who are interested how the numbers are computed you can find the inner
 == Injectability is Good ==
 We consider a class testable if it would be easy for us to exercise all paths of execution of the class without exercising  the rest of the system. (The classic definition of 'unit test' only test one class at a time) In order to test only the class, we need to be able to intercept any calls going out of the class, (or at least be sure that those few calls which we can not intercept are inexpensive).
 
-   Overall, we believe that a two classes (all other things equal) the one which allows interception of outbound calls will be easier to test, *because it can be isolated in a test*.
+   Holding all other things equal, we believe that for two classes the one which allows interception of outbound calls will be easier to test, *because it can be isolated in a test*.
 
 We intercept calls by:
   * Overriding a method in a subclass.
