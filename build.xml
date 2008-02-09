@@ -79,6 +79,7 @@
 	</target>
 
 	<target name="dist" depends="clean, test, jar">
+		<mkdir dir="${dist.dir}" />
 		<zip destfile="${dist.dir}/${project-name}-${version}-src.jar">
 			<fileset dir="src">
 				<exclude name="**/.svn" />
