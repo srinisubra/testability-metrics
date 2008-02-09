@@ -64,6 +64,7 @@
 	</target>
 
 	<target name="jar" depends="compile">
+		<mkdir dir="${dist.dir}" />
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar.jar" />
 		<jarjar jarfile="${dist.dir}/${project-name}-${version}.jar">
 			<manifest>
@@ -78,7 +79,6 @@
 	</target>
 
 	<target name="dist" depends="clean, test, jar">
-		<mkdir dir="${dist.dir}" />
 		<zip destfile="${dist.dir}/${project-name}-${version}-src.jar">
 			<fileset dir="src">
 				<exclude name="**/.svn" />
