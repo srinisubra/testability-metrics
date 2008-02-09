@@ -33,7 +33,7 @@ public class SumOfPrimes1 {
 
 In the code above, there is no way to test `SumOfPrimes1` class without exercising `Primeness` class as well. This is because  we can not intercept the call to `primeness.isPrime()`. This is because in order to override the method we would need to pass in a subclass of `Primeness`, but the test does not control the construction of the `Primeness` and hence can not intercept it.
 
-   In this case the cost of `primeness.isPrime()` is low and is not an issue. But imagine  if the the call talked to an external system and charged a credit card. A good unit test, that would not make. In the real world, interception becomes top priority.
+   In this case the cost of `primeness.isPrime()` is low and is not an issue. But imagine  if the the call talked to an external system and charged a credit card. In the real world, interception becomes top priority.
 
 In the similar code below the call to `primeness.isPrime()` can be intercepted in the test. Primeness is set via the constructor, so the test can easily pass in a subclass of `Primeness` with its `isPrime()` method stubbed out. We therefore believe that this class is easier to test. 
 {{{
