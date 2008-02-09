@@ -47,7 +47,7 @@
 
 	<target name="test" depends="compile-tests">
 		<mkdir dir="${reports.dir}/junit" />
-		<junit printsummary="yes" haltonfailure="no" fork="yes" maxmemory="750M">
+		<junit printsummary="yes" haltonfailure="yes" fork="yes" maxmemory="750M">
 			<classpath refid="test.classpath" />
 
 			<formatter type="xml" usefile="true" />
