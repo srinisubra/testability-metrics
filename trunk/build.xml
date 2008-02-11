@@ -45,13 +45,13 @@
 	</target>
 	
 	<target name="compile" depends="init">
-		<javac srcdir="src" destdir="target/bin" debug="true">
+		<javac srcdir="src" destdir="target/bin" debug="true" compiler="javac1.5">
 			<classpath refid="compile.classpath" />
 		</javac>
 	</target>
 
 	<target name="compile-tests" depends="compile">
-		<javac srcdir="src-test" destdir="target/bin-test" debug="true">
+		<javac srcdir="src-test" destdir="target/bin-test" debug="true" compiler="javac1.5">
 			<classpath refid="test.classpath" />
 		</javac>
 	</target>
