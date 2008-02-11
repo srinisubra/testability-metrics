@@ -1,59 +1,69 @@
-<project name="testability-metrics" default="dist">
+<project name="testability-metrics" default="test">
+	
+	<taskdef name="svn" classname="org.tigris.subversion.svnant.SvnTask">
+		<classpath>
+			<fileset dir="lib/svn">
+				<include name="*.jar" />
+				<exclude name="*-src.jar" />
+			</fileset>
+		</classpath>
+	</taskdef>
+	
 	<property name="version" value="1.0.0RC4" />
 	<property name="project-name" value="testability-metrics" />
 
-	<property name="src.dir" value="src" />
-	<property name="build.dir" value="build" />
-	<property name="classes.dir" value="${build.dir}/classes" />
-	<property name="test.src.dir" value="src-test" />
-	<property name="test.classes.dir" value="${build.dir}/test/classes" />
-	<property name="lib.dir" value="lib" />
-	<property name="dist.dir" value="dist" />
-	<property name="reports.dir" value="reports" />
-
 	<path id="compile.classpath">
-		<fileset dir="${lib.dir}">
+		<fileset dir="lib">
 			<include name="*.jar" />
 			<exclude name="junit.jar" />
 		</fileset>
 	</path>
 
 	<path id="test.classpath">
-		<pathelement location="${classes.dir}" />
 		<path refid="compile.classpath" />
-		<pathelement location="${lib.dir}/junit.jar" />
-		<pathelement location="${test.classes.dir}" />
+		<pathelement location="lib/junit.jar" />
+		<pathelement location="target/bin" />
+		<pathelement location="target/bin-test" />
 	</path>
 
 	<target name="clean">
-		<delete dir="${build.dir}" />
-		<delete dir="${dist.dir}" />
-		<delete dir="${reports.dir}" />
+		<delete dir="target" />
 	</target>
 
-	<target name="compile">
-		<mkdir dir="${classes.dir}" />
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true">
+	<target name="init">
+		<mkdir dir="target" />
+		<mkdir dir="target/bin" />
+		<mkdir dir="target/bin-test" />
+		<mkdir dir="target/dist" />
+		<mkdir dir="target/reports/junit" />
+	</target>
+
+	<target name="revision">
+		<svn>
+			<status path="." revisionProperty="revision" />
+		</svn>
+	</target>
+	
+	<target name="compile" depends="init">
+		<javac srcdir="src" destdir="target/bin" debug="true">
 			<classpath refid="compile.classpath" />
 		</javac>
 	</target>
 
 	<target name="compile-tests" depends="compile">
-		<mkdir dir="${test.classes.dir}" />
-		<javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" debug="true">
+		<javac srcdir="src-test" destdir="target/bin-test" debug="true">
 			<classpath refid="test.classpath" />
 		</javac>
 	</target>
 
 	<target name="test" depends="compile-tests">
-		<mkdir dir="${reports.dir}/junit" />
 		<junit printsummary="yes" haltonfailure="yes" fork="yes" maxmemory="750M">
 			<classpath refid="test.classpath" />
 
 			<formatter type="xml" usefile="true" />
 
-			<batchtest fork="yes" todir="${reports.dir}/junit">
-				<fileset dir="${test.src.dir}">
+			<batchtest fork="yes" todir="target/reports/junit">
+				<fileset dir="src-test">
 					<include name="**/*Test*.java" />
 					<exclude name="**/*TestCase.java" />
 					<exclude name="**/AllTests.java" />
@@ -63,37 +73,37 @@
 		</junit>
 	</target>
 
-	<target name="jar" depends="compile">
-		<mkdir dir="${dist.dir}" />
+	<target name="jar" depends="compile, revision">
 		<taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask" classpath="lib/jarjar.jar" />
-		<jarjar jarfile="${dist.dir}/${project-name}-${version}.jar">
+		<jarjar jarfile="target/dist/${project-name}-${version}-r${revision}.jar">
 			<manifest>
 				<attribute name="Main-Class" value="com.google.test.metric.Testability" />
 			</manifest>
-			<fileset dir="${classes.dir}" />
-			<zipfileset src="${lib.dir}/asm-3.0.jar" />
+			<fileset dir="target/bin" />
+			<zipfileset src="lib/asm-3.0.jar" />
 			<rule pattern="org.objectweb.asm.**" result="com.google.test.metric.asm.@1" />
-			<zipfileset src="${lib.dir}/args4j-2.0.8.jar" />
+			<zipfileset src="lib/args4j-2.0.8.jar" />
 			<rule pattern="org.koshuke.args4j.**" result="com.google.test.metric.args4j.@1" />
 		</jarjar>
-	</target>
-
-	<target name="dist" depends="clean, test, jar">
-		<mkdir dir="${dist.dir}" />
-		<zip destfile="${dist.dir}/${project-name}-${version}-src.jar">
+		<zip destfile="target/dist/${project-name}-${version}-r${revision}-src.jar">
 			<fileset dir="src">
 				<exclude name="**/.svn" />
 			</fileset>
 		</zip>
-		<zip destfile="${dist.dir}/${project-name}-${version}.zip">
+	</target>
+
+	<target name="dist" depends="jar">
+		<zip destfile="target/dist/${project-name}-${version}-r${revision}.zip">
 			<fileset dir=".">
 				<include name="README.txt" />
 				<include name="LICENSE.txt" />
 			</fileset>
-			<fileset dir="${dist.dir}">
-				<include name="${project-name}-${version}.jar" />
-				<include name="${project-name}-${version}-src.jar" />
+			<fileset dir="target/dist">
+				<include name="${project-name}-${version}-r${revision}.jar" />
+				<include name="${project-name}-${version}-r${revision}-src.jar" />
 			</fileset>
 		</zip>
 	</target>
+	
+	<target name="build" depends="clean,test,dist"/>
 </project>
