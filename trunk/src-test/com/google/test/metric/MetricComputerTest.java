@@ -15,6 +15,7 @@
  */
 package com.google.test.metric;
 
+import static com.google.classpath.ClasspathRootFactory.makeClasspathRootGroup;
 import static com.google.test.metric.SignatureUtil.L;
 
 import java.util.List;
@@ -405,4 +406,13 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     assertEquals(0L, cost.getTotalGlobalCost());
   }
 
+  public void testThatOnWindowsWeCanParseTheFonts() throws Exception {
+    repo = new ClassRepository(makeClasspathRootGroup("classes-for-test/jre1.6_TrueTypeBug"));
+    WhiteList whitelist = new PackageWhiteList();
+    computer = new MetricComputer(repo, null, whitelist);
+    ClassInfo clazz = repo.getClass("sun.font.TrueTypeFont");
+    MethodInfo method = clazz.getMethod("getTableBuffer(I)Ljava/nio/ByteBuffer;");
+    computer.compute(method);
+    // assert no exception thrown.
+  }
 }

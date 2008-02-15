@@ -15,15 +15,15 @@
  */
 package com.google.test.metric.method;
 
+import java.util.Arrays;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.method.op.turing.Operation;
-
-import junit.framework.TestCase;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class MethodBlockTest extends TestCase {
 
@@ -76,26 +76,14 @@ public class MethodBlockTest extends TestCase {
   public void testTryCatchBlock() throws Exception {
 
     MethodInfo method = getMethod("method()V", TryCatchFinally.class);
-    List<Operation> operations = method.getOperations();
+    String operations = method.getOperations().toString();
 
-    assertEquals("b{int} <- 1{int}", operations.get(0));
-    assertEquals("b{int} <- 2{int}", operations.get(1));
-    assertEquals("e{java.lang.RuntimeException} <- ?{java.lang.RuntimeException}",
-        operations.get(2));
-    assertEquals("local_3{java.lang.Object} <- ?{java.lang.Throwable}", operations.get(3));
-
-    List<Operation> opsThatAre3Or4Assignments = operations.subList(4, operations.size() - 1);
-    for (Operation op : opsThatAre3Or4Assignments) {
-      if (!"b{int} <- 3{int}".equals(op.toString())
-          && !"b{int} <- 4{int}".equals(op.toString())) {
-        fail("Unexpected Operation" + op);
-      }
-    }
-    assertEquals("b{int} <- 5{int}", operations.get(operations.size() - 1));
-  }
-
-  private static void assertEquals(String expected, Operation op) {
-    assertEquals(expected, op.toString());
+    assertTrue(operations.contains("b{int} <- 1{int}"));
+    assertTrue(operations.contains("b{int} <- 2{int}"));
+    assertTrue(operations.contains("b{int} <- 3{int}"));
+    assertTrue(operations.contains("b{int} <- 4{int}"));
+    assertTrue(operations.contains("b{int} <- 5{int}"));
+    assertTrue(operations.contains("e{java.lang.RuntimeException} <- ?{java.lang.RuntimeException}"));
   }
 
   public static class IIF {
@@ -120,11 +108,11 @@ public class MethodBlockTest extends TestCase {
   public void testMethodWithIIF() throws Exception {
     Class<IIF> clazz = IIF.class;
     MethodInfo method = getMethod("method()V", clazz);
-    assertOperations(method.getOperations(), "b{int} <- 1{int}",
-        "java.lang.Object.<init>()V", clazz.getName()
-        + ".a{java.lang.Object} <- new{java.lang.Object}",
-        clazz.getName()
-            + ".a{java.lang.Object} <- null{java.lang.Object}",
+    assertOperations(method.getOperations(),
+        "b{int} <- 1{int}",
+        "java.lang.Object.<init>()V",
+        clazz.getName() + ".a{java.lang.Object} <- new{java.lang.Object}",
+        clazz.getName() + ".a{java.lang.Object} <- null{java.lang.Object}",
         "b{int} <- 2{int}");
   }
 
