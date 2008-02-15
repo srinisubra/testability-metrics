@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,6 +15,7 @@
  */
 package com.google.classpath;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -31,7 +32,7 @@ import java.util.jar.JarFile;
 
 public class JarClasspathRoot extends ClasspathRoot {
 
-  private Map<String, Set<String>> resourceNamesByPackage =
+  private final Map<String, Set<String>> resourceNamesByPackage =
       new HashMap<String, Set<String>>();
 
   public JarClasspathRoot(URL url, String classpath) {
@@ -43,7 +44,7 @@ public class JarClasspathRoot extends ClasspathRoot {
 
   @Override
   public Collection<String> getResources(String packageName) {
-    if (packageName.endsWith("/")) {
+    if (packageName.endsWith(File.separator)) {
       packageName = packageName.substring(0, packageName.length() - 1);
     }
     Set<String> resources = resourceNamesByPackage.get(packageName);
@@ -55,10 +56,10 @@ public class JarClasspathRoot extends ClasspathRoot {
     while (enumeration.hasMoreElements()) {
       JarEntry entry = enumeration.nextElement();
       String path = entry.getName();
-      int index = Math.max(0, path.lastIndexOf('/'));
+      int index = Math.max(0, path.lastIndexOf(File.separatorChar));
       String location = path.substring(0, index);
       String name = path.substring(index);
-      name = name.replace("/", "");
+      name = name.replace(File.separator, "");
       addName(location, name);
     }
   }
@@ -74,7 +75,7 @@ public class JarClasspathRoot extends ClasspathRoot {
   }
 
   private void addName(String location, String name) {
-    int slash = location.lastIndexOf("/");
+    int slash = location.lastIndexOf(File.separator);
     if (slash >= 0) {
       String child = location.substring(slash + 1);
       String parent = location.substring(0, slash);
