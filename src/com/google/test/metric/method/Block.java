@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,22 +15,22 @@
  */
 package com.google.test.metric.method;
 
-import com.google.test.metric.method.op.stack.Return;
-import com.google.test.metric.method.op.stack.StackOperation;
-import com.google.test.metric.method.op.stack.Throw;
+import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
 import java.util.List;
 
-public class Block implements StackOperations {
+import com.google.test.metric.method.op.stack.Load;
+import com.google.test.metric.method.op.stack.StackOperation;
+
+public class Block {
 
   private final String id;
   private final List<Block> previousBlocks = new ArrayList<Block>();
-  private List<StackOperation> operations = new ArrayList<StackOperation>();
-  private List<Block> nextBlocks = new ArrayList<Block>();
-  private boolean isTerminal = false;
+  private final List<StackOperation> operations = new ArrayList<StackOperation>();
+  private final List<Block> nextBlocks = new ArrayList<Block>();
+  private final boolean isTerminal = false;
+  private Constant exception;
 
   public Block(String id) {
     this.id = id;
@@ -45,12 +45,6 @@ public class Block implements StackOperations {
 
   public void addOp(StackOperation operation) {
     operations.add(operation);
-    if (operation instanceof Return || operation instanceof Throw) {
-      // Return statement must be last one. Freeze the block!
-      isTerminal = true;
-      nextBlocks = emptyList();
-      operations = unmodifiableList(operations);
-    }
   }
 
   public List<StackOperation> getOperations() {
@@ -60,7 +54,8 @@ public class Block implements StackOperations {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append("Block[");
+    buf.append(exception == null ? "Block" : "ExceptionHandlerBlock");
+    buf.append("[");
     buf.append(id);
     String sep = " -> ";
     for (Block next : nextBlocks) {
@@ -94,6 +89,13 @@ public class Block implements StackOperations {
 
   public String getId() {
     return id;
+  }
+
+  public void setExceptionHandler(int lineNumber, Constant exception) {
+    if (this.exception == null) {
+      operations.add(0, new Load(lineNumber, exception));
+    }
+    this.exception = exception;
   }
 
 }

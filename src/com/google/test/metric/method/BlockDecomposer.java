@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,202 +15,281 @@
  */
 package com.google.test.metric.method;
 
-import com.google.test.metric.Type;
-import static com.google.test.metric.Type.fromClass;
-import static com.google.test.metric.Type.fromJava;
-import com.google.test.metric.method.op.stack.JSR;
-import com.google.test.metric.method.op.stack.Load;
-import com.google.test.metric.method.op.stack.StackOperation;
-import com.google.test.metric.method.op.turing.Operation;
+import static java.util.Arrays.asList;
 
-import org.objectweb.asm.Label;
-
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.asm.Label;
+
+import com.google.test.metric.Type;
+import com.google.test.metric.method.op.stack.JSR;
+import com.google.test.metric.method.op.stack.Return;
+import com.google.test.metric.method.op.stack.StackOperation;
+import com.google.test.metric.method.op.stack.Throw;
+import com.google.test.metric.method.op.turing.Operation;
+
 /**
- * This method shows how this class decomposes the bytecodes into the blocks
- *
- * <pre>
- * public void methodWithIIf() {
- *   int b = 1;
- *   a = b &gt; 0 ? null : new Object();
- *   b = 2;
- * }
- * </pre>
- *
- * is decomposed into these bytecodes:
- *
- * <pre>
- *   public void methodWithIIf();
- *   0  iconst_1                      Block0
- *   1  istore_1 [b]                  Block0  1 -&gt; b
- *   2  aload_0 [this]                Block0
- *   3  iload_1 [b]                   Block0
- *   4  ifle 11                       Block0
- * -----------------------------------------------
- *   7  aconst_null                   Block1  null -&gt; a
- *   8  goto 18                       Block1
- * -----------------------------------------------
- *  11  new java.lang.Object [3]      Block2  new ObjecT() -&gt; a
- *  14  dup                           Block2
- *                                    Block2
- *  15  invokespecial java.lang.Object() [10]
- * -----------------------------------------------
- *                                    Block3
- *  18  putfield com.google.test.metric.method.MethodBlockTest$MethodBlocks.a : java.lang.Object [12]
- *  21  iconst_2                      Block3
- *  22  istore_1 [b]                  Block3 2-&gt; b
- *  23  return
- * </pre>
- *
- * <b>NOTE:</b>
- * <ul>
- * <li> Even thought the " -> a" is common and it is technically in block 3 it
- * needs to be back propagated to block 1 and 2; </li>
- * In other words the assignment belongs to the block from which the L
- * </ul>
- *
- * <b>How it works:</b>
- * <ul>
- * <li>Ever time you see a conditional IF then create two blocks (1)
- * destination of if as well as (2) next instruction block</li>
- * <li>Non-conditional IF ends the current block and starts a new one.</li>
- * <li>Seeing a label means that we must have a jump to it so we must create a
- * new block. This means that Labels cause a creation a of new block always.
- * Even if we have a forward jump.
- * <li>
- * </ul>
- *
  * @author misko@google.com <Misko Hevery>
  */
-public class BlockDecomposer implements StackOperations {
+public class BlockDecomposer {
 
-  private int nextBlockId = 0;
-  private final List<Block> blocksInOrder = new LinkedList<Block>();
-  private final Block mainBlock = newBlock("");
-  private final Map<Label, Block> lookAheadBlocks = new HashMap<Label, Block>();
-  private Block currentBlock;
+  /**
+   * Method is broken down into one frame per bytecode in order to break it down
+   * into blocks
+   */
+  private static class Frame {
 
-  public BlockDecomposer() {
-    setCurrentBlock(mainBlock);
-  }
+    /**
+     * Next frame (ie next bytecode)
+     */
+    private Frame next;
+    /**
+     * Operation in this frame
+     */
+    private final StackOperation operation;
+    /**
+     * Any label associated with this bytecode
+     */
+    private Label label;
+    /**
+     * Block which this bytecode ended up assigned to
+     */
+    public Block block;
+    /**
+     * True if this is first bytecode of a block (GOTO). If true then new block
+     * will start here.
+     */
+    public boolean blockStartsHere;
+    /**
+     * If true then this will be last instruction in block and new block will
+     * start on next frame.
+     */
+    public boolean blockEndsHere;
+    /**
+     * If not null current block will link with block that this field points to.
+     */
+    public List<Label> gotoLabels = new LinkedList<Label>();
+    /**
+     * This instruction ends execution of block (ie return, throw) If this is
+     * true then this and subsequent blocks will not be linked
+     */
+    public boolean terminal;
 
-  private void setCurrentBlock(Block block) {
-    if (blocksInOrder.contains(block)) {
-      throw new IllegalStateException();
+    public Frame(Frame frame, StackOperation operation, Label label) {
+      this.operation = operation;
+      this.label = label;
+      if (frame != null) {
+        frame.addFrame(this);
+      }
     }
-    if (block != null) {
-      blocksInOrder.add(block);
+
+    private void addFrame(Frame frame) {
+      next = frame;
     }
-    currentBlock = block;
-  }
 
-  public void unconditionalGoto(Label label) {
-    Block lookaheadBlock = newLookAheadBlock("goto_", label);
-    currentBlock.addNextBlock(lookaheadBlock);
-    setCurrentBlock(null);
-  }
-
-  public void conditionalGoto(Label label) {
-    Block falseBlock = newBlock("if_false_");
-    Block trueBlock = newLookAheadBlock("if_true_", label);
-    currentBlock.addNextBlock(falseBlock);
-    currentBlock.addNextBlock(trueBlock);
-    setCurrentBlock(falseBlock);
-  }
-
-  public void jumpSubroutine(Label sub, int lineNumber) {
-    Block subBlock = newLookAheadBlock("subroutine", sub);
-    currentBlock.addOp(new JSR(lineNumber, subBlock));
-  }
-
-  private Block newBlock(String prefix) {
-    return new Block("" + (prefix + nextBlockId++));
-  }
-
-  private Block newLookAheadBlock(String prefix, Label label) {
-    Block lookaheadBlock = lookAheadBlocks.get(label);
-    if (lookaheadBlock == null) {
-      lookaheadBlock = newBlock(prefix);
-      lookAheadBlocks.put(label, lookaheadBlock);
+    @Override
+    public String toString() {
+      ByteArrayOutputStream buf = new ByteArrayOutputStream();
+      PrintStream out = new PrintStream(buf, true);
+      out.printf("%-10s %-70s %-15s s=%-5b e=%-5b t=%-5b goto=%s", label, operation,
+          block == null ? null : block.getId(), blockStartsHere, blockEndsHere,
+          terminal, gotoLabels);
+      return buf.toString();
     }
-    return lookaheadBlock;
+
   }
 
-  public void tryCatchBlock(Label start, Label end, Label handler,
-      String eType) {
-    Block startBlock = newLookAheadBlock("try_", start);
-    newLookAheadBlock("try_end_", end);
-    Block handlerBlock = newLookAheadBlock("handle_" + eType + "_", handler);
-    startBlock.addNextBlock(handlerBlock);
-    if (handlerBlock.getOperations().size() == 0) {
-      Type type = eType == null ? fromClass(Throwable.class)
-          : fromJava(eType);
-      handlerBlock.addOp(new Load(-1, new Constant("?", type)));
+  private final Map<Label, Frame> frames = new HashMap<Label, Frame>();
+  private final Map<Label, Block> blocks = new HashMap<Label, Block>();
+  private final List<Runnable> extraLinkSteps = new LinkedList<Runnable>();
+  private Frame firstFrame;
+  private Frame lastFrame;
+  private Label lastLabel;
+  private Block mainBlock;
+  private int counter = 0;
+
+  public void addOp(StackOperation operation) {
+    lastFrame = new Frame(lastFrame, operation, lastLabel);
+    if (operation instanceof Return || operation instanceof Throw) {
+      lastFrame.terminal = true;
+      lastFrame.blockEndsHere = true;
     }
+    if (firstFrame == null) {
+      firstFrame = lastFrame;
+    }
+    applyLastLabel();
   }
 
-  public void tableSwitch(Label dflt, Label[] labels) {
-    for (Label caseLabel : labels) {
-      currentBlock.addNextBlock(newLookAheadBlock("case_", caseLabel));
+  private void applyLastLabel() {
+    if (lastLabel != null) {
+      frames.put(lastLabel, lastFrame);
+      lastFrame.label = lastLabel;
+      lastLabel = null;
     }
-    currentBlock.addNextBlock(newLookAheadBlock("dflt_", dflt));
-    setCurrentBlock(null);
   }
 
   public void label(Label label) {
-    if (lookAheadBlocks.containsKey(label)) {
-      Block nextBlock = lookAheadBlocks.get(label);
-      if (currentBlock != null && !currentBlock.isTerminal()) {
-        currentBlock.addNextBlock(nextBlock);
-      }
-      setCurrentBlock(nextBlock);
+    if (lastLabel == null) {
+      lastLabel = label;
     } else {
-      if (currentBlock == null) {
-        setCurrentBlock(newBlock(""));
-        lookAheadBlocks.put(label, currentBlock);
-      } else if (currentBlock.getOperations().size() == 0) {
-        lookAheadBlocks.put(label, currentBlock);
-      } else {
-        Block nextBlock = newBlock("");
-        if (!currentBlock.isTerminal()) {
-          currentBlock.addNextBlock(nextBlock);
-        }
-        setCurrentBlock(nextBlock);
-        lookAheadBlocks.put(label, currentBlock);
-      }
+      throw new IllegalStateException("Multiple lables per line are not allowed.");
     }
+  }
+
+  public void unconditionalGoto(Label label) {
+    lastFrame.blockEndsHere = true;
+    lastFrame.gotoLabels.add(label);
+    lastFrame.terminal = true;
+    applyLastLabel();
+  }
+
+  public void conditionalGoto(Label label) {
+    lastFrame.blockEndsHere = true;
+    lastFrame.gotoLabels.add(label);
+    applyLastLabel();
+  }
+
+  public void jumpSubroutine(Label label, int lineNumber) {
+    Block subBlock = blocks.get(label);
+    if (subBlock == null) {
+      subBlock = new Block("sub_" + (counter++));
+    }
+    addOp(new JSR(lineNumber, subBlock));
+    blocks.put(label, subBlock);
+    applyLastLabel();
+  }
+
+  public void tryCatchBlock(Label start, final Label end, final Label handler,
+      final String eType) {
+    extraLinkSteps.add(new Runnable() {
+      public void run() {
+        Block endBlock = frames.get(end).block;
+        Block handlerBlock = frames.get(handler).block;
+        Type type = eType == null ? Type.fromClass(Throwable.class) : Type.fromJava(eType);
+        handlerBlock.setExceptionHandler(-1, new Constant("?", type));
+        endBlock.addNextBlock(handlerBlock);
+      }
+    });
+  }
+
+  public void tableSwitch(final Label dflt, final Label... labels) {
+    lastFrame.terminal = true;
+    lastFrame.blockEndsHere = true;
+    lastFrame.gotoLabels.addAll(asList(labels));
+    lastFrame.gotoLabels.add(dflt);
+    applyLastLabel();
   }
 
   public void done() {
+    if (firstFrame != null) {
+      breakIntoBlocks();
+      copyToBlocks();
+      linkBlocks();
+      for (Runnable extraLinkStep : extraLinkSteps) {
+        extraLinkStep.run();
+      }
+      mainBlock = firstFrame.block;
+    }
+  }
+
+  private void breakIntoBlocks() {
+    Frame frame = firstFrame;
+    while (frame != null) {
+      for (Label label : frame.gotoLabels) {
+        frames.get(label).blockStartsHere = true;
+        frame.blockEndsHere = true;
+      }
+      if (blocks.containsKey(frame.label)) {
+        frame.blockStartsHere = true;
+      }
+      frame = frame.next;
+    }
+  }
+
+  private void copyToBlocks() {
+    Frame frame = firstFrame;
+    Block block = null;
+    while (frame != null) {
+      if (frame.blockStartsHere) {
+        block = null;
+      }
+      Label frameLabel = frame.label;
+      if (blocks.containsKey(frameLabel)) {
+        block = blocks.get(frameLabel);
+      }
+      if (block == null) {
+        block = new Block("block_" + (counter++));
+      }
+      frame.block = block;
+      frame.block.addOp(frame.operation);
+      if (frame.blockEndsHere) {
+        block = null;
+      }
+      frame = frame.next;
+    }
+  }
+
+  private void linkBlocks() {
+    Frame previousFrame = firstFrame;
+    Frame thisFrame = previousFrame.next;
+    while (thisFrame != null) {
+      Block previousBlock = previousFrame.block;
+      Block thisBlock = thisFrame.block;
+      if (previousBlock != thisBlock && !previousFrame.terminal) {
+        previousBlock.addNextBlock(thisFrame.block);
+      }
+      for (Label label : previousFrame.gotoLabels) {
+        previousBlock.addNextBlock(frames.get(label).block);
+      }
+      previousFrame = thisFrame;
+      thisFrame = thisFrame.next;
+    }
   }
 
   public List<Operation> getOperations() {
-    return new Stack2Turing(mainBlock).translate();
-  }
-
-  public void addOp(StackOperation operation) {
-    currentBlock.addOp(operation);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder buf = new StringBuilder();
-    List<Block> processed = new LinkedList<Block>();
-    for (Block block : blocksInOrder) {
-      processed.add(block);
-      buf.append(block);
-      buf.append("\n");
+    if (mainBlock == null) {
+      return Collections.emptyList();
+    } else {
+      return new Stack2Turing(mainBlock).translate();
     }
-    return buf.toString();
+  }
+
+  public Block getBlock(Label label) {
+    return frames.get(label).block;
   }
 
   public Block getMainBlock() {
     return mainBlock;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder buf = new StringBuilder();
+    Frame frame = firstFrame;
+    while (frame != null) {
+      buf.append(frame);
+      buf.append("\n");
+      frame = frame.next;
+    }
+    if (mainBlock != null) {
+      frame = firstFrame;
+      List<Block> processed = new LinkedList<Block>();
+      while (frame!= null) {
+        Block block = frame.block;
+        if (!processed.contains(block)) {
+          buf.append(block);
+          processed.add(block);
+        }
+        frame = frame.next;
+      }
+    }
+    return buf.toString();
+  }
 
 }

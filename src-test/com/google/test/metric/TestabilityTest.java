@@ -202,7 +202,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     testability.execute();
     String baselineOutput = out.toString();
     out.clear();
-    testability.wl = "junit.framework.";
+    testability.wl = "junit.runner.";
     testability.execute();
     String throttledOutput = out.toString();
     assertTrue(throttledOutput.length() < baselineOutput.length());

@@ -17,6 +17,17 @@ package com.google.test.metric.asm;
 
 import static com.google.test.metric.asm.SignatureParser.parse;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+
 import com.google.test.metric.ClassInfo;
 import com.google.test.metric.ClassRepository;
 import com.google.test.metric.FieldInfo;
@@ -34,6 +45,7 @@ import com.google.test.metric.method.op.stack.Convert;
 import com.google.test.metric.method.op.stack.Duplicate;
 import com.google.test.metric.method.op.stack.Duplicate2;
 import com.google.test.metric.method.op.stack.GetField;
+import com.google.test.metric.method.op.stack.Increment;
 import com.google.test.metric.method.op.stack.Invoke;
 import com.google.test.metric.method.op.stack.Load;
 import com.google.test.metric.method.op.stack.MonitorEnter;
@@ -46,17 +58,6 @@ import com.google.test.metric.method.op.stack.Store;
 import com.google.test.metric.method.op.stack.Swap;
 import com.google.test.metric.method.op.stack.Throw;
 import com.google.test.metric.method.op.stack.Transform;
-
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.Attribute;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class MethodVisitorBuilder implements MethodVisitor {
 
@@ -105,6 +106,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
     if (opcode == Opcodes.GOTO) {
       recorder.add(new Runnable() {
         public void run() {
+          block.addOp(new Transform(lineNumber, "GOTO", null, null, null));
           block.unconditionalGoto(label);
         }
       });
@@ -176,8 +178,7 @@ public class MethodVisitorBuilder implements MethodVisitor {
         }
 
         private void if2(String name) {
-          block
-              .addOp(new Transform(lineNumber, name, Type.INT, Type.INT, null));
+          block.addOp(new Transform(lineNumber, name, Type.INT, Type.INT, null));
         }
       });
     }
@@ -822,7 +823,13 @@ public class MethodVisitorBuilder implements MethodVisitor {
       Object[] arg4) {
   }
 
-  public void visitIincInsn(int arg0, int arg1) {
+  public void visitIincInsn(final int var, final int increment) {
+    recorder.add(new Runnable() {
+      public void run() {
+        Variable variable = variable(var, Type.INT);
+        block.addOp(new Increment(lineNumber, increment, variable));
+      }
+    });
   }
 
   public void visitIntInsn(int opcode, int operand) {
