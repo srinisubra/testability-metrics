@@ -9,7 +9,7 @@
 		</classpath>
 	</taskdef>
 	
-	<property name="version" value="1.0.0RC4" />
+	<property name="version" value="1.1.0RC1" />
 	<property name="project-name" value="testability-metrics" />
 
 	<path id="compile.classpath">
