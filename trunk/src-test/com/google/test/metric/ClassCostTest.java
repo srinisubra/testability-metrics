@@ -17,13 +17,13 @@ package com.google.test.metric;
 
 import static java.util.Collections.EMPTY_LIST;
 
-import com.google.test.metric.asm.Visibility;
-
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import junit.framework.TestCase;
+
+import com.google.test.metric.asm.Visibility;
 
 public class ClassCostTest extends TestCase {
 
@@ -90,7 +90,7 @@ public class ClassCostTest extends TestCase {
     classCosts.add(classCost1);
     classCosts.add(classCost0);
     classCosts.add(classCost2);
-    Collections.sort(classCosts, ClassCost.descendingClassCost);
+    Collections.sort(classCosts, new ClassCost.Comparator());
     assertEquals(classCost2, classCosts.get(0));
     assertEquals(classCost1, classCosts.get(1));
     assertEquals(classCost0, classCosts.get(2));

@@ -76,7 +76,7 @@ public class HumanReadablePrinter {
   }
 
   public void printClassCosts() {
-    Collections.sort(toPrint, ClassCost.descendingClassCost);
+    Collections.sort(toPrint, new ClassCost.Comparator());
     for (ClassCost classCost : toPrint) {
       print(classCost, maxDepth, minCost);
     }

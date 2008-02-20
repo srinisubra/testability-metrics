@@ -15,22 +15,16 @@
  */
 package com.google.test.metric;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class ClassCost {
 
-  public static final Comparator<ClassCost> descendingClassCost =
-      new Comparator<ClassCost>() {
-        public int compare(ClassCost c1, ClassCost c2) {
-          return (int) (
-                c2.getTotalComplexityCost()
-              - c1.getTotalComplexityCost()
-              + c2.getTotalGlobalCost()
-              - c1.getTotalGlobalCost()
-            );
-        }
-      };
+  public static class Comparator implements java.util.Comparator<ClassCost> {
+    public int compare(ClassCost c1, ClassCost c2) {
+      return (int) (c2.getTotalComplexityCost() - c1.getTotalComplexityCost()
+          + c2.getTotalGlobalCost() - c1.getTotalGlobalCost());
+    }
+  }
 
   private final List<MethodCost> methods;
   private final ClassInfo classInfo;
