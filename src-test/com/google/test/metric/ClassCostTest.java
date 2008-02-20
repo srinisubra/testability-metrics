@@ -15,40 +15,17 @@
  */
 package com.google.test.metric;
 
-import static java.util.Collections.EMPTY_LIST;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import com.google.test.metric.asm.Visibility;
-
 public class ClassCostTest extends TestCase {
 
-  @SuppressWarnings("unchecked")
-  private final ClassInfo A = new ClassInfo("c.g.t.A", false, null, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method0 = new MethodInfo(A, "method0", 1, "()V",
-          null, null, null, Visibility.PUBLIC, 1, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method1 = new MethodInfo(A, "method1", 1, "()V",
-          null, null, null, Visibility.PUBLIC, 2, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method2 = new MethodInfo(A, "method2", 2, "()V",
-          null, null, null, Visibility.PUBLIC, 3, EMPTY_LIST);
-
-  private final  MethodCost methodCost0 = new MethodCost(method0);
-  private final  MethodCost methodCost1 = new MethodCost(method1);
-  private final  MethodCost methodCost2 = new MethodCost(method2);
-
-  ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
-  ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
-  ClassInfo classInfo2 = new ClassInfo("FAKE_classInfo2", false, null, null);
+  private final  MethodCost methodCost0 = new MethodCost("c.g.t.A.method0()V", 0, 0);
+  private final  MethodCost methodCost1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
+  private final  MethodCost methodCost2 = new MethodCost("c.g.t.A.method2()V", 0, 2);
 
   ClassCost classCost0;
   ClassCost classCost1;
@@ -74,9 +51,9 @@ public class ClassCostTest extends TestCase {
     methodCosts2.add(methodCost1);
     methodCosts2.add(methodCost2);
 
-    classCost0 = new ClassCost(classInfo0, methodCosts0);
-    classCost1 = new ClassCost(classInfo1, methodCosts1);
-    classCost2 = new ClassCost(classInfo2, methodCosts2);
+    classCost0 = new ClassCost("FAKE_classInfo0", methodCosts0);
+    classCost1 = new ClassCost("FAKE_classInfo1", methodCosts1);
+    classCost2 = new ClassCost("FAKE_classInfo2", methodCosts2);
   }
 
   public void testSumsUpTotalClassCostCorrectly() throws Exception {

@@ -88,7 +88,7 @@ public class HumanReadablePrinter {
       long tgc = classCost.getTotalGlobalCost();
       cumulativeTCC += tcc;
       cumulativeTGC += tgc;
-      out.println(NEW_LINE + "Testability cost for " + classCost.getClassInfo() + " [ "
+      out.println(NEW_LINE + "Testability cost for " + classCost.getClassName() + " [ "
           + tcc + " TCC, " + tgc + " TGC ]");
       for (MethodCost cost : classCost.getMethods()) {
         print("  ", cost, maxDepth, minCost);
@@ -97,7 +97,7 @@ public class HumanReadablePrinter {
   }
 
   public void print(String prefix, MethodCost cost, int maxDepth, int minCost) {
-    Set<MethodInfo> alreadySeen = new HashSet<MethodInfo>();
+    Set<String> alreadySeen = new HashSet<String>();
     if (shouldPrint(cost, maxDepth, minCost, alreadySeen)) {
       out.print(prefix);
       out.println(cost);
@@ -108,7 +108,7 @@ public class HumanReadablePrinter {
   }
 
   private void print(String prefix, LineNumberCost line, int maxDepth,
-      int minCost, Set<MethodInfo> alreadSeen) {
+      int minCost, Set<String> alreadSeen) {
     MethodCost method = line.getMethodCost();
     if (shouldPrint(method, maxDepth, minCost, alreadSeen)) {
       out.print(prefix);
@@ -128,11 +128,11 @@ public class HumanReadablePrinter {
   }
 
   private boolean shouldPrint(MethodCost method, int maxDepth, int minCost,
-      Set<MethodInfo> alreadySeen) {
-    if (maxDepth <= 0 || alreadySeen.contains(method.getMethod())) {
+      Set<String> alreadySeen) {
+    if (maxDepth <= 0 || alreadySeen.contains(method.getMethodName())) {
       return false;
     }
-    alreadySeen.add(method.getMethod());
+    alreadySeen.add(method.getMethodName());
     long totalComplexityCost = method.getTotalComplexityCost();
     long totalGlobalCost = method.getTotalGlobalCost();
     if (totalGlobalCost < minCost && totalComplexityCost < minCost) {

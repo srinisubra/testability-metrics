@@ -381,7 +381,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     LineNumberCost line1 = lineNumberCosts.get(1);
     LineNumberCost line2 = lineNumberCosts.get(2);
 
-    int methodStartingLine = cost.getMethod().getStartingLineNumber();
+    int methodStartingLine = cost.getMethodLineNumber();
 
     assertEquals(0, line0.getMethodCost().getTotalComplexityCost());
     assertEquals(methodStartingLine + 0, line0.getLineNumber());

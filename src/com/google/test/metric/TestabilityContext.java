@@ -68,7 +68,7 @@ public class TestabilityContext {
   private MethodCost getMethodCost(MethodInfo method) {
     MethodCost methodCost = methodCosts.get(method);
     if (methodCost == null) {
-      methodCost = new MethodCost(method);
+      methodCost = new MethodCost(method.getFullName(), method.getStartingLineNumber(), method.getTestCost());
       methodCosts.put(method, methodCost);
     }
     return methodCost;

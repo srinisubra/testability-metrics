@@ -34,7 +34,7 @@ public class LineNumberCost {
 
   @Override
   public String toString() {
-    return methodCost.getMethod() + ":" + lineNumber;
+    return methodCost.getMethodName() + ":" + lineNumber;
   }
 
 }

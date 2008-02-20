@@ -17,40 +17,18 @@ package com.google.test.metric;
 
 import static com.google.test.metric.HumanReadablePrinter.NEW_LINE;
 import static java.lang.Integer.MAX_VALUE;
-import static java.util.Collections.EMPTY_LIST;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.test.metric.asm.Visibility;
-
 public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
-  @SuppressWarnings("unchecked")
-  private final ClassInfo A = new ClassInfo("c.g.t.A", false, null, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method0 = new MethodInfo(A, "method0", 1, "()V",
-          null, null, null, Visibility.PUBLIC, 1, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method1 = new MethodInfo(A, "method1", 1, "()V",
-          null, null, null, Visibility.PUBLIC, 2, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method2 = new MethodInfo(A, "method2", 2, "()V",
-          null, null, null, Visibility.PUBLIC, 3, EMPTY_LIST);
-
-  @SuppressWarnings("unchecked")
-  private final  MethodInfo method3 = new MethodInfo(A, "method3", 2, "()V",
-          null, null, null, Visibility.PUBLIC, 4, EMPTY_LIST);
-
-  private final  MethodCost methodCost0 = new MethodCost(method0);
-  private final  MethodCost methodCost1 = new MethodCost(method1);
-  private final  MethodCost methodCost2 = new MethodCost(method2);
-  private final  MethodCost methodCost3 = new MethodCost(method3);
+  private final  MethodCost methodCost0 = new MethodCost("c.g.t.A.method0()V", 0, 0);
+  private final  MethodCost methodCost1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
+  private final  MethodCost methodCost2 = new MethodCost("c.g.t.A.method2()V", 0, 2);
+  private final  MethodCost methodCost3 = new MethodCost("c.g.t.A.method3()V", 0, 3);
   private ByteArrayOutputStream out;
   private HumanReadablePrinter printer;
 
@@ -62,7 +40,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testSimpleCost() throws Exception {
-    MethodCost costOnlyMethod1 = new MethodCost(method1);
+    MethodCost costOnlyMethod1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
     costOnlyMethod1.addGlobalCost(0, null);
     costOnlyMethod1.link();
     printer.print("", costOnlyMethod1, Integer.MAX_VALUE, 0);
@@ -70,7 +48,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void test2DeepPrintAll() throws Exception {
-    methodCost2.addMethodCost(81, new MethodCost(method1));
+    methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link();
     printer.print("", methodCost2, MAX_VALUE, 0);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
@@ -106,14 +84,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testSupressAllWhenMinCostIs4() throws Exception {
-    methodCost2.addMethodCost(81, new MethodCost(method1));
+    methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link();
     printer.print("", methodCost2, MAX_VALUE, 4);
     assertStringEquals("", out.toString());
   }
 
   public void testSupressPartialWhenMinCostIs2() throws Exception {
-    methodCost2.addMethodCost(81, new MethodCost(method1));
+    methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link();
     printer.print("", methodCost2, Integer.MAX_VALUE, 2);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
@@ -129,8 +107,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testAddOneClassCostThenPrintIt() throws Exception {
-    ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
-    ClassCost classCost0 = new ClassCost(classInfo0, new ArrayList<MethodCost>());
+    ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     printer.addClassCostToPrint(classCost0);
     printer.printClassCosts();
     assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
@@ -138,12 +115,9 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testAddSeveralClassCostsAndPrintThem() throws Exception {
-    ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
-    ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
-    ClassInfo classInfo2 = new ClassInfo("FAKE_classInfo2", false, null, null);
-    ClassCost classCost0 = new ClassCost(classInfo0, new ArrayList<MethodCost>());
-    ClassCost classCost1 = new ClassCost(classInfo1, new ArrayList<MethodCost>());
-    ClassCost classCost2 = new ClassCost(classInfo2, new ArrayList<MethodCost>());
+    ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
+    ClassCost classCost1 = new ClassCost("FAKE_classInfo1", new ArrayList<MethodCost>());
+    ClassCost classCost2 = new ClassCost("FAKE_classInfo2", new ArrayList<MethodCost>());
     printer.addClassCostToPrint(classCost0);
     printer.addClassCostToPrint(classCost1);
     printer.addClassCostToPrint(classCost2);
@@ -156,18 +130,15 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
   public void testAddSeveralClassCostsAndPrintThemInDescendingCostOrder()
       throws Exception {
-    ClassInfo classInfo0 = new ClassInfo("FAKE_classInfo0", false, null, null);
-    ClassInfo classInfo1 = new ClassInfo("FAKE_classInfo1", false, null, null);
-    ClassInfo classInfo2 = new ClassInfo("FAKE_classInfo2", false, null, null);
     List<MethodCost> methodCosts1 = new ArrayList<MethodCost>();
     methodCosts1.add(methodCost1);
     methodCost1.link();
     List<MethodCost> methodCosts2 = new ArrayList<MethodCost>();
     methodCosts2.add(methodCost2);
     methodCost2.link();
-    ClassCost classCost0 = new ClassCost(classInfo0, new ArrayList<MethodCost>());
-    ClassCost classCost1 = new ClassCost(classInfo1, methodCosts1);
-    ClassCost classCost2 = new ClassCost(classInfo2, methodCosts2);
+    ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
+    ClassCost classCost1 = new ClassCost("FAKE_classInfo1", methodCosts1);
+    ClassCost classCost2 = new ClassCost("FAKE_classInfo2", methodCosts2);
     printer.addClassCostToPrint(classCost0);
     printer.addClassCostToPrint(classCost1);
     printer.addClassCostToPrint(classCost2);
