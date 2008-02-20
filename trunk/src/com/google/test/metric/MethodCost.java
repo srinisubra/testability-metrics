@@ -20,14 +20,18 @@ import java.util.List;
 
 public class MethodCost {
 
-  private final MethodInfo method;
+  private final String methodName;
+  private final long cyclomaticCost;
+  private final int lineNumber;
   private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
   private long totalGlobalCost = -1;
   private long totalComplexityCost = -1;
 
-  public MethodCost(MethodInfo method) {
-    this.method = method;
+  public MethodCost(String methodName, int lineNumber, long cyclomaticCost) {
+    this.methodName = methodName;
+    this.lineNumber = lineNumber;
+    this.cyclomaticCost = cyclomaticCost;
   }
 
   public long getTotalComplexityCost() {
@@ -66,7 +70,7 @@ public class MethodCost {
   }
 
   private long getComplexityCost() {
-    return method.getTestCost();
+    return cyclomaticCost;
   }
 
   private int getGlobalCost() {
@@ -77,8 +81,8 @@ public class MethodCost {
     return lineNumberCosts;
   }
 
-  public MethodInfo getMethod() {
-    return method;
+  public String getMethodName() {
+    return methodName;
   }
 
   public void addMethodCost(int lineNumber, MethodCost to) {
@@ -91,12 +95,16 @@ public class MethodCost {
 
   @Override
   public String toString() {
-      return getMethod() + toCostsString();
+      return getMethodName() + toCostsString();
   }
 
   public String toCostsString() {
     return " [" + getComplexityCost() + ", " + getGlobalCost() + " / "
     + getTotalComplexityCost() + ", " + getTotalGlobalCost() + "]";
+  }
+
+  public int getMethodLineNumber() {
+    return lineNumber;
   }
 
 }

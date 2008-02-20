@@ -1,12 +1,12 @@
 /*
  * Copyright 2007 Google Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -15,12 +15,12 @@
  */
 package com.google.test.metric;
 
-import com.google.test.metric.asm.Visibility;
-
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.google.test.metric.asm.Visibility;
 
 public class MetricComputer {
 
@@ -28,7 +28,7 @@ public class MetricComputer {
   private final PrintStream err;
   private final WhiteList whitelist;
 
-  public MetricComputer(ClassRepository classRepository, PrintStream err, 
+  public MetricComputer(ClassRepository classRepository, PrintStream err,
       WhiteList whitelist) {
     this.classRepository = classRepository;
     this.err = err;
@@ -43,7 +43,7 @@ public class MetricComputer {
   }
 
   public MethodCost compute(MethodInfo method) {
-    TestabilityContext context = new TestabilityContext(classRepository, err, 
+    TestabilityContext context = new TestabilityContext(classRepository, err,
         whitelist);
     addStaticCost(method, context);
     addConstructorCost(method, context);
@@ -130,7 +130,7 @@ public class MetricComputer {
     for (MethodInfo method : clazz.getMethods()) {
       methods.add(compute(method));
     }
-    return new ClassCost(clazz, methods);
+    return new ClassCost(clazz.getName(), methods);
   }
 
 }

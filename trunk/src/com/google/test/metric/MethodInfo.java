@@ -58,6 +58,10 @@ public class MethodInfo {
 
   @Override
   public String toString() {
+    return getFullName();
+  }
+
+  public String getFullName() {
     return classInfo.getName() + "." + getNameDesc();
   }
 

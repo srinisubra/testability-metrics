@@ -27,16 +27,16 @@ public class ClassCost {
   }
 
   private final List<MethodCost> methods;
-  private final ClassInfo classInfo;
+  private final String className;
 
-  public ClassCost(ClassInfo classInfo, List<MethodCost> methods) {
-    this.classInfo = classInfo;
+  public ClassCost(String className, List<MethodCost> methods) {
+    this.className = className;
     this.methods = methods;
   }
 
   public MethodCost getMethodCost(String methodName) {
     for (MethodCost cost : methods) {
-      if (cost.getMethod().getNameDesc().equals(methodName)) {
+      if (cost.getMethodName().equals(className + "." + methodName)) {
         return cost;
       }
     }
@@ -52,15 +52,15 @@ public class ClassCost {
   }
 
   public void toString(StringBuilder buf) {
-    buf.append(classInfo.toString());
+    buf.append(className.toString());
     for (MethodCost cost : methods) {
       buf.append("\n  ");
       buf.append(cost);
     }
   }
 
-  public ClassInfo getClassInfo() {
-    return classInfo;
+  public String getClassName() {
+    return className;
   }
 
   public List<MethodCost> getMethods() {

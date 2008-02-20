@@ -16,6 +16,7 @@
 package com.google.test.metric;
 
 
+import static java.util.Collections.EMPTY_LIST;
 import junit.framework.TestCase;
 
 public class TestabilityContextTest extends TestCase {
@@ -32,8 +33,10 @@ public class TestabilityContextTest extends TestCase {
   LocalField localFinalField = new LocalField(instance, finalField);
   LocalField localStaticFinalField = new LocalField(null, finalStaticField);
   Variable dst = new Variable("dst", null, false, false);
+  @SuppressWarnings("unchecked")
+  ClassInfo classInfo = new ClassInfo("c.g.t.A", false, null, EMPTY_LIST);
   MethodInfo method =
-      new MethodInfo(null, "method", 0, null, null, null, null, null, 1, null);
+      new MethodInfo(classInfo, "method", 0, null, null, null, null, null, 1, null);
 
   public void testIsInjectable() throws Exception {
     Variable var = new Variable("", Type.fromJava("X"), false, false);
