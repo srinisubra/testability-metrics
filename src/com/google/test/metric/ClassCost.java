@@ -21,13 +21,13 @@ public class ClassCost {
 
   public static class Comparator implements java.util.Comparator<ClassCost> {
     public int compare(ClassCost c1, ClassCost c2) {
-      return (int) (c2.getTotalComplexityCost() - c1.getTotalComplexityCost()
-          + c2.getTotalGlobalCost() - c1.getTotalGlobalCost());
+      return (int) (c2.getOverallCost() - c1.getOverallCost());
     }
   }
 
   private final List<MethodCost> methods;
   private final String className;
+  private long overallCost;
 
   public ClassCost(String className, List<MethodCost> methods) {
     this.className = className;
@@ -101,6 +101,17 @@ public class ClassCost {
       }
     }
     return cost;
+  }
+
+  public void link(CostModel costModel) {
+    for (MethodCost methodCost : methods) {
+      methodCost.link(costModel);
+    }
+    overallCost = costModel.computeClass(methods);
+  }
+
+  public long getOverallCost() {
+    return overallCost;
   }
 
 }

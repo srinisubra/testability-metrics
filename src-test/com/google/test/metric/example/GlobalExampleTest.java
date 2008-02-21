@@ -17,17 +17,18 @@ package com.google.test.metric.example;
 
 import com.google.test.metric.AutoFieldClearTestCase;
 import com.google.test.metric.ClassRepository;
+import com.google.test.metric.CostModel;
 import com.google.test.metric.MethodCost;
 import com.google.test.metric.MethodInfo;
 import com.google.test.metric.MetricComputer;
-import com.google.test.metric.PackageWhiteList;
+import com.google.test.metric.RegExpWhiteList;
 import com.google.test.metric.example.GlobalExample.Gadget;
 
 public class GlobalExampleTest extends AutoFieldClearTestCase {
 
   ClassRepository repo = new ClassRepository();
-  PackageWhiteList whitelist = new PackageWhiteList();
-  MetricComputer computer = new MetricComputer(repo, null, whitelist);
+  RegExpWhiteList whitelist = new RegExpWhiteList();
+  MetricComputer computer = new MetricComputer(repo, null, whitelist, new CostModel());
 
   private MethodCost cost(Class<?> clazz, String method) {
     return computer.compute(clazz, method);

@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 public class TestabilityContextTest extends TestCase {
 
   TestabilityContext context =
-      new TestabilityContext(null, null, new PackageWhiteList());
+      new TestabilityContext(null, null, new RegExpWhiteList(), new CostModel());
 
   Variable instance = new Variable("instance", null, false, false);
   Variable finalInstance = new Variable("instance", null, true, false);

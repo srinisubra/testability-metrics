@@ -27,7 +27,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, new PackageWhiteList());
+    computer = new MetricComputer(repo, null, new RegExpWhiteList(), new CostModel());
   }
 
   public static class Medium {
@@ -400,16 +400,16 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   }
 
   public void testWhiteList() throws Exception {
-    PackageWhiteList whiteList = new PackageWhiteList("java.lang");
-    computer = new MetricComputer(repo, null, whiteList);
+    RegExpWhiteList whiteList = new RegExpWhiteList("java.lang");
+    computer = new MetricComputer(repo, null, whiteList, new CostModel());
     MethodCost cost = computer.compute(WhiteListTest.class, "testMethod()V");
     assertEquals(0L, cost.getTotalGlobalCost());
   }
 
   public void testThatOnWindowsWeCanParseTheFonts() throws Exception {
     repo = new ClassRepository(makeClasspathRootGroup("classes-for-test/jre1.6_TrueTypeBug"));
-    WhiteList whitelist = new PackageWhiteList();
-    computer = new MetricComputer(repo, null, whitelist);
+    WhiteList whitelist = new RegExpWhiteList();
+    computer = new MetricComputer(repo, null, whitelist, new CostModel());
     ClassInfo clazz = repo.getClass("sun.font.TrueTypeFont");
     MethodInfo method = clazz.getMethod("getTableBuffer(I)Ljava/nio/ByteBuffer;");
     computer.compute(method);
