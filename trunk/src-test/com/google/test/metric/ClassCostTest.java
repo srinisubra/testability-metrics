@@ -35,9 +35,10 @@ public class ClassCostTest extends TestCase {
   protected void setUp() throws Exception {
     super.setUp();
 
-    methodCost0.link();
-    methodCost1.link();
-    methodCost2.link();
+    CostModel context = new CostModel();
+    methodCost0.link(context);
+    methodCost1.link(context);
+    methodCost2.link(context);
 
     List<MethodCost> methodCosts0 = new ArrayList<MethodCost>();
     methodCosts0.add(methodCost0);
@@ -64,10 +65,15 @@ public class ClassCostTest extends TestCase {
 
   public void testClassCostSortsByDescendingCost() throws Exception {
     List<ClassCost> classCosts = new ArrayList<ClassCost>();
+    CostModel costModel = new CostModel();
+    classCost0.link(costModel);
+    classCost1.link(costModel);
+    classCost2.link(costModel);
     classCosts.add(classCost1);
     classCosts.add(classCost0);
     classCosts.add(classCost2);
     Collections.sort(classCosts, new ClassCost.Comparator());
+    System.out.println(classCosts);
     assertEquals(classCost2, classCosts.get(0));
     assertEquals(classCost1, classCosts.get(1));
     assertEquals(classCost0, classCosts.get(2));

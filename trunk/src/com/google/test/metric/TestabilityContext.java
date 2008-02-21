@@ -32,13 +32,15 @@ public class TestabilityContext {
   private final Map<MethodInfo, MethodCost> methodCosts = new HashMap<MethodInfo, MethodCost>();
   private final PrintStream err;
   private final WhiteList whitelist;
+  private final CostModel linkContext;
   private Variable returnValue;
 
   public TestabilityContext(ClassRepository classRepository, PrintStream err,
-    WhiteList whitelist) {
+    WhiteList whitelist, CostModel linkContext) {
     this.classRepository = classRepository;
     this.err = err;
     this.whitelist = whitelist;
+    this.linkContext = linkContext;
   }
 
   public MethodInfo getMethod(String clazzName, String methodName) {
@@ -61,7 +63,7 @@ public class TestabilityContext {
 
   public MethodCost getLinkedMethodCost(MethodInfo method) {
     MethodCost cost = getMethodCost(method);
-    cost.link();
+    cost.link(linkContext);
     return cost;
   }
 

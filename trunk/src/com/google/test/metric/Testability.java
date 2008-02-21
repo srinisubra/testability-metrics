@@ -47,9 +47,22 @@ public class Testability {
   @Option(name = "-whitelist",
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
-                  "given values. (Always whitelists java.*)")
+                  "given values. (Always whitelists java.*. RegExp OK.)")
   String wl = null;
-  private final PackageWhiteList whitelist = new PackageWhiteList();
+  private final RegExpWhiteList whitelist = new RegExpWhiteList();
+
+  @Option(name = "cyc",
+      metaVar = "cyclomatic cost multiplier",
+      usage = "When computing the overall cost of the method the " +
+              "individual costs are added using weighted average. " +
+              "This represents the weight of the cyclomatic cost.")
+  double cyclomaticMultiplier = 1;
+  @Option(name = "glob",
+      metaVar = "global state cost multiplier",
+      usage = "When computing the overall cost of the method the " +
+          "individual costs are added using weighted average. " +
+          "This represents the weight of the global state cost.")
+  double globalMultiplier = 10;
 
   @Argument(metaVar = "classes and packages",
           usage = "Classes or packages to analyze. " +
@@ -112,7 +125,8 @@ public class Testability {
   public void execute() {
     postParse();
     ClassRepository repository = new ClassRepository(classpath);
-    MetricComputer computer = new MetricComputer(repository, err, whitelist);
+    CostModel costModel = new CostModel(cyclomaticMultiplier, globalMultiplier);
+    MetricComputer computer = new MetricComputer(repository, err, whitelist, costModel);
     HumanReadablePrinter printer =
         new HumanReadablePrinter(out, entryList, printDepth, minCost);
     printer.printHeader();

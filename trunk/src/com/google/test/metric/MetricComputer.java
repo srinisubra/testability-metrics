@@ -27,12 +27,14 @@ public class MetricComputer {
   private final ClassRepository classRepository;
   private final PrintStream err;
   private final WhiteList whitelist;
+  private final CostModel costModel;
 
   public MetricComputer(ClassRepository classRepository, PrintStream err,
-      WhiteList whitelist) {
+      WhiteList whitelist, CostModel costModel) {
     this.classRepository = classRepository;
     this.err = err;
     this.whitelist = whitelist;
+    this.costModel = costModel;
   }
 
   /* used for testing */
@@ -44,7 +46,7 @@ public class MetricComputer {
 
   public MethodCost compute(MethodInfo method) {
     TestabilityContext context = new TestabilityContext(classRepository, err,
-        whitelist);
+        whitelist, costModel);
     addStaticCost(method, context);
     addConstructorCost(method, context);
     addSetterInjection(method, context);
@@ -130,7 +132,9 @@ public class MetricComputer {
     for (MethodInfo method : clazz.getMethods()) {
       methods.add(compute(method));
     }
-    return new ClassCost(clazz.getName(), methods);
+    ClassCost classCost = new ClassCost(clazz.getName(), methods);
+    classCost.link(costModel);
+    return classCost;
   }
 
 }

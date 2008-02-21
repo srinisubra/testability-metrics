@@ -31,6 +31,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   private final  MethodCost methodCost3 = new MethodCost("c.g.t.A.method3()V", 0, 3);
   private ByteArrayOutputStream out;
   private HumanReadablePrinter printer;
+  private final CostModel context = new CostModel();
 
   @Override
   public void setUp() {
@@ -42,14 +43,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void testSimpleCost() throws Exception {
     MethodCost costOnlyMethod1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
     costOnlyMethod1.addGlobalCost(0, null);
-    costOnlyMethod1.link();
+    costOnlyMethod1.link(context);
     printer.print("", costOnlyMethod1, Integer.MAX_VALUE, 0);
     assertStringEquals("c.g.t.A.method1()V [1, 1 / 1, 1]\n", out.toString());
   }
 
   public void test2DeepPrintAll() throws Exception {
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
-    methodCost2.link();
+    methodCost2.link(context);
     printer.print("", methodCost2, MAX_VALUE, 0);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
         "  line 81: c.g.t.A.method1()V [1, 0 / 1, 0]\n", out.toString());
@@ -58,7 +59,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void test3DeepPrintAll() throws Exception {
     methodCost2.addMethodCost(8, methodCost1);
     methodCost3.addMethodCost(2, methodCost2);
-    methodCost3.link();
+    methodCost3.link(context);
     printer.print("", methodCost3, MAX_VALUE, 0);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n" +
         "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
@@ -68,7 +69,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void test2DeepSupress0Cost() throws Exception {
     methodCost1.addMethodCost(8, methodCost0);
     methodCost1.addMethodCost(13, methodCost3);
-    methodCost1.link();
+    methodCost1.link(context);
     printer.print("", methodCost1, MAX_VALUE, 1);
     assertStringEquals("c.g.t.A.method1()V [1, 0 / 4, 0]\n" +
     		"  line 13: c.g.t.A.method3()V [3, 0 / 3, 0]\n", out.toString());
@@ -77,7 +78,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void test3DeepPrint2Deep() throws Exception {
     methodCost3.addMethodCost(2, methodCost2);
     methodCost2.addMethodCost(2, methodCost1);
-    methodCost3.link();
+    methodCost3.link(context);
     printer.print("", methodCost3, 2, 0);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n"
       + "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
@@ -85,14 +86,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
   public void testSupressAllWhenMinCostIs4() throws Exception {
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
-    methodCost2.link();
+    methodCost2.link(context);
     printer.print("", methodCost2, MAX_VALUE, 4);
     assertStringEquals("", out.toString());
   }
 
   public void testSupressPartialWhenMinCostIs2() throws Exception {
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
-    methodCost2.link();
+    methodCost2.link(context);
     printer.print("", methodCost2, Integer.MAX_VALUE, 2);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
   }
@@ -100,7 +101,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   public void testSecondLevelRecursive() throws Exception {
     methodCost3.addMethodCost(1, methodCost2);
     methodCost2.addMethodCost(2, methodCost2);
-    methodCost3.link();
+    methodCost3.link(context);
     printer.print("", methodCost3, 10, 0);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 5, 0]\n"
       + "  line 1: c.g.t.A.method2()V [2, 0 / 2, 0]\n", out.toString());
@@ -132,13 +133,14 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
       throws Exception {
     List<MethodCost> methodCosts1 = new ArrayList<MethodCost>();
     methodCosts1.add(methodCost1);
-    methodCost1.link();
     List<MethodCost> methodCosts2 = new ArrayList<MethodCost>();
     methodCosts2.add(methodCost2);
-    methodCost2.link();
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     ClassCost classCost1 = new ClassCost("FAKE_classInfo1", methodCosts1);
     ClassCost classCost2 = new ClassCost("FAKE_classInfo2", methodCosts2);
+    classCost0.link(context);
+    classCost1.link(context);
+    classCost2.link(context);
     printer.addClassCostToPrint(classCost0);
     printer.addClassCostToPrint(classCost1);
     printer.addClassCostToPrint(classCost2);

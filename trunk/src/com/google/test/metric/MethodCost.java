@@ -23,10 +23,11 @@ public class MethodCost {
   private final String methodName;
   private final long cyclomaticCost;
   private final int lineNumber;
-  private final List<LineNumberCost> lineNumberCosts = new LinkedList<LineNumberCost>();
+  private final List<LineNumberCost> operationCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
   private long totalGlobalCost = -1;
   private long totalComplexityCost = -1;
+  private long overallCost;
 
   public MethodCost(String methodName, int lineNumber, long cyclomaticCost) {
     this.methodName = methodName;
@@ -54,31 +55,28 @@ public class MethodCost {
     return totalComplexityCost >= 0 && totalGlobalCost >= 0;
   }
 
-  public void link() {
+  public void link(CostModel costModel) {
     if (!isLinked()) {
       totalGlobalCost = 0;
       totalComplexityCost = 0;
-      for (LineNumberCost lineNumberCost : lineNumberCosts) {
-        MethodCost childCost = lineNumberCost.getMethodCost();
-        childCost.link();
+      for (LineNumberCost operationCost : operationCosts) {
+        MethodCost childCost = operationCost.getMethodCost();
+        childCost.link(costModel);
         totalGlobalCost += childCost.getTotalGlobalCost();
         totalComplexityCost += childCost.getTotalComplexityCost();
       }
-      totalComplexityCost += getComplexityCost();
       totalGlobalCost += getGlobalCost();
+      totalComplexityCost += getCyclomaticCost();
+      overallCost = costModel.computeMethod(getTotalComplexityCost(), getTotalGlobalCost());
     }
   }
 
-  private long getComplexityCost() {
-    return cyclomaticCost;
-  }
-
-  private int getGlobalCost() {
+  public int getGlobalCost() {
     return globalStateCosts.size();
   }
 
   public List<LineNumberCost> getOperationCosts() {
-    return lineNumberCosts;
+    return operationCosts;
   }
 
   public String getMethodName() {
@@ -86,7 +84,7 @@ public class MethodCost {
   }
 
   public void addMethodCost(int lineNumber, MethodCost to) {
-    lineNumberCosts.add(new LineNumberCost(lineNumber, to));
+    operationCosts.add(new LineNumberCost(lineNumber, to));
   }
 
   public void addGlobalCost(int lineNumber, Variable variable) {
@@ -99,12 +97,20 @@ public class MethodCost {
   }
 
   public String toCostsString() {
-    return " [" + getComplexityCost() + ", " + getGlobalCost() + " / "
+    return " [" + getCyclomaticCost() + ", " + getGlobalCost() + " / "
     + getTotalComplexityCost() + ", " + getTotalGlobalCost() + "]";
+  }
+
+  public long getCyclomaticCost() {
+    return cyclomaticCost;
   }
 
   public int getMethodLineNumber() {
     return lineNumber;
+  }
+
+  public long getOverallCost() {
+    return overallCost;
   }
 
 }
