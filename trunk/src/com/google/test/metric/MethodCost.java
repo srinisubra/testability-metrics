@@ -25,9 +25,10 @@ public class MethodCost {
   private final int lineNumber;
   private final List<LineNumberCost> operationCosts = new LinkedList<LineNumberCost>();
   private final List<GlobalStateCost> globalStateCosts = new LinkedList<GlobalStateCost>();
-  private long totalGlobalCost = -1;
-  private long totalComplexityCost = -1;
+  private long totalGlobalCost;
+  private long totalComplexityCost;
   private long overallCost;
+  private boolean linked = false;
 
   public MethodCost(String methodName, int lineNumber, long cyclomaticCost) {
     this.methodName = methodName;
@@ -46,32 +47,29 @@ public class MethodCost {
   }
 
   private void assertLinked() {
-    if (!isLinked()) {
+    if (!linked) {
       throw new IllegalStateException("Need to link first.");
     }
   }
 
-  private boolean isLinked() {
-    return totalComplexityCost >= 0 && totalGlobalCost >= 0;
-  }
-
   public void link(CostModel costModel) {
-    if (!isLinked()) {
-      totalGlobalCost = 0;
-      totalComplexityCost = 0;
+    if (!linked) {
+      linked = true;
+      long totalGlobalCost = getGlobalCost();
+      long totalComplexityCost = getCyclomaticCost();
       for (LineNumberCost operationCost : operationCosts) {
         MethodCost childCost = operationCost.getMethodCost();
         childCost.link(costModel);
         totalGlobalCost += childCost.getTotalGlobalCost();
         totalComplexityCost += childCost.getTotalComplexityCost();
       }
-      totalGlobalCost += getGlobalCost();
-      totalComplexityCost += getCyclomaticCost();
+      this.totalComplexityCost = totalComplexityCost;
+      this.totalGlobalCost = totalGlobalCost;
       overallCost = costModel.computeMethod(getTotalComplexityCost(), getTotalGlobalCost());
     }
   }
 
-  public int getGlobalCost() {
+  public long getGlobalCost() {
     return globalStateCosts.size();
   }
 
