@@ -27,6 +27,7 @@ import org.kohsuke.args4j.Option;
 import com.google.classpath.ClasspathRootFactory;
 import com.google.classpath.ClasspathRootGroup;
 import com.google.classpath.ColonDelimitedStringParser;
+import com.google.test.metric.report.HumanReadablePrinter;
 
 public class Testability {
 
