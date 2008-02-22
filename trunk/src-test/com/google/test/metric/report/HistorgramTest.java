@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 public class HistorgramTest extends TestCase {
 
   public void testDrawHistogram() throws Exception {
-    Histogram histogram = new Histogram(6, 3, '*');
+    Histogram histogram = new Histogram(6, 3, '#');
     histogram.setMin(0);
     histogram.setMax(30);
     String[] rows = histogram.graph(10,20,20,30,30,30);
