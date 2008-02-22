@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.report;
 
 import static java.lang.System.getProperty;
 
@@ -23,6 +23,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.test.metric.ClassCost;
+import com.google.test.metric.LineNumberCost;
+import com.google.test.metric.MethodCost;
 
 public class HumanReadablePrinter {
   public static final String NEW_LINE = getProperty("line.separator");

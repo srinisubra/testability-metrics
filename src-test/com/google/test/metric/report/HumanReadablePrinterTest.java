@@ -13,15 +13,20 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.report;
 
-import static com.google.test.metric.HumanReadablePrinter.NEW_LINE;
+import static com.google.test.metric.report.HumanReadablePrinter.NEW_LINE;
 import static java.lang.Integer.MAX_VALUE;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.test.metric.AutoFieldClearTestCase;
+import com.google.test.metric.ClassCost;
+import com.google.test.metric.CostModel;
+import com.google.test.metric.MethodCost;
 
 public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 

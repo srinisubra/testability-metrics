@@ -20,6 +20,8 @@ import static com.google.test.metric.SignatureUtil.L;
 
 import java.util.List;
 
+import com.google.test.metric.report.HumanReadablePrinter;
+
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
