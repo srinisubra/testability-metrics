@@ -59,31 +59,13 @@ public class HumanReadablePrinter implements Report {
   }
 
   public void printFooter() {
-    printClassCosts();
-    out.println(NEW_LINE + DIVIDER + "Summary Statistics:");
-    out.println(" TCC for all classes entered: " + cumulativeTCC);
-    out.println(" TGC for all classes entered: " + cumulativeTGC);
-    out.println(" Average TCC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTCC) / toPrint.size()));
-    out.println(" Average TGC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTGC) / toPrint.size()));
-
-    out.println(NEW_LINE + "Key:");
-    out.println(" TCC: Total Compexity Cost");
-    out.println(" TGC: Total Global Cost");
-
-    out.println(NEW_LINE + "Analyzed " + toPrint.size() +
-    " classes (plus non-whitelisted external dependencies)");
+    for (ClassCost classCost : toPrint) {
+      print(classCost);
+    }
   }
 
   public void addClassCost(ClassCost classCost) {
     toPrint.add(classCost);
-  }
-
-  public void printClassCosts() {
-    for (ClassCost classCost : toPrint) {
-      print(classCost);
-    }
   }
 
   public void print(ClassCost classCost) {

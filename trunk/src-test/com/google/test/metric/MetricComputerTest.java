@@ -439,4 +439,15 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     assertEquals(0, cost.getMethodCost("<clinit>()V").getTotalGlobalCost());
   }
 
+  private final String testValue = null;
+  class InnerClassTest {
+    public void test() {
+      testValue.indexOf(0);
+    }
+  }
+  public void XtestInnerClassInjectability() throws Exception {
+    MethodCost cost = computer.compute(InnerClassTest.class, "test()V");
+    assertEquals(0, cost.getTotalComplexityCost());
+  }
+
 }
