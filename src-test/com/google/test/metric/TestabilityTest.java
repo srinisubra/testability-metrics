@@ -183,19 +183,6 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertEquals(4, classes.size());
   }
 
-  public void testFilterCostOverTotalCostThreshold() throws Exception {
-    testability.cp = JUNIT_JAR;
-    testability.execute();
-    String baselineOutput = out.toString();
-    out.clear();
-    testability.minCost = 9;
-    testability.execute();
-    String throttledOutput = out.toString();
-    assertTrue(throttledOutput, throttledOutput.length() < baselineOutput
-        .length());
-    assertFalse(baselineOutput.equals(throttledOutput));
-  }
-
   public void testOneEntryWhitelist() throws Exception {
     testability.cp = JUNIT_JAR;
     testability.entryList.add("junit.runner");

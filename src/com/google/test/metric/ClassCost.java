@@ -21,7 +21,8 @@ public class ClassCost {
 
   public static class Comparator implements java.util.Comparator<ClassCost> {
     public int compare(ClassCost c1, ClassCost c2) {
-      return (int) (c2.getOverallCost() - c1.getOverallCost());
+      int diff = (int) (c2.getOverallCost() - c1.getOverallCost());
+      return diff == 0 ? c1.className.compareTo(c2.className) : diff;
     }
   }
 
@@ -46,17 +47,7 @@ public class ClassCost {
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    toString(buf);
-    return buf.toString();
-  }
-
-  public void toString(StringBuilder buf) {
-    buf.append(className.toString());
-    for (MethodCost cost : methods) {
-      buf.append("\n  ");
-      buf.append(cost);
-    }
+    return className + " " + getOverallCost();
   }
 
   public String getClassName() {
