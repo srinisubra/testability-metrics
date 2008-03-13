@@ -87,6 +87,9 @@ public class MetricComputer {
   }
 
   private void addStaticCost(MethodInfo baseMethod, TestabilityContext context) {
+    if (baseMethod.isStaticConstructor()) {
+      return;
+    }
     for (MethodInfo method : baseMethod.getClassInfo().getMethods()) {
       if (method.getName().startsWith("<clinit>")) {
         context.implicitCost(baseMethod, method);

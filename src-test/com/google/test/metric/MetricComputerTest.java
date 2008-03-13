@@ -18,6 +18,8 @@ package com.google.test.metric;
 import static com.google.classpath.ClasspathRootFactory.makeClasspathRootGroup;
 import static com.google.test.metric.SignatureUtil.L;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
 import com.google.test.metric.report.HumanReadablePrinter;
@@ -25,11 +27,12 @@ import com.google.test.metric.report.HumanReadablePrinter;
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
   private MetricComputer computer;
+  private final RegExpWhiteList whitelist = new RegExpWhiteList();
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    computer = new MetricComputer(repo, null, new RegExpWhiteList(), new CostModel());
+    computer = new MetricComputer(repo, null, whitelist, new CostModel());
   }
 
   public static class Medium {
@@ -355,8 +358,8 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
     MethodCost cost =
         computer.compute(GlobalStateUser.class, "accessMutableState()V");
-    new HumanReadablePrinter(System.out, null, Integer.MAX_VALUE, 0)
-        .print("", cost, 10);
+    new HumanReadablePrinter(new PrintStream(new ByteArrayOutputStream()),
+        null, Integer.MAX_VALUE, 0).print("", cost, 10);
     assertEquals("Expecting one for read and one for write", 2L,
         cost.getTotalGlobalCost());
   }
@@ -417,4 +420,23 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     computer.compute(method);
     // assert no exception thrown.
   }
+
+  static class DoubleCountClassConst {
+    static int x;
+    static {
+      x = 1;
+    }
+  }
+  public void testDoubleCountClassConst() throws Exception {
+    ClassCost cost = computer.compute(DoubleCountClassConst.class);
+    assertEquals(1, cost.getMethodCost("<clinit>()V").getTotalGlobalCost());
+  }
+
+  static enum TestEnum1{ ONE };
+  public void testEnumerationIsZero() throws Exception {
+    whitelist.addPackage("java.");
+    ClassCost cost = computer.compute(TestEnum1.class);
+    assertEquals(0, cost.getMethodCost("<clinit>()V").getTotalGlobalCost());
+  }
+
 }

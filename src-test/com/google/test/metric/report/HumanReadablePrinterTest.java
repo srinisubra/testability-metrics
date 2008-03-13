@@ -126,7 +126,7 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     printer.addClassCost(classCost0);
     printer.printClassCosts();
-    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
+    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ cost = 0 ] [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 
@@ -140,9 +140,9 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     printer.addClassCost(classCost1);
     printer.addClassCost(classCost2);
     printer.printClassCosts();
-    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n" +
-        "\nTestability cost for FAKE_classInfo1 [ 0 TCC, 0 TGC ]\n" +
-        "\nTestability cost for FAKE_classInfo2 [ 0 TCC, 0 TGC ]\n",
+    assertStringEquals("\nTestability cost for FAKE_classInfo0 [ cost = 0 ] [ 0 TCC, 0 TGC ]\n" +
+        "\nTestability cost for FAKE_classInfo1 [ cost = 0 ] [ 0 TCC, 0 TGC ]\n" +
+        "\nTestability cost for FAKE_classInfo2 [ cost = 0 ] [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 
@@ -164,11 +164,11 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     printer.addClassCost(classCost1);
     printer.addClassCost(classCost2);
     printer.printClassCosts();
-    assertStringEquals("\nTestability cost for FAKE_classInfo2 [ 2 TCC, 0 TGC ]\n" +
+    assertStringEquals("\nTestability cost for FAKE_classInfo2 [ cost = 2 ] [ 2 TCC, 0 TGC ]\n" +
     		"  c.g.t.A.method2()V [2, 0 / 2, 0]\n" +
-        "\nTestability cost for FAKE_classInfo1 [ 1 TCC, 0 TGC ]\n" +
+        "\nTestability cost for FAKE_classInfo1 [ cost = 1 ] [ 1 TCC, 0 TGC ]\n" +
         "  c.g.t.A.method1()V [1, 0 / 1, 0]\n" +
-        "\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
+        "\nTestability cost for FAKE_classInfo0 [ cost = 0 ] [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 
