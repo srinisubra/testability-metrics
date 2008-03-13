@@ -141,14 +141,15 @@ public class TestabilityContext {
       Variable value, MethodInfo inMethod, int lineNumber) {
     localAssignment(inMethod, lineNumber, field, value);
     if (fieldInstance == null || statics.contains(fieldInstance)) {
-      getMethodCost(inMethod).addGlobalCost(lineNumber, fieldInstance);
+      if (!field.isFinal()) {
+        getMethodCost(inMethod).addGlobalCost(lineNumber, fieldInstance);
+      }
       statics.add(field);
     }
   }
 
   public void arrayAssignment(Variable array, Variable index, Variable value,
       MethodInfo inMethod, int lineNumber) {
-    localAssignment(inMethod, lineNumber, array, value);
     if (statics.contains(array)) {
       getMethodCost(inMethod).addGlobalCost(lineNumber, array);
     }

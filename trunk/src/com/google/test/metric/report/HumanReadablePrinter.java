@@ -39,7 +39,6 @@ public class HumanReadablePrinter implements Report {
   private final int minCost;
   private long cumulativeTCC = 0;
   private long cumulativeTGC = 0;
-  private int countAnalyzed;
 
   public HumanReadablePrinter(PrintStream out, List<String> entryList,
       int maxDepth, int minCost) {
@@ -65,15 +64,15 @@ public class HumanReadablePrinter implements Report {
     out.println(" TCC for all classes entered: " + cumulativeTCC);
     out.println(" TGC for all classes entered: " + cumulativeTGC);
     out.println(" Average TCC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTCC) / countAnalyzed));
+        String.format("%.2f", ((double)cumulativeTCC) / toPrint.size()));
     out.println(" Average TGC for all classes entered: " +
-        String.format("%.2f", ((double)cumulativeTGC) / countAnalyzed));
+        String.format("%.2f", ((double)cumulativeTGC) / toPrint.size()));
 
     out.println(NEW_LINE + "Key:");
     out.println(" TCC: Total Compexity Cost");
     out.println(" TGC: Total Global Cost");
 
-    out.println(NEW_LINE + "Analyzed " + countAnalyzed +
+    out.println(NEW_LINE + "Analyzed " + toPrint.size() +
     " classes (plus non-whitelisted external dependencies)");
   }
 
@@ -93,8 +92,9 @@ public class HumanReadablePrinter implements Report {
       long tgc = classCost.getTotalGlobalCost();
       cumulativeTCC += tcc;
       cumulativeTGC += tgc;
-      out.println(NEW_LINE + "Testability cost for " + classCost.getClassName() + " [ "
-          + tcc + " TCC, " + tgc + " TGC ]");
+      out.println(NEW_LINE + "Testability cost for " + classCost.getClassName()
+          + " [ cost = " + classCost.getOverallCost() + " ]"
+          + " [ " + tcc + " TCC, " + tgc + " TGC ]");
       for (MethodCost cost : classCost.getMethods()) {
         print("  ", cost, maxDepth);
       }
