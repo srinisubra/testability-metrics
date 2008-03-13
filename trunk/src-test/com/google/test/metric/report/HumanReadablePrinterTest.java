@@ -34,99 +34,111 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   private final  MethodCost methodCost1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
   private final  MethodCost methodCost2 = new MethodCost("c.g.t.A.method2()V", 0, 2);
   private final  MethodCost methodCost3 = new MethodCost("c.g.t.A.method3()V", 0, 3);
-  private ByteArrayOutputStream out;
-  private HumanReadablePrinter printer;
+  private final ByteArrayOutputStream out = new ByteArrayOutputStream();
   private final CostModel context = new CostModel();
 
-  @Override
-  public void setUp() {
-    out = new ByteArrayOutputStream();
-    printer =
-        new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
-  }
-
   public void testSimpleCost() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     MethodCost costOnlyMethod1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
     costOnlyMethod1.addGlobalCost(0, null);
     costOnlyMethod1.link(context);
-    printer.print("", costOnlyMethod1, Integer.MAX_VALUE, 0);
+    printer.print("", costOnlyMethod1, Integer.MAX_VALUE);
     assertStringEquals("c.g.t.A.method1()V [1, 1 / 1, 1]\n", out.toString());
   }
 
   public void test2DeepPrintAll() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
-    printer.print("", methodCost2, MAX_VALUE, 0);
+    printer.print("", methodCost2, MAX_VALUE);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
         "  line 81: c.g.t.A.method1()V [1, 0 / 1, 0]\n", out.toString());
   }
 
   public void test3DeepPrintAll() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost2.addMethodCost(8, methodCost1);
     methodCost3.addMethodCost(2, methodCost2);
     methodCost3.link(context);
-    printer.print("", methodCost3, MAX_VALUE, 0);
+    printer.print("", methodCost3, MAX_VALUE);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n" +
         "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n" +
         "    line 8: c.g.t.A.method1()V [1, 0 / 1, 0]\n", out.toString());
   }
 
   public void test2DeepSupress0Cost() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 2);
     methodCost1.addMethodCost(8, methodCost0);
     methodCost1.addMethodCost(13, methodCost3);
     methodCost1.link(context);
-    printer.print("", methodCost1, MAX_VALUE, 1);
+    printer.print("", methodCost1, MAX_VALUE);
     assertStringEquals("c.g.t.A.method1()V [1, 0 / 4, 0]\n" +
     		"  line 13: c.g.t.A.method3()V [3, 0 / 3, 0]\n", out.toString());
   }
 
   public void test3DeepPrint2Deep() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost3.addMethodCost(2, methodCost2);
     methodCost2.addMethodCost(2, methodCost1);
     methodCost3.link(context);
-    printer.print("", methodCost3, 2, 0);
+    printer.print("", methodCost3, 2);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 6, 0]\n"
       + "  line 2: c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
   }
 
   public void testSupressAllWhenMinCostIs4() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 4);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
-    printer.print("", methodCost2, MAX_VALUE, 4);
+    printer.print("", methodCost2, MAX_VALUE);
     assertStringEquals("", out.toString());
   }
 
   public void testSupressPartialWhenMinCostIs2() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 2);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
-    printer.print("", methodCost2, Integer.MAX_VALUE, 2);
+    printer.print("", methodCost2, Integer.MAX_VALUE);
     assertStringEquals("c.g.t.A.method2()V [2, 0 / 3, 0]\n", out.toString());
   }
 
   public void testSecondLevelRecursive() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost3.addMethodCost(1, methodCost2);
     methodCost2.addMethodCost(2, methodCost2);
     methodCost3.link(context);
-    printer.print("", methodCost3, 10, 0);
+    printer.print("", methodCost3, 10);
     assertStringEquals("c.g.t.A.method3()V [3, 0 / 5, 0]\n"
       + "  line 1: c.g.t.A.method2()V [2, 0 / 2, 0]\n", out.toString());
   }
 
   public void testAddOneClassCostThenPrintIt() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
-    printer.addClassCostToPrint(classCost0);
+    printer.addClassCost(classCost0);
     printer.printClassCosts();
     assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n",
         out.toString());
   }
 
   public void testAddSeveralClassCostsAndPrintThem() throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     ClassCost classCost1 = new ClassCost("FAKE_classInfo1", new ArrayList<MethodCost>());
     ClassCost classCost2 = new ClassCost("FAKE_classInfo2", new ArrayList<MethodCost>());
-    printer.addClassCostToPrint(classCost0);
-    printer.addClassCostToPrint(classCost1);
-    printer.addClassCostToPrint(classCost2);
+    printer.addClassCost(classCost0);
+    printer.addClassCost(classCost1);
+    printer.addClassCost(classCost2);
     printer.printClassCosts();
     assertStringEquals("\nTestability cost for FAKE_classInfo0 [ 0 TCC, 0 TGC ]\n" +
         "\nTestability cost for FAKE_classInfo1 [ 0 TCC, 0 TGC ]\n" +
@@ -136,6 +148,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
   public void testAddSeveralClassCostsAndPrintThemInDescendingCostOrder()
       throws Exception {
+    HumanReadablePrinter printer =
+      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
     List<MethodCost> methodCosts1 = new ArrayList<MethodCost>();
     methodCosts1.add(methodCost1);
     List<MethodCost> methodCosts2 = new ArrayList<MethodCost>();
@@ -146,9 +160,9 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
     classCost0.link(context);
     classCost1.link(context);
     classCost2.link(context);
-    printer.addClassCostToPrint(classCost0);
-    printer.addClassCostToPrint(classCost1);
-    printer.addClassCostToPrint(classCost2);
+    printer.addClassCost(classCost0);
+    printer.addClassCost(classCost1);
+    printer.addClassCost(classCost2);
     printer.printClassCosts();
     assertStringEquals("\nTestability cost for FAKE_classInfo2 [ 2 TCC, 0 TGC ]\n" +
     		"  c.g.t.A.method2()V [2, 0 / 2, 0]\n" +

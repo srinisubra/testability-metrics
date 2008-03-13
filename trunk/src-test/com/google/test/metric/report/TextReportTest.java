@@ -33,7 +33,7 @@ public class TextReportTest extends TestCase {
 
   public static final String NEW_LINE = getProperty("line.separator");
   ByteArrayOutputStream out = new ByteArrayOutputStream();
-  TextReport report = new TextReport(new PrintStream(out), 50, 100);
+  TextReport report = new TextReport(new PrintStream(out), 50, 100, 0);
 
   private void assertOutput(String... expected) {
     StringBuilder buf = new StringBuilder();

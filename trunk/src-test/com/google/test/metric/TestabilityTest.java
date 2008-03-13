@@ -112,7 +112,7 @@ public class TestabilityTest extends AutoFieldClearTestCase {
     assertTrue(err.toString().length() == 0);
   }
 
-  public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() {
+  public void testJarFileAndJunitRunnerEntryPatternAndMaxDepthZero() throws CmdLineException {
     testability.cp = JUNIT_JAR;
     testability.printDepth = 0;
     testability.entryList.add("junit.runner");

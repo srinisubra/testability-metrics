@@ -356,7 +356,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     MethodCost cost =
         computer.compute(GlobalStateUser.class, "accessMutableState()V");
     new HumanReadablePrinter(System.out, null, Integer.MAX_VALUE, 0)
-        .print("", cost, 10, 0);
+        .print("", cost, 10);
     assertEquals("Expecting one for read and one for write", 2L,
         cost.getTotalGlobalCost());
   }
