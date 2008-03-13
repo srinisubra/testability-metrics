@@ -22,20 +22,22 @@ import java.util.TreeSet;
 import com.google.test.metric.ClassCost;
 
 
-public class TextReport {
+public class TextReport implements Report {
 
   private final PrintStream out;
   private final SortedSet<ClassCost> costs = new TreeSet<ClassCost>(new ClassCost.Comparator());
   private final int maxExcelentCost;
   private final int maxAcceptableCost;
+  private final int worstOffenderCount;
   private int excelentCount = 0;
   private int goodCount = 0;
   private int needsWorkCount = 0;
 
-  public TextReport(PrintStream out, int maxExcelentCost, int maxAcceptableCost) {
+  public TextReport(PrintStream out, int maxExcelentCost, int maxAcceptableCost, int worstOffenderCount) {
     this.out = out;
     this.maxExcelentCost = maxExcelentCost;
     this.maxAcceptableCost = maxAcceptableCost;
+    this.worstOffenderCount = worstOffenderCount;
   }
 
   public void printSummary() {
@@ -49,6 +51,9 @@ public class TextReport {
     out.printf("             Breakdown: [%s]%n", chart);
   }
 
+  /* (non-Javadoc)
+   * @see com.google.test.metric.report.Report#addClassCost(com.google.test.metric.ClassCost)
+   */
   public void addClassCost(ClassCost classCost) {
     long cost = classCost.getOverallCost();
     if (cost < maxExcelentCost) {
@@ -94,6 +99,18 @@ public class TextReport {
         break;
       }
     }
+  }
+
+  /* (non-Javadoc)
+   * @see com.google.test.metric.report.Report#print()
+   */
+  public void printFooter() {
+    printSummary();
+    printDistribution(25, 70);
+    printWorstOffenders(worstOffenderCount);
+  }
+
+  public void printHeader() {
   }
 
 }

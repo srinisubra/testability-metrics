@@ -27,6 +27,8 @@ import org.kohsuke.args4j.Option;
 import com.google.classpath.ClasspathRootFactory;
 import com.google.classpath.ClasspathRootGroup;
 import com.google.classpath.ColonDelimitedStringParser;
+import com.google.test.metric.report.HumanReadablePrinter;
+import com.google.test.metric.report.Report;
 import com.google.test.metric.report.TextReport;
 
 public class Testability {
@@ -39,7 +41,7 @@ public class Testability {
   @Option(name = "-printDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
-  int printDepth = 1;
+  int printDepth = 10;
 
   @Option(name = "-minCost",
       usage = "Minimum Total Class cost required to print that class' metrics.")
@@ -51,6 +53,7 @@ public class Testability {
 
   @Option(name = "-worstOffenderCount",
       usage = "Print N number of worst ofending classes.")
+  public
   int worstOffenderCount = 20;
 
   @Option(name = "-maxAcceptableCost",
@@ -94,6 +97,8 @@ public class Testability {
   private final PrintStream out;
   private final PrintStream err;
 
+  private Report report;
+
   public Testability(PrintStream out, PrintStream err) {
     this.out = out;
     this.err = err;
@@ -131,7 +136,7 @@ public class Testability {
     }
   }
 
-  private void postParse() {
+  private void postParse() throws CmdLineException {
     for (String packageName : new ColonDelimitedStringParser(wl).getStrings()) {
         whitelist.addPackage(packageName);
     }
@@ -139,15 +144,23 @@ public class Testability {
       entryList.add("");
     }
     classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
+    if (printer.equals("summary")) {
+      report = new TextReport(out, maxEcelentCost, maxAcceptableCost, worstOffenderCount);
+    } else if (printer.equals("detail")) {
+      report = new HumanReadablePrinter(out, entryList, printDepth, minCost);
+    } else {
+      throw new CmdLineException("Don't understand '-print' option '"
+          + printer + "'");
+    }
   }
 
-  public void execute() {
+  public void execute() throws CmdLineException {
     postParse();
     ClassRepository repository = new ClassRepository(classpath);
     CostModel costModel = new CostModel(cyclomaticMultiplier, globalMultiplier);
     MetricComputer computer = new MetricComputer(repository, err, whitelist, costModel);
     List<String> classNames = classpath.getClassNamesToEnter(entryList);
-    TextReport report = new TextReport(out, maxEcelentCost, maxAcceptableCost);
+    report.printHeader();
     for (String className : classNames) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
@@ -157,8 +170,6 @@ public class Testability {
             "' since class '" + e.getClassName() + "' was not found.");
       }
     }
-    report.printSummary();
-    report.printDistribution(25, 70);
-    report.printWorstOffenders(worstOffenderCount);
+    report.printFooter();
   }
 }
