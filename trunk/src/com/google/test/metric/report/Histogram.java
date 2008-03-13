@@ -21,14 +21,14 @@ public class Histogram {
 
   private final int width;
   private final int height;
-  private final PieGraph pieGraph;
-  private int min;
-  private int max;
+  private final Marker marker;
+  private int min = 0;
+  private int max = -1;
 
-  public Histogram(int width, int height, char marker) {
+  public Histogram(int width, int height, Marker marker) {
     this.width = width;
     this.height = height;
-    this.pieGraph = new PieGraph(width, marker, ' ');
+    this.marker = marker;
   }
 
   public void setMax(int max) {
@@ -42,19 +42,20 @@ public class Histogram {
   public String[] graph(float... values) {
     String[] rows = new String[height + 1];
     if (max == -1) {
-      max = (int) maxFloat(values);
+      max = (int) Math.ceil(maxFloat(values));
     }
-    int[] counts = count(values);
+    int bucketWidth = (int)Math.ceil((float)(max - min) / height);
+    int[] counts = count(bucketWidth, values);
     int maxCount = max(counts);
     StringBuilder out = new StringBuilder();
     Formatter formatter = new Formatter(out);
     formatter.format("%8d %" + width + "d", 0, maxCount);
     rows[0] = out.toString();
-    float bucketWidth = (float)(max - min) / height;
     for (int i = 0; i < counts.length; i++) {
       out.setLength(0);
-      String bar = pieGraph.render(counts[i], maxCount - counts[i]);
       int bucketId = (int) (min + bucketWidth * i + bucketWidth / 2f);
+      PieGraph pieGraph = new PieGraph(width, new CharMarker(marker.get(i, bucketId), ' '));
+      String bar = pieGraph.render(counts[i], maxCount - counts[i]);
       formatter.format("%6d |%s:%6d", bucketId, bar, counts[i]);
       rows[i + 1] = out.toString();
     }
@@ -77,11 +78,10 @@ public class Histogram {
     return max;
   }
 
-  public int[] count(float... values) {
+  public int[] count(int binSize, float... values) {
     int[] counts = new int[height];
-    float binSize = (max - min) / (height);
     for (float value : values) {
-      float bin = min;
+      int bin = min;
       for (int row = 0; row < height; row++) {
         bin += binSize;
         if (bin >= value) {

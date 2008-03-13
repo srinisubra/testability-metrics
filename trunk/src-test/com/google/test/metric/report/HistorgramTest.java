@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 public class HistorgramTest extends TestCase {
 
   public void testDrawHistogram() throws Exception {
-    Histogram histogram = new Histogram(6, 3, '#');
+    Histogram histogram = new Histogram(6, 3, new CharMarker('#'));
     histogram.setMin(0);
     histogram.setMax(30);
     String[] rows = histogram.graph(10,20,20,30,30,30);
@@ -31,14 +31,14 @@ public class HistorgramTest extends TestCase {
   }
 
   public void testMax() throws Exception {
-    assertEquals(5, new Histogram(-1,-1,'*').max(1,2,5,4,5,3,0));
+    assertEquals(5, new Histogram(-1,-1, null).max(1,2,5,4,5,3,0));
   }
 
   public void testCount() throws Exception {
-    Histogram histogram = new Histogram(-1, 3, '*');
+    Histogram histogram = new Histogram(-1, 3, null);
     histogram.setMin(0);
     histogram.setMax(30);
-    int[] counts = histogram.count(10,20,20,30,30,30);
+    int[] counts = histogram.count(10, 10,20,20,30,30,30);
     assertEquals(1, counts[0]);
     assertEquals(2, counts[1]);
     assertEquals(3, counts[2]);

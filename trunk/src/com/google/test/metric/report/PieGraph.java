@@ -17,12 +17,12 @@ package com.google.test.metric.report;
 
 public class PieGraph {
 
-  private final char[] markers;
   private final int width;
+  private final Marker marker;
 
-  public PieGraph(int width, char...markers) {
+  public PieGraph(int width, Marker marker) {
     this.width = width;
-    this.markers = markers;
+    this.marker = marker;
   }
 
   public String render(float...values) {
@@ -33,7 +33,7 @@ public class PieGraph {
     for (int i = 0; i < values.length; i++) {
       marker += values[i];
       while (cursor < marker) {
-        out.append(markers[i]);
+        out.append(this.marker.get(i, values[i]));
         cursor += characterWidth;
       }
     }

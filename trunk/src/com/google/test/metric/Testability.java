@@ -27,7 +27,7 @@ import org.kohsuke.args4j.Option;
 import com.google.classpath.ClasspathRootFactory;
 import com.google.classpath.ClasspathRootGroup;
 import com.google.classpath.ColonDelimitedStringParser;
-import com.google.test.metric.report.HumanReadablePrinter;
+import com.google.test.metric.report.TextReport;
 
 public class Testability {
 
@@ -45,6 +45,18 @@ public class Testability {
       usage = "Minimum Total Class cost required to print that class' metrics.")
   int minCost = 1;
 
+  @Option(name = "-maxEcelentCost",
+      usage = "Maximum Total Class cost to be classify it as 'excelent'.")
+  int maxEcelentCost = 50;
+
+  @Option(name = "-worstOffenderCount",
+      usage = "Print N number of worst ofending classes.")
+  int worstOffenderCount = 20;
+
+  @Option(name = "-maxAcceptableCost",
+      usage = "Maximum Total Class cost to be classify it as 'acceptable'.")
+  int maxAcceptableCost = 100;
+
   @Option(name = "-whitelist",
           usage = "colon delimited whitelisted packages that will not " +
                   "count against you. Matches packages/classes starting with " +
@@ -52,13 +64,19 @@ public class Testability {
   String wl = null;
   private final RegExpWhiteList whitelist = new RegExpWhiteList();
 
-  @Option(name = "cyc",
+  @Option(name = "-print",
+      usage = "summary: (default) print package summary information.\n" +
+              "detail: print detail drill down information for each method call.")
+  String printer = "summary";
+
+  @Option(name = "cyclomatic",
       metaVar = "cyclomatic cost multiplier",
       usage = "When computing the overall cost of the method the " +
               "individual costs are added using weighted average. " +
               "This represents the weight of the cyclomatic cost.")
   double cyclomaticMultiplier = 1;
-  @Option(name = "glob",
+
+  @Option(name = "global",
       metaVar = "global state cost multiplier",
       usage = "When computing the overall cost of the method the " +
           "individual costs are added using weighted average. " +
@@ -128,20 +146,19 @@ public class Testability {
     ClassRepository repository = new ClassRepository(classpath);
     CostModel costModel = new CostModel(cyclomaticMultiplier, globalMultiplier);
     MetricComputer computer = new MetricComputer(repository, err, whitelist, costModel);
-    HumanReadablePrinter printer =
-        new HumanReadablePrinter(out, entryList, printDepth, minCost);
-    printer.printHeader();
     List<String> classNames = classpath.getClassNamesToEnter(entryList);
+    TextReport report = new TextReport(out, maxEcelentCost, maxAcceptableCost);
     for (String className : classNames) {
       try {
         ClassCost classCost = computer.compute(repository.getClass(className));
-        printer.addClassCostToPrint(classCost);
+        report.addClassCost(classCost);
       } catch (ClassNotFoundException e) {
         err.println("WARNING: can not analyze class '" + className +
             "' since class '" + e.getClassName() + "' was not found.");
       }
     }
-    printer.printClassCosts();
-    printer.printFooter(classNames.size());
+    report.printSummary();
+    report.printDistribution(25, 70);
+    report.printWorstOffenders(worstOffenderCount);
   }
 }

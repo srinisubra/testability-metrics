@@ -73,7 +73,6 @@ public class ClassCostTest extends TestCase {
     classCosts.add(classCost0);
     classCosts.add(classCost2);
     Collections.sort(classCosts, new ClassCost.Comparator());
-    System.out.println(classCosts);
     assertEquals(classCost2, classCosts.get(0));
     assertEquals(classCost1, classCosts.get(1));
     assertEquals(classCost0, classCosts.get(2));

@@ -1,5 +1,3 @@
-package com.google.test.metric.report;
-
 /*
  * Copyright 2007 Google Inc.
  *
@@ -15,6 +13,8 @@ package com.google.test.metric.report;
  * License for the specific language governing permissions and limitations under
  * the License.
  */
+
+package com.google.test.metric.report;
 
 import static java.lang.System.getProperty;
 
@@ -53,12 +53,12 @@ public class TextReportTest extends TestCase {
   }
 
   public void testPrintSummary() throws Exception {
-    report.addExcelent(classCost("c.g.t.A", 1));
-    report.addGood(classCost("c.g.t.B", 10));
-    report.addGood(classCost("c.g.t.C", 10));
-    report.addNeedsWork(classCost("c.g.t.D", 100));
-    report.addNeedsWork(classCost("c.g.t.E", 100));
-    report.addNeedsWork(classCost("c.g.t.F", 100));
+    report.addClassCost(classCost("c.g.t.A", 1));
+    report.addClassCost(classCost("c.g.t.B", 70));
+    report.addClassCost(classCost("c.g.t.C", 70));
+    report.addClassCost(classCost("c.g.t.D", 101));
+    report.addClassCost(classCost("c.g.t.E", 101));
+    report.addClassCost(classCost("c.g.t.F", 101));
     report.printSummary();
     assertOutput(
         "      Analyzed classes:     6",
@@ -69,20 +69,19 @@ public class TextReportTest extends TestCase {
   }
 
   public void testPrintDistribution() throws Exception {
-    report.addExcelent(classCost("c.g.t.A", 1));
-    report.addExcelent(classCost("c.g.t.B", 10));
-    report.addExcelent(classCost("c.g.t.C", 15));
-    report.addExcelent(classCost("c.g.t.D", 30));
-    report.addExcelent(classCost("c.g.t.E", 31));
-    report.addExcelent(classCost("c.g.t.F", 32));
-    report.printExcelentDistribution(3);
+    report.addClassCost(classCost("c.g.t.A", 1));
+    report.addClassCost(classCost("c.g.t.B", 10));
+    report.addClassCost(classCost("c.g.t.C", 15));
+    report.addClassCost(classCost("c.g.t.D", 30));
+    report.addClassCost(classCost("c.g.t.E", 31));
+    report.addClassCost(classCost("c.g.t.F", 32));
+    report.printDistribution(3, 50);
     assertOutput(
-        "Excelent Cost Distribution",
-        "==========================",
         "       0                                                  3",
-        "     8 |...................................................:     3",
-        "    25 |...................................................:     3",
-        "    41 |                                                   :     0");
+        "     5 |..................................                 :     2",
+        "    16 |.................                                  :     1",
+        "    27 |...................................................:     3"
+        );
   }
 
 }

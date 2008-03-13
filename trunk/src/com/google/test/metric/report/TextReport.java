@@ -16,8 +16,8 @@
 
 package com.google.test.metric.report;
 import java.io.PrintStream;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import com.google.test.metric.ClassCost;
 
@@ -25,11 +25,12 @@ import com.google.test.metric.ClassCost;
 public class TextReport {
 
   private final PrintStream out;
-  private final List<ClassCost> excelent = new LinkedList<ClassCost>();
-  private final List<ClassCost> good = new LinkedList<ClassCost>();
-  private final List<ClassCost> needsWork = new LinkedList<ClassCost>();
+  private final SortedSet<ClassCost> costs = new TreeSet<ClassCost>(new ClassCost.Comparator());
   private final int maxExcelentCost;
   private final int maxAcceptableCost;
+  private int excelentCount = 0;
+  private int goodCount = 0;
+  private int needsWorkCount = 0;
 
   public TextReport(PrintStream out, int maxExcelentCost, int maxAcceptableCost) {
     this.out = out;
@@ -38,57 +39,40 @@ public class TextReport {
   }
 
   public void printSummary() {
-    int needsWork = this.needsWork.size();
-    int good = this.good.size();
-    int excelent = this.excelent.size();
-    int total = excelent + good + needsWork;
+    int total = costs.size();
     out.printf("      Analyzed classes: %5d%n", total);
-    out.printf("  Excelent classes (.): %5d %5.1f%%%n", excelent, 100f * excelent / total);
-    out.printf("      Good classes (=): %5d %5.1f%%%n", good, 100f * good / total);
-    out.printf("Needs work classes (@): %5d %5.1f%%%n", needsWork, 100f * needsWork / total);
-    PieGraph graph = new PieGraph(50, '.', '=', '@');
-    String chart = graph.render(excelent, good, needsWork);
+    out.printf("  Excelent classes (.): %5d %5.1f%%%n", excelentCount, 100f * excelentCount / total);
+    out.printf("      Good classes (=): %5d %5.1f%%%n", goodCount, 100f * goodCount / total);
+    out.printf("Needs work classes (@): %5d %5.1f%%%n", needsWorkCount, 100f * needsWorkCount / total);
+    PieGraph graph = new PieGraph(50, new CharMarker('.', '=', '@'));
+    String chart = graph.render(excelentCount, goodCount, needsWorkCount);
     out.printf("             Breakdown: [%s]%n", chart);
   }
 
-  public void addExcelent(ClassCost classCost) {
-    excelent.add(classCost);
-  }
-
-  public void addGood(ClassCost classCost) {
-    good.add(classCost);
-  }
-
-  public void addNeedsWork(ClassCost classCost) {
-    needsWork.add(classCost);
-  }
-
   public void addClassCost(ClassCost classCost) {
-    throw new UnsupportedOperationException();
+    long cost = classCost.getOverallCost();
+    if (cost < maxExcelentCost) {
+      excelentCount++;
+    } else if (cost < maxAcceptableCost) {
+      goodCount++;
+    } else {
+      needsWorkCount++;
+    }
+    costs.add(classCost);
   }
 
-  public void printExcelentDistribution(int rows) {
-    out.printf("Excelent Cost Distribution%n");
-    out.printf("==========================%n");
-    printDistribution(excelent, rows, 0, maxExcelentCost, '.');
-  }
-
-  public void printGoodDistribution(int rows) {
-    out.printf("Good Cost Distribution%n");
-    out.printf("======================%n");
-    printDistribution(excelent, rows, maxExcelentCost, maxAcceptableCost, '=');
-  }
-
-  public void printNeedsWorkDistribution(int rows) {
-    out.printf("Needs Work Cost Distribution%n");
-    out.printf("============================%n");
-    printDistribution(excelent, rows, maxAcceptableCost, -1, '#');
-  }
-
-  public void printDistribution(List<ClassCost> costs, int rows, int min, int max, char marker) {
-    Histogram histogram = new Histogram(50, rows, marker);
-    histogram.setMin(min);
-    histogram.setMax(max);
+  public void printDistribution(int rows, int width) {
+    Histogram histogram = new Histogram(width, rows, new Marker() {
+      public char get(int index, float value) {
+        if (value < maxExcelentCost) {
+          return '.';
+        } else if (value < maxAcceptableCost) {
+          return '=';
+        } else {
+          return '@';
+        }
+      }
+    });
     float[] values = new float[costs.size()];
     int i = 0;
     for (ClassCost cost : costs) {
@@ -96,6 +80,19 @@ public class TextReport {
     }
     for (String graph : histogram.graph(values)) {
       out.println(graph);
+    }
+  }
+
+  public void printWorstOffenders(int worstOffenderCount) {
+    out.println();
+    out.println("Highest Cost");
+    out.println("============");
+    int i=0;
+    for (ClassCost cost : costs) {
+      out.println(cost);
+      if (++i == worstOffenderCount) {
+        break;
+      }
     }
   }
 

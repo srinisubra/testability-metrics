@@ -13,7 +13,10 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.google.test.metric;
+package com.google.test.metric.method;
+
+import com.google.test.metric.CostModel;
+import com.google.test.metric.MethodCost;
 
 import junit.framework.TestCase;
 

@@ -19,20 +19,22 @@ import junit.framework.TestCase;
 
 public class PieGraphTest extends TestCase {
 
+  CharMarker marker = new CharMarker('.', '=', '#');
+
   public void testChart() throws Exception {
-    assertEquals("111223", new PieGraph(6, '1', '2', '3').render(3, 2, 1));
+    assertEquals("111223", new PieGraph(6, new CharMarker('1', '2', '3')).render(3, 2, 1));
   }
 
   public void testChartEven() throws Exception {
-    assertEquals(".==###", new PieGraph(6, '.', '=', '#').render(1, 2, 3));
-    assertEquals("..====######", new PieGraph(12, '.', '=', '#').render(1, 2, 3));
-    assertEquals("....========############", new PieGraph(24, '.', '=', '#').render(1, 2, 3));
+    assertEquals(".==###", new PieGraph(6, marker).render(1, 2, 3));
+    assertEquals("..====######", new PieGraph(12, marker).render(1, 2, 3));
+    assertEquals("....========############", new PieGraph(24, marker).render(1, 2, 3));
   }
 
   public void testChartOdd() throws Exception {
-    assertEquals(".==##", new PieGraph(5, '.', '=', '#').render(1, 2, 3));
-    assertEquals("..===######", new PieGraph(10, '.', '=', '#').render(1, 2, 3));
-    assertEquals("....=======#########", new PieGraph(20, '.', '=', '#').render(1, 2, 3));
+    assertEquals(".==##", new PieGraph(5, marker).render(1, 2, 3));
+    assertEquals("..===######", new PieGraph(10, marker).render(1, 2, 3));
+    assertEquals("....=======#########", new PieGraph(20, marker).render(1, 2, 3));
   }
 
 }
