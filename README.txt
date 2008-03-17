@@ -9,23 +9,103 @@ piece of code. The difficulty is a measure of:
 
 ==How to run it==
 {{{
-$ java -jar testability-metrics-1.0.0RC2.jar
-
+$ java -jar testability-metrics-1.1.0RC1-r128.jar 
 Argument "classes and packages" is required
 
- classes and packages : Classes or packages to analyze. Matches any class starting with these.
-                        Ex. com.example.analyze.these com.google.and.these.packages com.google.AClass
- -costThreshold N     : Minimum Total Class cost required to print that class' metrics.
- -cp VAL              : colon delimited classpath to analyze (jars or directories)
-                        Ex. lib/one.jar:lib/two.jar
- -printDepth N        : Maximum depth to recurse and print costs of classes/methods that the classes under analysis depe
-                        nd on. Defaults to 0.
- -whitelist VAL       : colon delimited whitelisted packages that will not count against you. Matches packages/classes s
-                        tarting with given values. (Always whitelists java.*)
+ classes and packages                  : Classes or packages to analyze. Matches any class starting with these.
+                                         Ex. com.example.analyze.these com.google.and.these.packages com.google.AClass
+ -cp VAL                               : colon delimited classpath to analyze (jars or directories)
+                                         Ex. lib/one.jar:lib/two.jar
+ -maxAcceptableCost N                  : Maximum Total Class cost to be classify it as 'acceptable'.
+ -maxEcellentCost N                    : Maximum Total Class cost to be classify it as 'excellent'.
+ -minCost N                            : Minimum Total Class cost required to print that class' metrics.
+ -print VAL                            : summary: (default) print package summary information.
+                                         detail: print detail drill down information for each method call.
+ -printDepth N                         : Maximum depth to recurse and print costs of classes/methods that the classes un
+                                         der analysis depend on. Defaults to 0.
+ -whitelist VAL                        : colon delimited whitelisted packages that will not count against you. Matches p
+                                         ackages/classes starting with given values. (Always whitelists java.*. RegExp O
+                                         K.)
+ -worstOffenderCount N                 : Print N number of worst offending classes.
+ cyclomatic cyclomatic cost multiplier : When computing the overall cost of the method the individual costs are added us
+                                         ing weighted average. This represents the weight of the cyclomatic cost.
+ global global state cost multiplier   : When computing the overall cost of the method the individual costs are added us
+                                         ing weighted average. This represents the weight of the global state cost.
 }}}
 
 
 ==Output Format==
+
+There are two kinds of output format: summary and detail
+
+=== Output Format: summary ===
+
+Use the summary mode to get a quick overview of the project. This example shows what running the testability metric
+on itself produces. The top shows statistical breakdown of "Excellent", "Good" and "Needs work" classes.
+It is followed by a breakdown chart showing the breakdown visually. A more detailed breakdown is shown in the
+histogram. Finally the list of 20 highest offending classes is shown sorted by test difficulty.
+
+{{{
+$ java -jar testability-metrics-1.1.0RC1-r129.jar -print summary com.google.test.metric -whitelist com.google.test.org.objectweb.asm.
+      Analyzed classes:   125
+ Excellent classes (.):   123  98.4%
+      Good classes (=):     0   0.0%
+Needs work classes (@):     2   1.6%
+             Breakdown: [..................................................]
+       0                                                                     98
+     3 |......................................................................:    98
+     9 |.........                                                             :    12
+    15 |......                                                                :     8
+    21 |..                                                                    :     2
+    27 |...                                                                   :     3
+    33 |                                                                      :     0
+    39 |                                                                      :     0
+    45 |                                                                      :     0
+    51 |                                                                      :     0
+    57 |                                                                      :     0
+    63 |                                                                      :     0
+    69 |                                                                      :     0
+    75 |                                                                      :     0
+    81 |                                                                      :     0
+    87 |                                                                      :     0
+    93 |                                                                      :     0
+    99 |                                                                      :     0
+   105 |                                                                      :     0
+   111 |@                                                                     :     1
+   117 |                                                                      :     0
+   123 |                                                                      :     0
+   129 |                                                                      :     0
+   135 |                                                                      :     0
+   141 |                                                                      :     0
+   147 |@                                                                     :     1
+
+Highest Cost
+============
+com.google.test.metric.Testability 148
+com.google.test.metric.asm.MethodVisitorBuilder 113
+com.google.test.metric.method.BlockDecomposer 29
+com.google.test.metric.asm.MethodVisitorBuilder$GetFieldRunnable 27
+com.google.test.metric.asm.MethodVisitorBuilder$PutFieldRunnable 27
+com.google.test.metric.asm.MethodVisitorBuilder$2 23
+com.google.test.metric.Type 22
+com.google.test.metric.asm.ClassInfoBuilderVisitor 18
+com.google.test.metric.asm.FieldVisitorBuilder 18
+com.google.test.metric.MetricComputer 17
+com.google.test.metric.asm.MethodVisitorBuilder$30 17
+com.google.test.metric.asm.MethodVisitorBuilder$12 16
+com.google.test.metric.collection.KeyedMultiStack 15
+com.google.test.metric.method.BlockDecomposer$1 14
+com.google.test.metric.method.op.turing.MethodInvokation 14
+com.google.test.metric.asm.MethodVisitorBuilder$28 12
+com.google.test.metric.asm.SignatureParser 12
+com.google.test.metric.asm.SignatureParser$TypeVisitor 12
+com.google.test.metric.report.TextReport 12
+com.google.test.metric.asm.MethodVisitorBuilder$7 10
+}}}
+
+=== Output Format: detail ===
+
+
 An example score for a method is:
   `package.Class.methodName()V[1, 2 / 3, 4]`
 

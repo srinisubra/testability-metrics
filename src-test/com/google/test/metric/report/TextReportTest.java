@@ -62,7 +62,7 @@ public class TextReportTest extends TestCase {
     report.printSummary();
     assertOutput(
         "      Analyzed classes:     6",
-        "  Excelent classes (.):     1  16.7%",
+        " Excellent classes (.):     1  16.7%",
         "      Good classes (=):     2  33.3%",
         "Needs work classes (@):     3  50.0%",
         "             Breakdown: [.........=================@@@@@@@@@@@@@@@@@@@@@@@@@]");

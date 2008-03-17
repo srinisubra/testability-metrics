@@ -43,7 +43,7 @@ public class TextReport implements Report {
   public void printSummary() {
     int total = costs.size();
     out.printf("      Analyzed classes: %5d%n", total);
-    out.printf("  Excelent classes (.): %5d %5.1f%%%n", excelentCount, 100f * excelentCount / total);
+    out.printf(" Excellent classes (.): %5d %5.1f%%%n", excelentCount, 100f * excelentCount / total);
     out.printf("      Good classes (=): %5d %5.1f%%%n", goodCount, 100f * goodCount / total);
     out.printf("Needs work classes (@): %5d %5.1f%%%n", needsWorkCount, 100f * needsWorkCount / total);
     PieGraph graph = new PieGraph(50, new CharMarker('.', '=', '@'));
