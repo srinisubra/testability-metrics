@@ -47,12 +47,12 @@ public class Testability {
       usage = "Minimum Total Class cost required to print that class' metrics.")
   int minCost = 1;
 
-  @Option(name = "-maxEcelentCost",
-      usage = "Maximum Total Class cost to be classify it as 'excelent'.")
+  @Option(name = "-maxEcellentCost",
+      usage = "Maximum Total Class cost to be classify it as 'excellent'.")
   int maxEcelentCost = 50;
 
   @Option(name = "-worstOffenderCount",
-      usage = "Print N number of worst ofending classes.")
+      usage = "Print N number of worst offending classes.")
   public
   int worstOffenderCount = 20;
 
