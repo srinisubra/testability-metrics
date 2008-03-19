@@ -778,16 +778,16 @@ public class MethodVisitorBuilder implements MethodVisitor {
       final String name, final String desc) {
     switch (opcode) {
       case Opcodes.PUTSTATIC :
-          recorder.add(new PutFieldRunnable(owner, name, desc, true));
+          recorder.add(new PutFieldRunnable(repository, owner, name, desc, true));
           break;
       case Opcodes.PUTFIELD :
-        recorder.add(new PutFieldRunnable(owner, name, desc, false));
+        recorder.add(new PutFieldRunnable(repository, owner, name, desc, false));
         break;
       case Opcodes.GETSTATIC :
-          recorder.add(new GetFieldRunnable(owner, name, desc, true));
+          recorder.add(new GetFieldRunnable(repository, owner, name, desc, true));
           break;
       case Opcodes.GETFIELD :
-        recorder.add(new GetFieldRunnable(owner, name, desc, false));
+        recorder.add(new GetFieldRunnable(repository, owner, name, desc, false));
         break;
     }
   }
@@ -907,9 +907,11 @@ public class MethodVisitorBuilder implements MethodVisitor {
     private final String fieldName;
     private final String fieldDesc;
     private final boolean isStatic;
+    private final ClassRepository repository;
 
-    public PutFieldRunnable(String owner, String name, String desc,
+    public PutFieldRunnable(ClassRepository repository, String owner, String name, String desc,
         boolean isStatic) {
+      this.repository = repository;
       this.fieldOwner = owner;
       this.fieldName = name;
       this.fieldDesc = desc;
@@ -937,9 +939,11 @@ public class MethodVisitorBuilder implements MethodVisitor {
     private final String fieldName;
     private final String fieldDesc;
     private final boolean isStatic;
+    private final ClassRepository repository;
 
-    public GetFieldRunnable(String owner, String name, String desc,
+    public GetFieldRunnable(ClassRepository repository, String owner, String name, String desc,
         boolean isStatic) {
+      this.repository = repository;
       this.fieldOwner = owner;
       this.fieldName = name;
       this.fieldDesc = desc;
