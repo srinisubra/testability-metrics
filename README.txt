@@ -9,7 +9,7 @@ piece of code. The difficulty is a measure of:
 
 ==How to run it==
 {{{
-$ java -jar testability-metrics-1.1.0RC1-r128.jar 
+$ testability.sh 
 Argument "classes and packages" is required
 
  classes and packages                  : Classes or packages to analyze. Matches any class starting with these.
@@ -46,7 +46,7 @@ It is followed by a breakdown chart showing the breakdown visually. A more detai
 histogram. Finally the list of 20 highest offending classes is shown sorted by test difficulty.
 
 {{{
-$ java -jar testability-metrics-1.1.0RC1-r129.jar -print summary com.google.test.metric -whitelist com.google.test.org.objectweb.asm.
+$ testability.sh -print summary com.google.test.metric -whitelist com.google.test.org.objectweb.asm.
       Analyzed classes:   125
  Excellent classes (.):   123  98.4%
       Good classes (=):     0   0.0%
@@ -105,6 +105,20 @@ com.google.test.metric.asm.MethodVisitorBuilder$7 10
 
 === Output Format: detail ===
 
+To get a more in depth view of view a particular class has a high cost use the detail output format.
+
+{{{
+$ testability.sh -print detail com.google.test.metric.example.Primeness
+-----------------------------------------
+Packages/Classes To Enter: 
+  com.google.test.metric.example.Primeness*
+Max Method Print Depth: 1
+Min Class Cost: 1
+-----------------------------------------
+
+Testability cost for com.google.test.metric.example.Primeness [ cost = 2 ] [ 2 TCC, 0 TGC ]
+  com.google.test.metric.example.Primeness.isPrime(I)Z [2, 0 / 2, 0]
+}}}
 
 An example score for a method is:
   `package.Class.methodName()V[1, 2 / 3, 4]`

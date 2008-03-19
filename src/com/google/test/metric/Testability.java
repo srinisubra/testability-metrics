@@ -41,7 +41,7 @@ public class Testability {
   @Option(name = "-printDepth",
       usage = "Maximum depth to recurse and print costs of classes/methods " +
       	  "that the classes under analysis depend on. Defaults to 0.")
-  int printDepth = 1;
+  int printDepth = 2;
 
   @Option(name = "-minCost",
       usage = "Minimum Total Class cost required to print that class' metrics.")
