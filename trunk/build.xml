@@ -48,6 +48,11 @@
 		<javac srcdir="src" destdir="target/bin" debug="true" compiler="javac1.5">
 			<classpath refid="compile.classpath" />
 		</javac>
+		<copy todir="target/bin">
+			<fileset dir="src">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="compile-tests" depends="compile">

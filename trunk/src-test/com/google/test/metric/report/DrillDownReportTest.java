@@ -15,7 +15,7 @@
  */
 package com.google.test.metric.report;
 
-import static com.google.test.metric.report.HumanReadablePrinter.NEW_LINE;
+import static com.google.test.metric.report.DrillDownReport.NEW_LINE;
 import static java.lang.Integer.MAX_VALUE;
 
 import java.io.ByteArrayOutputStream;
@@ -28,7 +28,7 @@ import com.google.test.metric.ClassCost;
 import com.google.test.metric.CostModel;
 import com.google.test.metric.MethodCost;
 
-public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
+public class DrillDownReportTest extends AutoFieldClearTestCase {
 
   private final  MethodCost methodCost0 = new MethodCost("c.g.t.A.method0()V", 0, 0);
   private final  MethodCost methodCost1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
@@ -38,8 +38,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   private final CostModel context = new CostModel();
 
   public void testSimpleCost() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     MethodCost costOnlyMethod1 = new MethodCost("c.g.t.A.method1()V", 0, 1);
     costOnlyMethod1.addGlobalCost(0, null);
     costOnlyMethod1.link(context);
@@ -48,8 +48,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void test2DeepPrintAll() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
     printer.print("", methodCost2, MAX_VALUE);
@@ -58,8 +58,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void test3DeepPrintAll() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost2.addMethodCost(8, methodCost1);
     methodCost3.addMethodCost(2, methodCost2);
     methodCost3.link(context);
@@ -70,8 +70,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void test2DeepSupress0Cost() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 2);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 2);
     methodCost1.addMethodCost(8, methodCost0);
     methodCost1.addMethodCost(13, methodCost3);
     methodCost1.link(context);
@@ -81,8 +81,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void test3DeepPrint2Deep() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost3.addMethodCost(2, methodCost2);
     methodCost2.addMethodCost(2, methodCost1);
     methodCost3.link(context);
@@ -92,8 +92,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testSupressAllWhenMinCostIs4() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 4);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 4);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
     printer.print("", methodCost2, MAX_VALUE);
@@ -101,8 +101,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testSupressPartialWhenMinCostIs2() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 2);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 2);
     methodCost2.addMethodCost(81, new MethodCost("c.g.t.A.method1()V", 0, 1));
     methodCost2.link(context);
     printer.print("", methodCost2, Integer.MAX_VALUE);
@@ -110,8 +110,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testSecondLevelRecursive() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     methodCost3.addMethodCost(1, methodCost2);
     methodCost2.addMethodCost(2, methodCost2);
     methodCost3.link(context);
@@ -121,8 +121,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testAddOneClassCostThenPrintIt() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     printer.addClassCost(classCost0);
     printer.printFooter();
@@ -131,8 +131,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
   }
 
   public void testAddSeveralClassCostsAndPrintThem() throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     ClassCost classCost0 = new ClassCost("FAKE_classInfo0", new ArrayList<MethodCost>());
     ClassCost classCost1 = new ClassCost("FAKE_classInfo1", new ArrayList<MethodCost>());
     ClassCost classCost2 = new ClassCost("FAKE_classInfo2", new ArrayList<MethodCost>());
@@ -148,8 +148,8 @@ public class HumanReadablePrinterTest extends AutoFieldClearTestCase {
 
   public void testAddSeveralClassCostsAndPrintThemInDescendingCostOrder()
       throws Exception {
-    HumanReadablePrinter printer =
-      new HumanReadablePrinter(new PrintStream(out), null, MAX_VALUE, 0);
+    DrillDownReport printer =
+      new DrillDownReport(new PrintStream(out), null, MAX_VALUE, 0);
     List<MethodCost> methodCosts1 = new ArrayList<MethodCost>();
     methodCosts1.add(methodCost1);
     List<MethodCost> methodCosts2 = new ArrayList<MethodCost>();
