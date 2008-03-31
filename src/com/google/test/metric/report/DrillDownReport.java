@@ -28,7 +28,7 @@ import com.google.test.metric.ClassCost;
 import com.google.test.metric.LineNumberCost;
 import com.google.test.metric.MethodCost;
 
-public class HumanReadablePrinter implements Report {
+public class DrillDownReport implements Report {
   public static final String NEW_LINE = getProperty("line.separator");
 
   private static final String DIVIDER  = "-----------------------------------------\n";
@@ -40,7 +40,7 @@ public class HumanReadablePrinter implements Report {
   private long cumulativeTCC = 0;
   private long cumulativeTGC = 0;
 
-  public HumanReadablePrinter(PrintStream out, List<String> entryList,
+  public DrillDownReport(PrintStream out, List<String> entryList,
       int maxDepth, int minCost) {
     this.out = out;
     this.entryList = entryList;

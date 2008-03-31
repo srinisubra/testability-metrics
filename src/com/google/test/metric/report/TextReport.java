@@ -16,28 +16,16 @@
 
 package com.google.test.metric.report;
 import java.io.PrintStream;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.google.test.metric.ClassCost;
 
 
-public class TextReport implements Report {
+public class TextReport extends SummaryReport {
 
   private final PrintStream out;
-  private final SortedSet<ClassCost> costs = new TreeSet<ClassCost>(new ClassCost.Comparator());
-  private final int maxExcelentCost;
-  private final int maxAcceptableCost;
-  private final int worstOffenderCount;
-  private int excelentCount = 0;
-  private int goodCount = 0;
-  private int needsWorkCount = 0;
-
   public TextReport(PrintStream out, int maxExcelentCost, int maxAcceptableCost, int worstOffenderCount) {
+    super(maxExcelentCost, maxAcceptableCost, worstOffenderCount);
     this.out = out;
-    this.maxExcelentCost = maxExcelentCost;
-    this.maxAcceptableCost = maxAcceptableCost;
-    this.worstOffenderCount = worstOffenderCount;
   }
 
   public void printSummary() {
@@ -51,23 +39,8 @@ public class TextReport implements Report {
     out.printf("             Breakdown: [%s]%n", chart);
   }
 
-  /* (non-Javadoc)
-   * @see com.google.test.metric.report.Report#addClassCost(com.google.test.metric.ClassCost)
-   */
-  public void addClassCost(ClassCost classCost) {
-    long cost = classCost.getOverallCost();
-    if (cost < maxExcelentCost) {
-      excelentCount++;
-    } else if (cost < maxAcceptableCost) {
-      goodCount++;
-    } else {
-      needsWorkCount++;
-    }
-    costs.add(classCost);
-  }
-
   public void printDistribution(int rows, int width) {
-    Histogram histogram = new Histogram(width, rows, new Marker() {
+    TextHistogram histogram = new TextHistogram(width, rows, new Marker() {
       public char get(int index, float value) {
         if (value < maxExcelentCost) {
           return '.';

@@ -17,7 +17,7 @@ package com.google.test.metric.report;
 
 import java.util.Formatter;
 
-public class Histogram {
+public class TextHistogram {
 
   private final int width;
   private final int height;
@@ -25,7 +25,7 @@ public class Histogram {
   private int min = 0;
   private int max = -1;
 
-  public Histogram(int width, int height, Marker marker) {
+  public TextHistogram(int width, int height, Marker marker) {
     this.width = width;
     this.height = height;
     this.marker = marker;

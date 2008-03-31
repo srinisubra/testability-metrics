@@ -27,7 +27,8 @@ import org.kohsuke.args4j.Option;
 import com.google.classpath.ClasspathRootFactory;
 import com.google.classpath.ClasspathRootGroup;
 import com.google.classpath.ColonDelimitedStringParser;
-import com.google.test.metric.report.HumanReadablePrinter;
+import com.google.test.metric.report.DrillDownReport;
+import com.google.test.metric.report.HtmlReport;
 import com.google.test.metric.report.Report;
 import com.google.test.metric.report.TextReport;
 
@@ -146,8 +147,10 @@ public class Testability {
     classpath = ClasspathRootFactory.makeClasspathRootGroup(cp);
     if (printer.equals("summary")) {
       report = new TextReport(out, maxEcelentCost, maxAcceptableCost, worstOffenderCount);
+    } else if (printer.equals("html")) {
+      report = new HtmlReport(out, maxEcelentCost, maxAcceptableCost, worstOffenderCount);
     } else if (printer.equals("detail")) {
-      report = new HumanReadablePrinter(out, entryList, printDepth, minCost);
+      report = new DrillDownReport(out, entryList, printDepth, minCost);
     } else {
       throw new CmdLineException("Don't understand '-print' option '"
           + printer + "'");

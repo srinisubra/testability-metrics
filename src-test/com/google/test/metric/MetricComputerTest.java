@@ -22,7 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import com.google.test.metric.report.HumanReadablePrinter;
+import com.google.test.metric.report.DrillDownReport;
 
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
@@ -358,7 +358,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
   public void testGlobalLoadAccessStateThroughFinalShouldBeOne() {
     MethodCost cost =
         computer.compute(GlobalStateUser.class, "accessMutableState()V");
-    new HumanReadablePrinter(new PrintStream(new ByteArrayOutputStream()),
+    new DrillDownReport(new PrintStream(new ByteArrayOutputStream()),
         null, Integer.MAX_VALUE, 0).print("", cost, 10);
     assertEquals("Expecting one for read and one for write", 2L,
         cost.getTotalGlobalCost());
