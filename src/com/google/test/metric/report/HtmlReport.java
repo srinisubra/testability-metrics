@@ -23,12 +23,12 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.log;
 import static java.lang.Math.min;
 
+import com.google.test.metric.ClassCost;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
-
-import com.google.test.metric.ClassCost;
 
 public class HtmlReport extends SummaryReport {
 
@@ -37,9 +37,9 @@ public class HtmlReport extends SummaryReport {
   private static final int HISTOGRAM_LEGEND_WIDTH = 130;
   private final PrintStream out;
 
-  public HtmlReport(PrintStream out, int maxExcelentCount, int maxAcceptableCost,
+  public HtmlReport(PrintStream out, int maxExcellentCount, int maxAcceptableCost,
       int worstOffenderCount) {
-    super(maxExcelentCount, maxAcceptableCost, worstOffenderCount);
+    super(maxExcellentCount, maxAcceptableCost, worstOffenderCount);
     this.out = out;
   }
 
@@ -48,7 +48,7 @@ public class HtmlReport extends SummaryReport {
     out.println("<h2>Class breakdown</h2>");
     out.printf("<pre>%n");
     out.printf("  Analyzed classes : %5d%n", total);
-    out.printf(" Excellent classes : %5d %5.1f%%%n", excelentCount, 100f * excelentCount / total);
+    out.printf(" Excellent classes : %5d %5.1f%%%n", excellentCount, 100f * excellentCount / total);
     out.printf("      Good classes : %5d %5.1f%%%n", goodCount, 100f * goodCount / total);
     out.printf("Needs work classes : %5d %5.1f%%%n", needsWorkCount, 100f * needsWorkCount / total);
     out.printf("</pre>%n");
@@ -66,11 +66,11 @@ public class HtmlReport extends SummaryReport {
       histogram.value((int) cost.getOverallCost());
     }
     HistogramChartUrl chart = new HistogramChartUrl();
-    int[] excelent = histogram.getScaledBinRange(0, maxAcceptableCost, 61);
-    int[] good = histogram.getScaledBinRange(maxAcceptableCost, maxExcelentCost, 61);
-    int[] needsWork = histogram.getScaledBinRange(maxExcelentCost, MAX_VALUE, 61);
+    int[] excellent = histogram.getScaledBinRange(0, maxAcceptableCost, 61);
+    int[] good = histogram.getScaledBinRange(maxAcceptableCost, maxExcellentCost, 61);
+    int[] needsWork = histogram.getScaledBinRange(maxExcellentCost, MAX_VALUE, 61);
     chart.setItemLabel(histogram.getBinLabels(20));
-    chart.setValues(excelent, good, needsWork);
+    chart.setValues(excellent, good, needsWork);
     chart.setYMark(0, histogram.getMaxBin());
     chart.setSize(HISTOGRAM_WIDTH, 200);
     chart.setBarWidth((HISTOGRAM_WIDTH - HISTOGRAM_LEGEND_WIDTH) / binCount, 0, 0);
@@ -84,7 +84,7 @@ public class HtmlReport extends SummaryReport {
     chart.setSize(400, 100);
     chart.setItemLabel("Excellent", "Good", "Needs Work");
     chart.setColors(GREEN, YELLOW, RED);
-    chart.setValues(excelentCount, goodCount, needsWorkCount);
+    chart.setValues(excellentCount, goodCount, needsWorkCount);
     out.print(chart.getHtml());
     out.println("<br>");
   }

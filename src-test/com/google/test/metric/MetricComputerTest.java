@@ -18,11 +18,11 @@ package com.google.test.metric;
 import static com.google.classpath.ClasspathRootFactory.makeClasspathRootGroup;
 import static com.google.test.metric.SignatureUtil.L;
 
+import com.google.test.metric.report.DrillDownReport;
+
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
-
-import com.google.test.metric.report.DrillDownReport;
 
 public class MetricComputerTest extends ClassRepositoryTestCase {
 
@@ -432,7 +432,7 @@ public class MetricComputerTest extends ClassRepositoryTestCase {
     assertEquals(1, cost.getMethodCost("<clinit>()V").getTotalGlobalCost());
   }
 
-  static enum TestEnum1{ ONE };
+  static enum TestEnum1{ ONE }
   public void testEnumerationIsZero() throws Exception {
     whitelist.addPackage("java.");
     ClassCost cost = computer.compute(TestEnum1.class);

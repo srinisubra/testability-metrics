@@ -18,20 +18,21 @@ package com.google.test.metric.report;
 import static com.google.test.metric.report.GoogleChartAPI.GREEN;
 import static com.google.test.metric.report.GoogleChartAPI.RED;
 import static com.google.test.metric.report.GoogleChartAPI.YELLOW;
+
 import junit.framework.TestCase;
 
 public class HistogramChartUrlTest extends TestCase {
 
-  // http://chart.apis.google.com/chart?cht=bvs&chs=300x125&chdl=Excelent|Good|Needs+Work&chco=00AA00,FFFF00,D22222&chd=s:ZGAA,AAGA,AAAL
+  // http://chart.apis.google.com/chart?cht=bvs&chs=300x125&chdl=Excellent|Good|Needs+Work&chco=00AA00,FFFF00,D22222&chd=s:ZGAA,AAGA,AAAL
   public void testURL() throws Exception {
     HistogramChartUrl url = new HistogramChartUrl();
     url.setSize(300, 125);
-    url.setChartLabel("Excelent", "Good", "Needs Work");
+    url.setChartLabel("Excellent", "Good", "Needs Work");
     url.setColors(GREEN, YELLOW, RED);
     url.setValues(array(10, 5, 0, 0), array(0,0,3,0), array(0,0,0,2));
     assertEquals("bvs", url.getMap().get("cht"));
     assertEquals("300x125", url.getMap().get("chs"));
-    assertEquals("Excelent|Good|Needs Work", url.getMap().get("chdl"));
+    assertEquals("Excellent|Good|Needs Work", url.getMap().get("chdl"));
     assertEquals("00AA00,FFFF00,D22222", url.getMap().get("chco"));
     assertEquals("s:KFAA,AADA,AAAC", url.getMap().get("chd"));
   }

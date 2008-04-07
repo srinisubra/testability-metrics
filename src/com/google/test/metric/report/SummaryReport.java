@@ -15,32 +15,32 @@
  */
 package com.google.test.metric.report;
 
+import com.google.test.metric.ClassCost;
+
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import com.google.test.metric.ClassCost;
 
 public abstract class SummaryReport implements Report {
 
   protected final SortedSet<ClassCost> costs = new TreeSet<ClassCost>(new ClassCost.Comparator());
-  protected final int maxExcelentCost;
+  protected final int maxExcellentCost;
   protected final int maxAcceptableCost;
   protected final int worstOffenderCount;
-  protected int excelentCount = 0;
+  protected int excellentCount = 0;
   protected int goodCount = 0;
   protected int needsWorkCount = 0;
   protected int worstCost = 1;
 
-  public SummaryReport(int maxExcelentCost, int maxAcceptableCost, int worstOffenderCount) {
-    this.maxExcelentCost = maxExcelentCost;
+  public SummaryReport(int maxExcellentCost, int maxAcceptableCost, int worstOffenderCount) {
+    this.maxExcellentCost = maxExcellentCost;
     this.maxAcceptableCost = maxAcceptableCost;
     this.worstOffenderCount = worstOffenderCount;
   }
 
   public void addClassCost(ClassCost classCost) {
     int cost = (int) classCost.getOverallCost();
-    if (cost < maxExcelentCost) {
-      excelentCount++;
+    if (cost < maxExcellentCost) {
+      excellentCount++;
     } else if (cost < maxAcceptableCost) {
       goodCount++;
     } else {
