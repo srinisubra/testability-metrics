@@ -17,7 +17,7 @@ Argument "classes and packages" is required
  -cp VAL                               : colon delimited classpath to analyze (jars or directories)
                                          Ex. lib/one.jar:lib/two.jar
  -maxAcceptableCost N                  : Maximum Total Class cost to be classify it as 'acceptable'.
- -maxEcellentCost N                    : Maximum Total Class cost to be classify it as 'excellent'.
+ -maxExcellentCost N                   : Maximum Total Class cost to be classify it as 'excellent'.
  -minCost N                            : Minimum Total Class cost required to print that class' metrics.
  -print VAL                            : summary: (default) print package summary information.
                                          detail: print detail drill down information for each method call.

@@ -18,6 +18,7 @@ package com.google.test.metric.report;
 import static com.google.test.metric.report.GoogleChartAPI.GREEN;
 import static com.google.test.metric.report.GoogleChartAPI.RED;
 import static com.google.test.metric.report.GoogleChartAPI.YELLOW;
+
 import junit.framework.TestCase;
 
 public class PieChartUrlTest extends TestCase {
@@ -26,14 +27,14 @@ public class PieChartUrlTest extends TestCase {
     GoogleChartAPI url = new PieChartUrl();
     url.setSize(300, 100);
     url.setTitle("Class Breakdown");
-    url.setItemLabel("Excelent", "Good", "Needs Work");
+    url.setItemLabel("Excellent", "Good", "Needs Work");
     url.setColors(GREEN, YELLOW, RED);
     url.setValues(30,6,4);
     assertEquals("http://chart.apis.google.com/chart", GoogleChartAPI.BASE_URL);
     assertEquals("p3", url.getMap().get("cht"));
     assertEquals("t:30,6,4", url.getMap().get("chd"));
     assertEquals("300x100", url.getMap().get("chs"));
-    assertEquals("Excelent|Good|Needs Work", url.getMap().get("chl"));
+    assertEquals("Excellent|Good|Needs Work", url.getMap().get("chl"));
     assertEquals("00AA00,FFFF00,D22222", url.getMap().get("chco"));
     assertEquals("Class Breakdown", url.getMap().get("chtt"));
   }

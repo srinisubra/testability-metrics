@@ -15,34 +15,34 @@
  */
 
 package com.google.test.metric.report;
-import java.io.PrintStream;
-
 import com.google.test.metric.ClassCost;
+
+import java.io.PrintStream;
 
 
 public class TextReport extends SummaryReport {
 
   private final PrintStream out;
-  public TextReport(PrintStream out, int maxExcelentCost, int maxAcceptableCost, int worstOffenderCount) {
-    super(maxExcelentCost, maxAcceptableCost, worstOffenderCount);
+  public TextReport(PrintStream out, int maxExcellentCost, int maxAcceptableCost, int worstOffenderCount) {
+    super(maxExcellentCost, maxAcceptableCost, worstOffenderCount);
     this.out = out;
   }
 
   public void printSummary() {
     int total = costs.size();
     out.printf("      Analyzed classes: %5d%n", total);
-    out.printf(" Excellent classes (.): %5d %5.1f%%%n", excelentCount, 100f * excelentCount / total);
+    out.printf(" Excellent classes (.): %5d %5.1f%%%n", excellentCount, 100f * excellentCount / total);
     out.printf("      Good classes (=): %5d %5.1f%%%n", goodCount, 100f * goodCount / total);
     out.printf("Needs work classes (@): %5d %5.1f%%%n", needsWorkCount, 100f * needsWorkCount / total);
     PieGraph graph = new PieGraph(50, new CharMarker('.', '=', '@'));
-    String chart = graph.render(excelentCount, goodCount, needsWorkCount);
+    String chart = graph.render(excellentCount, goodCount, needsWorkCount);
     out.printf("             Breakdown: [%s]%n", chart);
   }
 
   public void printDistribution(int rows, int width) {
     TextHistogram histogram = new TextHistogram(width, rows, new Marker() {
       public char get(int index, float value) {
-        if (value < maxExcelentCost) {
+        if (value < maxExcellentCost) {
           return '.';
         } else if (value < maxAcceptableCost) {
           return '=';
