@@ -23,12 +23,12 @@ import static java.lang.Math.ceil;
 import static java.lang.Math.log;
 import static java.lang.Math.min;
 
-import com.google.test.metric.ClassCost;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+
+import com.google.test.metric.ClassCost;
 
 public class HtmlReport extends SummaryReport {
 
@@ -66,9 +66,9 @@ public class HtmlReport extends SummaryReport {
       histogram.value((int) cost.getOverallCost());
     }
     HistogramChartUrl chart = new HistogramChartUrl();
-    int[] excellent = histogram.getScaledBinRange(0, maxAcceptableCost, 61);
-    int[] good = histogram.getScaledBinRange(maxAcceptableCost, maxExcellentCost, 61);
-    int[] needsWork = histogram.getScaledBinRange(maxExcellentCost, MAX_VALUE, 61);
+    int[] excellent = histogram.getScaledBinRange(0, maxExcellentCost, 61);
+    int[] good = histogram.getScaledBinRange(maxExcellentCost, maxAcceptableCost, 61);
+    int[] needsWork = histogram.getScaledBinRange(maxAcceptableCost, MAX_VALUE, 61);
     chart.setItemLabel(histogram.getBinLabels(20));
     chart.setValues(excellent, good, needsWork);
     chart.setYMark(0, histogram.getMaxBin());
